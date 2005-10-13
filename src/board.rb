@@ -5,11 +5,11 @@ module Board
 
         def initialize(size) 
             @size = size
-            @squares = []
+            @squares = Array.new(size)
             colour = "black";
      
             0.upto(size - 1) do |y|
-                @squares[y] = []
+                @squares[y] = Array.new(size)
                 0.upto(size - 1) do |x|
                     @squares[y][x] = Square.new(Coord.new(x, y), colour)    
                     colour = colour == "black" ? "white" : "black"
