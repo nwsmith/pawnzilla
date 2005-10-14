@@ -6,16 +6,19 @@ module Board
         def initialize(size) 
             @size = size
             @squares = Array.new(size)
-            colour = "black";
      
             0.upto(size - 1) do |y|
                 @squares[y] = Array.new(size)
                 0.upto(size - 1) do |x|
-                    @squares[y][x] = Square.new(Coord.new(x, y), colour)    
-                    colour = colour == "black" ? "white" : "black"
+                    coord = Coord.new(x, y)
+                    @squares[y][x] = Square.new(coord, Board.get_colour(coord))    
                 end
             end 
         end 
+
+        def Board.get_colour(coord) 
+            ((coord.x + coord.y) & 1 == 0) ? "black" : "white"
+        end
     end
 
     class Square 
