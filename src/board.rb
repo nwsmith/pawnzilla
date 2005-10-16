@@ -24,15 +24,19 @@ module Board
             @size = size
             @squares = Array.new(size)
      
-            0.upto(size - 1) do |y|
-                @squares[y] = Array.new(size)
-                0.upto(size - 1) do |x|
+            0.upto(size - 1) do |x|
+                @squares[x] = Array.new(size)
+                0.upto(size - 1) do |y|
                     coord = Coord.new(x, y)
-                    @squares[y][x] = Square.new(coord, Board.get_colour(coord))    
+                    @squares[x][y] = Square.new(coord, Board.get_colour(coord))    
                 end
             end 
         end 
 
+        def sq_at(coord) 
+            @squares[coord.x][coord.y]
+        end
+                  
         def Board.get_colour(coord) 
             ((coord.x + coord.y) & 1 == 0) ? "black" : "white"
         end
