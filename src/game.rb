@@ -48,18 +48,22 @@ module Game
         def to_txt(sep = DEFAULT_SEPARATOR)
             tr = Translator::PieceTranslator.new()
             txt, row = '', @board.size;
-    
-            @board.squares.reverse.each do |y|
-                # Output to rank number
-                txt += "#{row}" + sep 
+
+            # Because we store the board in a standard orientation, in order to make the board
+            # look "right side up" in a textual representation, we have to do the y-axis in
+            # reverse.
+            (@board.size - 1).downto(0) do |y|
+                # Output the rank number (for alg coord)
+                txt += "#{row}" + sep
                 row -= 1
-    
+                
                 # Output the pieces on the rank
-                y.each do |x|
-                    txt += x.piece.nil? ? "-" : tr.to_txt(x.piece)
+                (0).upto(@board.size - 1) do |x|
+                    sq = @board.sq_at(Board::Coord.new(x, y))
+                    txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                     txt += sep
                 end
-    
+                
                 txt += "\n"
             end
     
@@ -82,7 +86,6 @@ gs = Game::State.new(8)
 gs.place_piece(Board::Coord.new(0, 1), ChessPiece::ChessPiece.new("black", 3.5, "Bishop"))
 puts gs.to_txt()
 
-puts
 puts
 
 gs.move_piece(Board::Coord.new(0, 1), Board::Coord::new(1,2))
