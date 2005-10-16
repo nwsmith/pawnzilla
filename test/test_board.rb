@@ -19,12 +19,21 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 require "src/board"
 require "test/unit"
 
-class TestBoard < Test::Unit::TestCase
+class TestBoard < Test::Unit::TestCase    
+    def test_get_colour
+        assert_equal(Board::Board.get_colour(Board::Coord.new(0,0)), "black")
+        assert_equal(Board::Board.get_colour(Board::Coord.new(1,0)), "white")        
+        assert_equal(Board::Board.get_colour(Board::Coord.new(0,1)), "white")
+        assert_equal(Board::Board.get_colour(Board::Coord.new(1,1)), "black")                
+    end
+    
     def test_init
         b = Board::Board.new(2);
-        assert_equal(b.sq_at(Board::Coord.new(0,0)).colour, "black")
-        assert_equal(b.sq_at(Board::Coord.new(0,1)).colour, "white")
-        assert_equal(b.sq_at(Board::Coord.new(1,0)).colour, "white")
-        assert_equal(b.sq_at(Board::Coord.new(1,1)).colour, "black")                        
+
+        assert_equal(b.sq_at(Board::Coord.new(0,0)).colour, Board::Board.get_colour(Board::Coord.new(0,0)))
+        assert_equal(b.sq_at(Board::Coord.new(0,1)).colour, Board::Board.get_colour(Board::Coord.new(0,1)))
+        assert_equal(b.sq_at(Board::Coord.new(1,0)).colour, Board::Board.get_colour(Board::Coord.new(1,0)))
+        assert_equal(b.sq_at(Board::Coord.new(1,1)).colour, Board::Board.get_colour(Board::Coord.new(1,1)))                        
     end
+
 end
