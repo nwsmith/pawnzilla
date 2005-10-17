@@ -23,17 +23,42 @@ module Rule_Std
     
     class Engine      
         attr_accessor :state 
+        :pc_val
           
         def initialize 
+            @pc_val = {
+                "Bishop" => 3.5,
+                "King" => 1_000_000,
+                "Knight" => 3.5,
+                "Pawn" => 1,
+                "Queen" => 9,
+                "Rook" => 5
+            }
+        
             @state = Game::State.new(B_SZ)
             
-            y = 1
-                        
-            0.upto(B_SZ - 1) do |x|
-                state.place_piece(Board::Coord.new(x, y), 
-                    ChessPiece::ChessPiece.new("white", 1, "Pawn"))
-                state.place_piece(Board::Coord.new(x, y + 5),
-                    ChessPiece::ChessPiece.new("black", 1, "Pawn"))
+            clr = "white"
+
+            # Pawn Rows
+            [1, 6].each do |y|
+                0.upto(B_SZ - 1) do |x|
+                    state.place_piece(Board::Coord.new(x, y),
+                        ChessPiece::ChessPiece.new(clr, @pc_val["Pawn"], "Pawn"))
+                end
+                
+                clr = (clr == "white") ? "black" : "white"
+            end
+            
+            # Back Rows                        
+            bck_row = ["Rook", "Knight", "Bishop", "Queen", "King", "Bishop", "Knight", "Rook"]
+            
+            [0, 7].each do |y|
+                bck_row.each_index do |x|
+                    state.place_piece(Board::Coord.new(x, y),
+                        ChessPiece::ChessPiece.new(clr, @pc_val[bck_row[x]], bck_row[x]))
+                end
+                
+                clr = (clr == "white") ? "black" : "white"
             end
         end
         
