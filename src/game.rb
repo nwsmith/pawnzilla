@@ -15,9 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-require "board.rb"
-require "piece.rb"
-require "tr.rb"
+require "board"
+require "piece"
+require "tr"
 
 COLUMN_A = 97
 DEFAULT_SEPARATOR = " "

@@ -15,8 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-require "game.rb"
-require "board.rb"
+require "game"
+require "board"
 
 module Rule_Std
     B_SZ = 8
