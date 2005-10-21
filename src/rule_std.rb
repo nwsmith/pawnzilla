@@ -61,6 +61,10 @@ module Rule_Std
                 clr = (clr == "white") ? "black" : "white"
             end
         end
+        
+        def move(src, dest) 
+            state.move_piece(Rule_Std::Engine.alg_to_coord(src), Rule_Std::Engine.alg_to_coord(dest))
+        end
                 
         # Convert a standard algebric coordinate into an internal coordinate
         def Engine.alg_to_coord(alg) 
@@ -89,5 +93,10 @@ module Rule_Std
     end
     
     e = Rule_Std::Engine.new
+    e.move("e2", "e4")
+    e.move("e7", "e5")
+    e.move("g1", "f3")
+    e.move("b8", "c6")
+    e.move("f1", "b5")
     puts e.state.to_txt
 end
