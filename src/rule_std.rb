@@ -61,6 +61,27 @@ module Rule_Std
                 clr = (clr == "white") ? "black" : "white"
             end
         end
+                
+        # Convert a standard algebric coordinate into an internal coordinate
+        def Engine.alg_to_coord(alg) 
+            if (alg.length != 2) 
+                raise ArgumentError, "algebraic coords must consist of one letter and one number (e.g. a1)"
+            end
+        
+            try_x, try_y = alg[0], alg[1].chr.to_i
+
+            if (try_x < 97 || try_x > (97 + B_SZ)) 
+                raise ArgumentError, 
+                    "illegal algebraic alpha [#{try_x}] valid: [#{try_x.chr} - #{(try_x + B_SZ).chr}"
+            end
+            
+            if (try_y < 1 || try_y > (B_SZ + 1))
+                raise ArgumentError, 
+                    "illegal algebraic num [#{try_y}] valid: [1 - #{B_SZ}]"     
+            end
+            
+            Board::Coord.new((try_x - 97), (try_y - 1))                
+        end
         
         def Engine.coord_to_alg(coord)
             (97 + coord.x).chr + (coord.y + 1).to_s 
