@@ -31,8 +31,8 @@ module Board
                     @squares[x][y] = Square.new(coord, Board.get_colour(coord))    
                 end
             end 
-        end 
-
+        end
+        
         def sq_at(coord) 
             @squares[coord.x][coord.y]
         end
@@ -60,6 +60,11 @@ module Board
         def initialize(x, y) 
             @x = x
             @y = y
+        end
+
+        # Two coordinates are equal iff both their x and y coordinates are equal        
+        def ==(c) 
+            (@x == c.x) && (@y == c.y)
         end
     end
 end
