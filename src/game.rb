@@ -82,11 +82,3 @@ module Game
     end
 end
 
-gs = Game::State.new(8)
-gs.place_piece(Board::Coord.new(0, 1), ChessPiece::ChessPiece.new("black", 3.5, "Bishop"))
-puts gs.to_txt()
-
-puts
-
-gs.move_piece(Board::Coord.new(0, 1), Board::Coord::new(1,2))
-puts gs.to_txt()
