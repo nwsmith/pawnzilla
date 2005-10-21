@@ -21,16 +21,16 @@ require "test/unit"
 
 class TestBoard < Test::Unit::TestCase    
     def test_coord_to_alg
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 0)), "a1")
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 7)), "a8")
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 0)), "h1")
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 7)), "h8")
+        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
     end
     
     def test_alg_to_coord
-        assert_equal(Rule_Std::Engine.alg_to_coord("a1"), Board::Coord.new(0, 0))
-        assert_equal(Rule_Std::Engine.alg_to_coord("a8"), Board::Coord.new(0, 7))
-        assert_equal(Rule_Std::Engine.alg_to_coord("h1"), Board::Coord.new(7, 0))
-        assert_equal(Rule_Std::Engine.alg_to_coord("h8"), Board::Coord.new(7, 7))                        
+        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Board::Coord.new(0, 0))
+        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Board::Coord.new(0, 7))
+        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Board::Coord.new(7, 0))
+        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Board::Coord.new(7, 7))                        
     end
 end
