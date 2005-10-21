@@ -63,40 +63,45 @@ module Rule_Std
         end
         
         def move(src, dest) 
-            state.move_piece(Rule_Std::Engine.alg_to_coord(src), Rule_Std::Engine.alg_to_coord(dest))
+            state.move_piece(src.to_coord, dest.to_coord)
         end
                 
-        # Convert a standard algebric coordinate into an internal coordinate
-        def Engine.alg_to_coord(alg) 
-            if (alg.length != 2) 
-                raise ArgumentError, "algebraic coords must consist of one letter and one number (e.g. a1)"
-            end
-        
-            try_x, try_y = alg[0], alg[1].chr.to_i
-
-            if (try_x < 97 || try_x > (97 + B_SZ)) 
-                raise ArgumentError, 
-                    "illegal algebraic alpha [#{try_x}] valid: [#{try_x.chr} - #{(try_x + B_SZ).chr}"
-            end
-            
-            if (try_y < 1 || try_y > (B_SZ + 1))
-                raise ArgumentError, 
-                    "illegal algebraic num [#{try_y}] valid: [1 - #{B_SZ}]"     
-            end
-            
-            Board::Coord.new((try_x - 97), (try_y - 1))                
-        end
-        
         def Engine.coord_to_alg(coord)
-            (97 + coord.x).chr + (coord.y + 1).to_s 
+            Rule_Std::AlgCoord.new((97 + coord.x).chr, (coord.y + 1))
         end
     end
     
+    class AlgCoord
+        attr_accessor :file
+        attr_accessor :rank
+        
+        def initialize(file, rank) 
+            if (file[0] < 97 || file[0] > (97 + B_SZ)) 
+                raise ArgumentException, "Illegal Alpha"
+            end
+            @file = file
+            
+            if (rank < 1 || rank > (B_SZ + 1))
+                raise ArgumentException, "Illegal Numeric"
+            end            
+            @rank = rank
+        end
+        
+        def ==(c)
+            (@file == c.file && @rank == c.rank)
+        end
+        
+        def to_coord
+            Board::Coord.new(@file[0] - 97, @rank - 1)            
+        end
+    end
+    
+    
     e = Rule_Std::Engine.new
-    e.move("e2", "e4")
-    e.move("e7", "e5")
-    e.move("g1", "f3")
-    e.move("b8", "c6")
-    e.move("f1", "b5")
+    e.move(Rule_Std::AlgCoord.new("e", 1), Rule_Std::AlgCoord.new("e", 4))
+    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 5))
+    e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
+    e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
+    e.move(Rule_Std::AlgCoord.new("f", 1), Rule_Std::AlgCoord.new("b", 5))
     puts e.state.to_txt
 end
