@@ -43,7 +43,7 @@ module Rule_Std
             [1, 6].each do |y|
                 0.upto(B_SZ - 1) do |x|
                     state.place_piece(Board::Coord.new(x, y),
-                        ChessPiece::ChessPiece.new(clr, @pc_val["Pawn"], "Pawn"))
+                        ChessPiece::ChessPiece.new(clr, "Pawn"))
                 end
                 
                 clr = (clr == "white") ? "black" : "white"
@@ -55,7 +55,7 @@ module Rule_Std
             [0, 7].each do |y|
                 bck_row.each_index do |x|
                     state.place_piece(Board::Coord.new(x, y),
-                        ChessPiece::ChessPiece.new(clr, @pc_val[bck_row[x]], bck_row[x]))
+                        ChessPiece::ChessPiece.new(clr, bck_row[x]))
                 end
                 
                 clr = (clr == "white") ? "black" : "white"
