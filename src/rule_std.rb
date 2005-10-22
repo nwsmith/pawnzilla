@@ -45,7 +45,7 @@ module Rule_Std
 
             # Pawn Rows
             [1, 6].each do |y|
-                0.upto(B_SZ - 1) do |x|
+                (0...B_SZ).each do |x|
                     state.place_piece(Board::Coord.new(x, y),
                         ChessPiece::ChessPiece.new(clr, "Pawn"))
                 end
