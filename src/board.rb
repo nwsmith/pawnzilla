@@ -24,9 +24,9 @@ module Board
             @size = size
             @squares = Array.new(size)
      
-            0.upto(size - 1) do |x|
+            (0...size).each do |x|
                 @squares[x] = Array.new(size)
-                0.upto(size - 1) do |y|
+                (0...size).each do |y|
                     coord = Coord.new(x, y)
                     @squares[x][y] = Square.new(coord, Board.get_colour(coord))    
                 end

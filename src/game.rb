@@ -51,14 +51,14 @@ module Game
 
             # Because we store the board in a standard orientation, in order to make the board
             # look "right side up" in a textual representation, we have to do the y-axis in
-            # reverse.
+            # reverse.            
             (@board.size - 1).downto(0) do |y|
                 # Output the rank number (for alg coord)
                 txt += "#{row}" + sep
                 row -= 1
                 
                 # Output the pieces on the rank
-                (0).upto(@board.size - 1) do |x|
+                (0...@board.size).each do |x|
                     sq = @board.sq_at(Board::Coord.new(x, y))
                     txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                     txt += sep
@@ -73,7 +73,7 @@ module Game
             end
     
             # Output the file letters
-            COLUMN_A.upto(COLUMN_A + (@board.size - 1)) do |col|
+            (COLUMN_A...(COLUMN_A + @board.size)).each do |col|
                 txt += col.chr + sep
             end 
     
