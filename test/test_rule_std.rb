@@ -33,4 +33,39 @@ class TestRule_Std < Test::Unit::TestCase
         assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Board::Coord.new(7, 0))
         assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Board::Coord.new(7, 7))                        
     end
+    
+    def test_chk_mv_pawn
+        e = Rule_Std::Engine.new
+        
+        # cannot move a "pawn" from an empty square
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 3).to_coord, 
+                                Rule_Std::AlgCoord.new('e', 4).to_coord), false)
+        
+        # can move one square forward
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
+                                Rule_Std::AlgCoord.new('e', 3).to_coord), true)
+                                
+        # cannot move one square forward if blocked
+        e.state.place_piece(Rule_Std::AlgCoord.new('e', 3).to_coord, 
+                            ChessPiece::ChessPiece.new("white", "Bishop"))
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
+                                Rule_Std::AlgCoord.new('e', 3).to_coord), false)
+                                
+        # cannot move diagonally if not a capture
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
+                                Rule_Std::AlgCoord.new('d', 3).to_coord), false)
+                                
+        # can move diagonally if a capture
+        e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
+                            ChessPiece::ChessPiece.new("black", "Bishop"))
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
+                                Rule_Std::AlgCoord.new('d', 3).to_coord), true)
+                                
+        # cannot capture the same colored piece
+        e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
+                            ChessPiece::ChessPiece.new("white", "Bishop"))
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
+                                Rule_Std::AlgCoord.new('d', 3).to_coord), false)
+                                
+    end
 end
