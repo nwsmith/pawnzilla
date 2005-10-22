@@ -66,37 +66,38 @@ module Rule_Std
             end
         end
         
-        def move(src, dest) 
-            state.move_piece(src.to_coord, dest.to_coord)
+        def move(src, dest)
+            if chk_mv(src.to_coord, dest.to_coord)  
+                @state.move_piece(src.to_coord, dest.to_coord)
+            end
         end
                 
         def Engine.coord_to_alg(coord)
             Rule_Std::AlgCoord.new((97 + coord.x).chr, (coord.y + 1))
         end
-    end
-    
-    class EngineRule
-        attr_accessor :state
         
-        def initialize(state) 
-            @state = state    
-        end
-        
-        def is_valid(src, dest) 
+        def chk_mv(src, dest) 
             pc = @state.board.sq_at(src).piece
+            v = true
             
-            if piece.nil?
+            if pc.nil?
                 return false
             end
             
-            
+            case pc.name 
+                when "Pawn"
+                    v = chk_mv_pawn(src, dest, @state)
                 
+            end
+            
+            v
         end
-    end
-    
-    class PawnRule
-        def is_valid(src, dest)
-            # no matter what, the pawn has to move forward
+        
+        def chk_mv_pawn(src, dest, state)
+            pc_src = state.board.sq_at(src).piece
+            pc_dest = state.board.sq_at(dest).piece        
+        
+           # no matter what, the pawn has to move forward
             if (dest.y <= src.y) 
                 return false
             end
@@ -110,11 +111,26 @@ module Rule_Std
             # pawns can move one square forward
             if (dest.y > (src.y + 1)) 
                 return false
+            end        
+            
+            # if diagonal, it must be a capture
+            if dest.y == (src.y + 1) && [dest.y + 1, dest.y - 1].include?(src.y)
+                if !pc_dest.nil?
+                    # Can only capture opposite colored piece
+                    v = (pc_dest.color != pc_src.color)
+                else 
+                    v = false
+                end
             end
-        end
+            
+            # if straight, cannot be blocked
+            if dest.y == (src.y + 1) && dest.x == src.x
+                v = state.board.sq_at(dest).piece.nil?
+            end
+            
+            v
+        end        
     end
-    
-    
     
     class AlgCoord
         attr_accessor :file
@@ -140,7 +156,6 @@ module Rule_Std
             Board::Coord.new(@file[0] - 97, @rank - 1)            
         end
     end
-    
     
     e = Rule_Std::Engine.new
     e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 4))
