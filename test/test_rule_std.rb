@@ -19,7 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 require "src/rule_std"
 require "test/unit"
 
-class TestBoard < Test::Unit::TestCase    
+class TestRule_Std < Test::Unit::TestCase    
     def test_coord_to_alg
         assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
         assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
