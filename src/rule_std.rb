@@ -20,6 +20,10 @@ require "board"
 
 module Rule_Std
     B_SZ = 8
+    MIN_FILE = 'a'
+    MAX_FILE = 'h'
+    MIN_RANK = 1
+    MAX_RANK = 8
     
     class Engine      
         attr_accessor :state 
@@ -75,13 +79,13 @@ module Rule_Std
         attr_accessor :file
         attr_accessor :rank
         
-        def initialize(file, rank) 
-            if (file[0] < 97 || file[0] > (97 + B_SZ)) 
+        def initialize(file, rank)
+            unless (MIN_FILE..MAX_FILE) === file
                 raise ArgumentException, "Illegal Alpha"
             end
             @file = file
-            
-            if (rank < 1 || rank > (B_SZ + 1))
+ 
+            unless (MIN_RANK..MAX_RANK) === rank           
                 raise ArgumentException, "Illegal Numeric"
             end            
             @rank = rank
