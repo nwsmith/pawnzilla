@@ -75,6 +75,47 @@ module Rule_Std
         end
     end
     
+    class EngineRule
+        attr_accessor :state
+        
+        def initialize(state) 
+            @state = state    
+        end
+        
+        def is_valid(src, dest) 
+            pc = @state.board.sq_at(src).piece
+            
+            if piece.nil?
+                return false
+            end
+            
+            
+                
+        end
+    end
+    
+    class PawnRule
+        def is_valid(src, dest)
+            # no matter what, the pawn has to move forward
+            if (dest.y <= src.y) 
+                return false
+            end
+            
+            # no matter what, the pawn can only stay on the same rank or ONE either way            
+            unless ((src.x - 1)..(src.x + 1)) === dest.x
+                return false
+            end
+            
+            # TODO: the first move problem
+            # pawns can move one square forward
+            if (dest.y > (src.y + 1)) 
+                return false
+            end
+        end
+    end
+    
+    
+    
     class AlgCoord
         attr_accessor :file
         attr_accessor :rank
@@ -102,7 +143,7 @@ module Rule_Std
     
     
     e = Rule_Std::Engine.new
-    e.move(Rule_Std::AlgCoord.new("e", 1), Rule_Std::AlgCoord.new("e", 4))
+    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 4))
     e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 5))
     e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
     e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
