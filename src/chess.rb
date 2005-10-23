@@ -50,13 +50,17 @@ module Chess
         
         # Returns true if the specified colour is the opposite of the internal colour
         def opposite?(cmp) 
-            @colour != cmp.colour
+            self != cmp
         end
         
         # Change the colour of this object - black becomes white;white becomes black
         def flip!
             @colour = (@colour == WHITE) ? BLACK : WHITE
         end        
+        
+        def ==(cmp)
+            @colour == cmp.colour
+        end
     end
     
     class Piece
