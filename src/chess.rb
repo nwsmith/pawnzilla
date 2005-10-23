@@ -58,6 +58,11 @@ module Chess
             @colour = (@colour == WHITE) ? BLACK : WHITE
         end        
         
+        # Return a colour object with the opposite colour of this one
+        def flip
+            (@colour == WHITE) ? Chess::Colour.new_black : Chess::Colour.new_white
+        end
+        
         def ==(cmp)
             @colour == cmp.colour
         end
