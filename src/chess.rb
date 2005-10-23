@@ -58,4 +58,66 @@ module Chess
             @colour = (@colour == WHITE) ? BLACK : WHITE
         end        
     end
+    
+    class Piece
+        attr_reader :color
+        attr_reader :name
+
+        def initialize(color, name)
+            @color = color
+            @name = name
+        end
+    end    
+    
+    class Board
+        attr_reader :size
+        attr_reader :squares
+
+        def initialize(size) 
+            @size = size
+            @squares = Array.new(size)
+     
+            (0...size).each do |x|
+                @squares[x] = Array.new(size)
+                (0...size).each do |y|
+                    coord = Coord.new(x, y)
+                    @squares[x][y] = Square.new(coord, Board.get_colour(coord))    
+                end
+            end 
+        end
+        
+        def sq_at(coord) 
+            @squares[coord.x][coord.y]
+        end
+                  
+        def Board.get_colour(coord) 
+            ((coord.x + coord.y) & 1 == 0) ? Chess::Colour.new_black : Chess::Colour.new_white
+        end
+    end
+
+    class Square 
+        attr_reader :coord
+        attr_reader :colour
+        attr_accessor :piece
+
+        def initialize(coord, colour) 
+            @coord = coord
+            @colour = colour
+        end
+    end
+
+    class Coord
+        attr_reader :x
+        attr_reader :y
+
+        def initialize(x, y) 
+            @x = x
+            @y = y
+        end
+
+        # Two coordinates are equal iff both their x and y coordinates are equal        
+        def ==(c) 
+            (@x == c.x) && (@y == c.y)
+        end
+    end    
 end
