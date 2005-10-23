@@ -39,7 +39,7 @@ module Translator
         private
 
         def parseFen(col, w, b) 
-            col == "white" ? w : b;    
+            col.white? ? w : b;    
         end
     end
 end
