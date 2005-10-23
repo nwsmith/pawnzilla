@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 require "game"
-require "board"
+require "chess"
 
 module Rule_Std
     B_SZ = 8
@@ -41,16 +41,16 @@ module Rule_Std
         
             @state = Game::State.new(B_SZ)
             
-            clr = "white"
+            clr = Chess::Colour.new_white
 
             # Pawn Rows
             [1, 6].each do |y|
                 (0...B_SZ).each do |x|
-                    state.place_piece(Board::Coord.new(x, y),
-                        ChessPiece::ChessPiece.new(clr, "Pawn"))
+                    state.place_piece(Chess::Coord.new(x, y),
+                        Chess::Piece.new(clr, "Pawn"))
                 end
                 
-                clr = (clr == "white") ? "black" : "white"
+                clr = clr.flip
             end
             
             # Back Rows                        
@@ -58,11 +58,11 @@ module Rule_Std
             
             [0, 7].each do |y|
                 bck_row.each_index do |x|
-                    state.place_piece(Board::Coord.new(x, y),
-                        ChessPiece::ChessPiece.new(clr, bck_row[x]))
+                    state.place_piece(Chess::Coord.new(x, y),
+                        Chess::Piece.new(clr, bck_row[x]))
                 end
                 
-                clr = (clr == "white") ? "black" : "white"
+                clr = clr.flip
             end
         end
         
@@ -101,7 +101,7 @@ module Rule_Std
             if (dest.y <= src.y) 
                 return false
             end
-            
+
             # no matter what, the pawn can only stay on the same rank or ONE either way            
             unless ((src.x - 1)..(src.x + 1)) === dest.x
                 return false
@@ -117,7 +117,7 @@ module Rule_Std
             if dest.y == (src.y + 1) && [dest.y + 1, dest.y - 1].include?(src.y)
                 if !pc_dest.nil?
                     # Can only capture opposite colored piece
-                    v = (pc_dest.color != pc_src.color)
+                    v = pc_dest.color.opposite?(pc_src.color)
                 else 
                     v = false
                 end
@@ -153,13 +153,15 @@ module Rule_Std
         end
         
         def to_coord
-            Board::Coord.new(@file[0] - 97, @rank - 1)            
+            Chess::Coord.new(@file[0] - 97, @rank - 1)            
         end
     end
     
     e = Rule_Std::Engine.new
-    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 4))
-    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 5))
+    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 3))
+    e.move(Rule_Std::AlgCoord.new("e", 3), Rule_Std::AlgCoord.new("e", 4))    
+    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 6))
+    e.move(Rule_Std::AlgCoord.new("e", 6), Rule_Std::AlgCoord.new("e", 5))    
     e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
     e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
     e.move(Rule_Std::AlgCoord.new("f", 1), Rule_Std::AlgCoord.new("b", 5))

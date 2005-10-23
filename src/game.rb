@@ -15,8 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-require "board"
-require "piece"
+require "chess"
 require "tr"
 
 COLUMN_A = 97
@@ -26,7 +25,7 @@ module Game
         attr_accessor :board
     
         def initialize(b_sz) 
-            @board = Board::Board.new(b_sz)
+            @board = Chess::Board.new(b_sz)
         end
      
         def place_piece(coord, piece) 
@@ -59,7 +58,7 @@ module Game
                 
                 # Output the pieces on the rank
                 (0...@board.size).each do |x|
-                    sq = @board.sq_at(Board::Coord.new(x, y))
+                    sq = @board.sq_at(Chess::Coord.new(x, y))
                     txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                     txt += sep
                 end

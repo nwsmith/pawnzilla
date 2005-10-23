@@ -21,17 +21,17 @@ require "test/unit"
 
 class TestRule_Std < Test::Unit::TestCase    
     def test_coord_to_alg
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Board::Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
     end
     
     def test_alg_to_coord
-        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Board::Coord.new(0, 0))
-        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Board::Coord.new(0, 7))
-        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Board::Coord.new(7, 0))
-        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Board::Coord.new(7, 7))                        
+        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Chess::Coord.new(0, 0))
+        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Chess::Coord.new(0, 7))
+        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Chess::Coord.new(7, 0))
+        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Chess::Coord.new(7, 7))                        
     end
     
     def test_chk_mv_pawn
@@ -47,7 +47,7 @@ class TestRule_Std < Test::Unit::TestCase
                                 
         # cannot move one square forward if blocked
         e.state.place_piece(Rule_Std::AlgCoord.new('e', 3).to_coord, 
-                            ChessPiece::ChessPiece.new("white", "Bishop"))
+                            Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('e', 3).to_coord), false)
                                 
@@ -57,13 +57,13 @@ class TestRule_Std < Test::Unit::TestCase
                                 
         # can move diagonally if a capture
         e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
-                            ChessPiece::ChessPiece.new("black", "Bishop"))
+                            Chess::Piece.new(Chess::Colour.new_black, "Bishop"))
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('d', 3).to_coord), true)
                                 
         # cannot capture the same colored piece
         e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
-                            ChessPiece::ChessPiece.new("white", "Bishop"))
+                            Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('d', 3).to_coord), false)
                                 
