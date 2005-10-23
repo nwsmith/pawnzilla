@@ -48,4 +48,27 @@ class TestColour < Test::Unit::TestCase
         assert(w.white?)
         assert(!w.black?)
     end
+    
+    def test_equalsequals
+        assert(Chess::Colour.new_white == Chess::Colour.new_white)
+    end
+end
+
+class TestBoard < Test::Unit::TestCase    
+    def test_get_colour
+        assert_equal(Chess::Board.get_colour(Chess::Coord.new(0,0)), Chess::Colour.new_black)
+        assert_equal(Chess::Board.get_colour(Chess::Coord.new(1,0)), Chess::Colour.new_white)        
+        assert_equal(Chess::Board.get_colour(Chess::Coord.new(0,1)), Chess::Colour.new_white)
+        assert_equal(Chess::Board.get_colour(Chess::Coord.new(1,1)), Chess::Colour.new_black)                
+    end
+    
+    def test_init
+        b = Chess::Board.new(2);
+
+        assert_equal(b.sq_at(Chess::Coord.new(0,0)).colour, Chess::Board.get_colour(Chess::Coord.new(0,0)))
+        assert_equal(b.sq_at(Chess::Coord.new(0,1)).colour, Chess::Board.get_colour(Chess::Coord.new(0,1)))
+        assert_equal(b.sq_at(Chess::Coord.new(1,0)).colour, Chess::Board.get_colour(Chess::Coord.new(1,0)))
+        assert_equal(b.sq_at(Chess::Coord.new(1,1)).colour, Chess::Board.get_colour(Chess::Coord.new(1,1)))                        
+    end
+
 end
