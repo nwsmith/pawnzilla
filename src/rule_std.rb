@@ -97,38 +97,33 @@ module Rule_Std
             pc_src = state.board.sq_at(src).piece
             pc_dest = state.board.sq_at(dest).piece        
         
-           # no matter what, the pawn has to move forward
-            if (dest.y <= src.y) 
-                return false
-            end
+            # no matter what, the pawn has to move forward
+            dst = dest.y - src.y
+            
+            # in the coordinate system, a forward move is a reduction in y for black
+            dst = -dst if pc_src.color.black?
+           
+            return false unless dst > 0           
 
             # no matter what, the pawn can only stay on the same rank or ONE either way            
-            unless ((src.x - 1)..(src.x + 1)) === dest.x
+            return false unless ((src.x - 1)..(src.x + 1)) === dest.x
+            
+            # pawns can move one square forward except for first move
+            # I'm not a fan of this, but it works for now:
+            at_strt = (pc_src.color.white? ? src.y == 1 : src.y == 6)
+            if at_strt && ![1,2].include?(dst) || !at_strt && dst != 1
                 return false
             end
-            
-            # TODO: the first move problem
-            # pawns can move one square forward
-            if (dest.y > (src.y + 1)) 
-                return false
-            end        
-            
-            # if diagonal, it must be a capture
-            if dest.y == (src.y + 1) && [dest.y + 1, dest.y - 1].include?(src.y)
-                if !pc_dest.nil?
-                    # Can only capture opposite colored piece
-                    v = pc_dest.color.opposite?(pc_src.color)
-                else 
-                    v = false
-                end
+           
+            if dst == 1 && [src.x + 1, src.x - 1].include?(dest.x)
+                # it's a diagonal move, ensure it's a capture
+                return false unless !pc_dest.nil? && pc_dest.color.opposite?(pc_src.color)
+            else 
+                # it's a straight move, ensure it's not blocked                                
+                return false unless pc_dest.nil?
             end
             
-            # if straight, cannot be blocked
-            if dest.y == (src.y + 1) && dest.x == src.x
-                v = state.board.sq_at(dest).piece.nil?
-            end
-            
-            v
+            true
         end        
     end
     
@@ -158,10 +153,8 @@ module Rule_Std
     end
     
     e = Rule_Std::Engine.new
-    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 3))
-    e.move(Rule_Std::AlgCoord.new("e", 3), Rule_Std::AlgCoord.new("e", 4))    
-    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 6))
-    e.move(Rule_Std::AlgCoord.new("e", 6), Rule_Std::AlgCoord.new("e", 5))    
+    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 4))
+    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 5))    
     e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
     e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
     e.move(Rule_Std::AlgCoord.new("f", 1), Rule_Std::AlgCoord.new("b", 5))
