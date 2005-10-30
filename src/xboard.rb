@@ -1,7 +1,7 @@
 #
 #   $Id$
 #
-#   Copyright 2005 Nathan Smith, Sheldon Fuchs
+#   Copyright 2005 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,31 +15,55 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-# POC code
-# This should work with both xboard and winboard.
-
-# exucte with a command like the following:
-#
-# "C:\Program Files\WinBoard\winboard.exe" /fcp "c:\ruby\bin\ruby.exe c:\cygwin\home\ron\pawnzilla\src\xboard.rb
+# This class should work with both xboard and winboard. Call xboard/winboard
+# with a command similiar to the one given blow:
+# "C:\Program Files\WinBoard\winboard.exe" \
+#     /fcp "c:\ruby\bin\ruby.exe c:\cygwin\home\ron\pawnzilla\src\xboard.rb
 module XBoard
-	f = open("game_rb.log", "w+");
-	while xboardInput = STDIN.gets
-		xboardInput.chop!
-		f.puts ">" + xboardInput
+    class XBoard
+    @log_file
 
-		if (xboardInput == "xboard")
-			f.puts("<");
-			STDOUT.puts
-		elsif (xboardInput == "protover 2")
-			f.puts("<feature myname=\"Pawnzilla\"");
-			STDOUT.puts("feature myname=\"Pawnzilla\"");
-			f.puts("<feature done=1");
-			STDOUT.puts("feature done=1");
-		elsif (xboardInput[/.\d.\d/])
-			f.puts("<move d7d5");
-			STDOUT.puts("move d7d5");
-		end
-		STDOUT.flush
-	end
-	f.close
+        def initialize()
+            @log_file = File.open("pawnzilla_xb.log", "w+")
+        @log_file.puts "Game Started"
+        end
+
+        def process_cmd(command) 
+            @log_file.puts "RECEIVED: " + command
+
+            send_msg = false;
+            if (command == "xboard")
+                send_msg = true;
+                msg = ""
+            elsif (command[0..7] == "protover")
+                send_msg = true;
+                msg = get_features(command[9..9]);
+            elsif (command[/.\d.\d/])
+                send_msg = true;
+                msg = "move d7d5"
+            else
+                # do nothing
+            end
+
+            if send_msg
+                @log_file.puts "SENT:     " + msg
+                STDOUT.puts msg
+                STDOUT.flush
+            end
+        end
+
+        def get_features(ver_num)
+            if (ver_num == "2")
+                return "feature myname=\"Pawnzilla\" done=1"
+            else
+                return "feature done=1"
+            end
+        end
+    end
+
+    xboard_conn = XBoard.new();
+    while input = STDIN.gets
+        input.chop!
+        xboard_conn.process_cmd(input)
+    end
 end
