@@ -29,6 +29,21 @@ class Coord
      (@x == c.x) && (@y == c.y)
     end
     
+    # Checks if the specified coordinate is on the same diagonal as this object
+    def on_diag?(c) 
+        Coord.same_diag?(self, c)
+    end
+    
+    # Checks if the specified coordinate is on the same rank as this object
+    def on_rank(c)
+        Coord.same_rank?(self, c)
+    end
+    
+    # Checks if the specified coordinate is on the same file as this object
+    def on_file(c) 
+        Coord.same_rank?(self, c)
+    end    
+    
     # Checks if the the two specified coordinates are on the same diagonal
     def Coord.same_diag?(c0, c1)
         (c1.x - c0.x).abs == (c1.y - c0.y).abs
