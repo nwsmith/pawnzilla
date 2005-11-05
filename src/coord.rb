@@ -28,4 +28,19 @@ class Coord
     def ==(c) 
      (@x == c.x) && (@y == c.y)
     end
+    
+    # Checks if the the two specified coordinates are on the same diagonal
+    def Coord.same_diag?(c0, c1)
+        (c1.x - c0.x).abs == (c1.y - c0.y).abs
+    end
+    
+    # Checks if the two specified coordinates are on the same file
+    def Coord.same_file?(c0, c1) 
+        c0.x == c1.x
+    end
+    
+    # Checks if the two specified coordinates are on the same rank
+    def Coord.same_rank?(c0, c1) 
+        c0.y == c1.y
+    end
 end
