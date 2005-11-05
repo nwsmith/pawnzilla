@@ -15,8 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-require "game"
 require "chess"
+require "coord"
+require "game"
 
 module Rule_Std
     B_SZ = 8
@@ -46,7 +47,7 @@ module Rule_Std
             # Pawn Rows
             [1, 6].each do |y|
                 (0...B_SZ).each do |x|
-                    state.place_piece(Chess::Coord.new(x, y),
+                    state.place_piece(Coord.new(x, y),
                         Chess::Piece.new(clr, "Pawn"))
                 end
                 
@@ -58,7 +59,7 @@ module Rule_Std
             
             [0, 7].each do |y|
                 bck_row.each_index do |x|
-                    state.place_piece(Chess::Coord.new(x, y),
+                    state.place_piece(Coord.new(x, y),
                         Chess::Piece.new(clr, bck_row[x]))
                 end
                 
@@ -148,7 +149,7 @@ module Rule_Std
         end
         
         def to_coord
-            Chess::Coord.new(@file[0] - 97, @rank - 1)            
+            Coord.new(@file[0] - 97, @rank - 1)            
         end
     end
     

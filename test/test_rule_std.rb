@@ -21,17 +21,17 @@ require "test/unit"
 
 class TestRule_Std < Test::Unit::TestCase    
     def test_coord_to_alg
-        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Chess::Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
+        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
     end
     
     def test_alg_to_coord
-        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Chess::Coord.new(0, 0))
-        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Chess::Coord.new(0, 7))
-        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Chess::Coord.new(7, 0))
-        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Chess::Coord.new(7, 7))                        
+        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Coord.new(0, 0))
+        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Coord.new(0, 7))
+        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Coord.new(7, 0))
+        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Coord.new(7, 7))                        
     end
     
     def test_chk_mv_pawn

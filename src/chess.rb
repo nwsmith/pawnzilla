@@ -15,6 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+require "coord"
+
 module Chess
     class Colour
         WHITE = "white"
@@ -114,19 +116,5 @@ module Chess
             @colour = colour
         end
     end
-
-    class Coord
-        attr_reader :x
-        attr_reader :y
-
-        def initialize(x, y) 
-            @x = x
-            @y = y
-        end
-
-        # Two coordinates are equal iff both their x and y coordinates are equal        
-        def ==(c) 
-            (@x == c.x) && (@y == c.y)
-        end
-    end    
+            
 end

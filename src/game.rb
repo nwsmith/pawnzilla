@@ -16,6 +16,7 @@
 #   limitations under the License.
 #
 require "chess"
+require "coord"
 require "tr"
 
 COLUMN_A = 97
@@ -58,7 +59,7 @@ module Game
                 
                 # Output the pieces on the rank
                 (0...@board.size).each do |x|
-                    sq = @board.sq_at(Chess::Coord.new(x, y))
+                    sq = @board.sq_at(Coord.new(x, y))
                     txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                     txt += sep
                 end
