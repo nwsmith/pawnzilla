@@ -38,4 +38,24 @@ class TestCoord < Test::Unit::TestCase
         assert(Coord.same_diag?(Coord.new(1, 1), Coord.new(0, 0)))
         assert(Coord.same_diag?(Coord.new(7, 7), Coord.new(1, 1)))
     end
+    
+    def test_same_file?
+        # N to S
+        assert(Coord.same_file?(Coord.new(0, 0), Coord.new(0, 4)))
+        assert(!Coord.same_file?(Coord.new(0, 0), Coord.new(4, 4)))
+        assert(!Coord.same_file?(Coord.new(0, 0), Coord.new(4, 0)))
+        
+        # S to N
+        assert(Coord.same_file?(Coord.new(0, 4), Coord.new(0, 0)))
+    end
+    
+    def test_same_rank?
+        # W to E
+        assert(Coord.same_rank?(Coord.new(0, 0), Coord.new(4, 0)))
+        assert(!Coord.same_rank?(Coord.new(0, 0), Coord.new(4, 4)))
+        assert(!Coord.same_rank?(Coord.new(0, 0), Coord.new(0, 4)))
+        
+        # E to W
+        assert(Coord.same_rank?(Coord.new(4, 0), Coord.new(0, 0)))        
+    end
 end
