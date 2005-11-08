@@ -63,12 +63,31 @@ class TestBoard < Test::Unit::TestCase
     end
     
     def test_init
-        b = Chess::Board.new(2);
+        b = Chess::Board.new(2)
 
         assert_equal(b.sq_at(Coord.new(0,0)).colour, Chess::Board.get_colour(Coord.new(0,0)))
         assert_equal(b.sq_at(Coord.new(0,1)).colour, Chess::Board.get_colour(Coord.new(0,1)))
         assert_equal(b.sq_at(Coord.new(1,0)).colour, Chess::Board.get_colour(Coord.new(1,0)))
         assert_equal(b.sq_at(Coord.new(1,1)).colour, Chess::Board.get_colour(Coord.new(1,1)))                        
     end
-
+    
+    def test_blocked
+        b = Chess::Board.new(8)
+        
+        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
+        
+        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
+        
+        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
+    end    
 end
