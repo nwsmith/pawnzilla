@@ -42,6 +42,10 @@ module Game
             place_piece(to_coord, piece)
             remove_piece(from_coord)
         end
+        
+        def blocked?(src, dest) 
+            @board.blocked?(src, dest)
+        end
     
         # Output a text representation of the current board state using the specified separator
         # If no separator is defined, the default separator is used.
