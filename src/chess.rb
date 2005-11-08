@@ -104,6 +104,33 @@ module Chess
         def Board.get_colour(coord) 
             ((coord.x + coord.y) & 1 == 0) ? Chess::Colour.new_black : Chess::Colour.new_white
         end
+        
+        def blocked?(src, dest) 
+            # First, normalize the coords (i.e. make sure they go W-E)
+            src, dest = dest, src if (src.x > dest.x) 
+            
+            # Now check where we're going
+            if src.on_diag?(dest) 
+                y_inc = src.y < dest.y ? 1 : -1
+                y = 0 + y_inc
+                ((src.x + 1)...dest.x).each do |x|
+                    return true unless @squares[x][y].piece.nil?
+                    y += y_inc
+                end
+            elsif src.on_file?(dest)
+                ((src.y + 1)...dest.y).each do |y|
+                    return true unless @squares[0][y].piece.nil?
+                end
+            elsif src.on_rank?(dest)
+                ((src.x + 1)...dest.x).each do |x|
+                    return true unless @squares[x][0].piece.nil?
+                end
+            else
+                raise "#{src.inspect} and #{dest.inspect} are not on same vector: cannot check for block."
+            end
+            
+            false;
+        end        
     end
 
     class Square 
