@@ -58,4 +58,25 @@ class TestCoord < Test::Unit::TestCase
         # E to W
         assert(Coord.same_rank?(Coord.new(4, 0), Coord.new(0, 0)))        
     end
+    
+    def test_on_rank?
+        # W to E
+        assert(Coord.new(0, 0).on_rank?(Coord.new(4, 0)))
+        assert(!Coord.new(0, 0).on_rank?(Coord.new(4, 4)))
+        assert(!Coord.new(0, 0).on_rank?(Coord.new(0, 4)))
+        
+        # E to W
+        assert(Coord.new(4, 0).on_rank?(Coord.new(0, 0)))            
+    end
+    
+    def test_on_file?
+        # W to E
+        assert(Coord.new(0, 0).on_file?(Coord.new(0, 4)))
+        assert(!Coord.new(0, 0).on_file?(Coord.new(4, 4)))
+        assert(!Coord.new(0, 0).on_file?(Coord.new(4, 0)))
+        
+        # E to W
+        assert(Coord.new(0, 4).on_file?(Coord.new(0, 0)))            
+    end
+    
 end
