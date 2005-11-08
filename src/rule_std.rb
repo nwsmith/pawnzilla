@@ -121,7 +121,7 @@ module Rule_Std
                 return false unless !pc_dest.nil? && pc_dest.color.opposite?(pc_src.color)
             else 
                 # it's a straight move, ensure it's not blocked                                
-                return false unless pc_dest.nil?
+                return false if !pc_dest.nil? || state.blocked?(src, dest)
             end
             
             true
