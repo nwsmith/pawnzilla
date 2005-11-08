@@ -119,11 +119,11 @@ module Chess
                 end
             elsif src.on_file?(dest)
                 ((src.y + 1)...dest.y).each do |y|
-                    return true unless @squares[0][y].piece.nil?
+                    return true unless @squares[src.x][y].piece.nil?
                 end
             elsif src.on_rank?(dest)
                 ((src.x + 1)...dest.x).each do |x|
-                    return true unless @squares[x][0].piece.nil?
+                    return true unless @squares[x][src.y].piece.nil?
                 end
             else
                 raise "#{src.inspect} and #{dest.inspect} are not on same vector: cannot check for block."
