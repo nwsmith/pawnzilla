@@ -51,6 +51,9 @@ class TestRule_Std < Test::Unit::TestCase
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('e', 3).to_coord), false)
                                 
+        # cannot move two squares forward if blocked
+        assert(!e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, Rule_Std::AlgCoord.new('e', 4).to_coord))
+                                
         # cannot move diagonally if not a capture
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('d', 3).to_coord), false)
