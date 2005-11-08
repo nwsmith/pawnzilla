@@ -35,13 +35,13 @@ class Coord
     end
     
     # Checks if the specified coordinate is on the same rank as this object
-    def on_rank(c)
+    def on_rank?(c)
         Coord.same_rank?(self, c)
     end
     
     # Checks if the specified coordinate is on the same file as this object
-    def on_file(c) 
-        Coord.same_rank?(self, c)
+    def on_file?(c) 
+        Coord.same_file?(self, c)
     end    
     
     # Checks if the the two specified coordinates are on the same diagonal
