@@ -88,6 +88,8 @@ module Rule_Std
             case pc.name 
                 when "Pawn"
                     v = chk_mv_pawn(src, dest, @state)
+                when "Bishop"
+                    v = chk_mv_bishop(src, dest, @state)
                 
             end
             
@@ -126,6 +128,19 @@ module Rule_Std
             
             true
         end        
+        
+        def chk_mv_bishop(src, dest, state) 
+            # Bishops can only move diagonally and cannot jump pieces
+            return false unless src.on_diag?(dest) && !state.blocked?(src, dest)    
+            
+            # If a piece is on the dest square, make sure it's a capture.
+            pc_dest = state.board.sq_at(dest).piece
+            pc_src = state.board.sq_at(src).piece
+            
+            return false if !pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)
+            
+            true
+        end
     end
     
     class AlgCoord
