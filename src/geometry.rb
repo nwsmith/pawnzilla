@@ -59,3 +59,48 @@ class Coord
         c0.y == c1.y
     end
 end
+
+class Line
+    attr_accessor :c0, :c1
+    
+    def initialize(c0, c1) 
+        raise "Coordinates not on same line" unless Line.same_line?(c0, c1)
+            
+        @c0, @c1 = c0, c1
+    end
+    
+    def each_coord
+        c0, c1 = @c0, @c1
+        
+        # First, normalize the coords (i.e. make sure they go W-E)
+        c0, c1 = c0, c1 if (c0.x > c1.x) 
+            
+        # Now check where we're going
+        if c0.on_diag?(c1) 
+            y_inc = c0.y < c1.y ? 1 : -1
+            y = c0.y + y_inc
+            ((c0.x + 1)..c1.x).each do |x|
+                yield Coord.new(x, y)                    
+                y += y_inc
+            end
+        elsif c0.on_file?(c1)
+            ((c0.y + 1)..c1.y).each do |y|
+                yield Coord.new(c0.x, y)
+            end
+        elsif c0.on_rank?(c1)
+            ((c0.x + 1)..c1.x).each do |x|
+                yield Coord.new(x, c0.y)
+            end
+        end
+    end
+    
+    def len
+        len = 0
+        self.each_coord {|x| len += 1}
+        len         
+    end
+    
+    def Line.same_line?(c0, c1) 
+        Coord.same_diag?(c0, c1) || Coord.same_rank?(c0, c1) || Coord.same_file?(c0, c1)
+    end
+end
