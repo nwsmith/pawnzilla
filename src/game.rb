@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 require "chess"
-require "coord"
+require "geometry"
 require "tr"
 
 COLUMN_A = 97

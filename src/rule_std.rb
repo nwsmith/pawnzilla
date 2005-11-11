@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 require "chess"
-require "coord"
+require "geometry"
 require "game"
 
 module Rule_Std
