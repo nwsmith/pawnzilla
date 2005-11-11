@@ -106,31 +106,17 @@ module Chess
         end
         
         def blocked?(src, dest) 
-            # First, normalize the coords (i.e. make sure they go W-E)
-            src, dest = dest, src if (src.x > dest.x) 
+            l = Line.new(src, dest)
             
-            # Now check where we're going
-            if src.on_diag?(dest) 
-                y_inc = src.y < dest.y ? 1 : -1
-                y = src.y + y_inc
-                ((src.x + 1)...dest.x).each do |x|
-                    return true unless @squares[x][y].piece.nil?
-                    y += y_inc
-                end
-            elsif src.on_file?(dest)
-                ((src.y + 1)...dest.y).each do |y|
-                    return true unless @squares[src.x][y].piece.nil?
-                end
-            elsif src.on_rank?(dest)
-                ((src.x + 1)...dest.x).each do |x|
-                    return true unless @squares[x][src.y].piece.nil?
-                end
-            else
-                raise "#{src.inspect} and #{dest.inspect} are not on same vector: cannot check for block."
+            l.each_coord do |c|
+                # a piece on the destination square isn't a block
+                break if c == dest
+                
+                return true unless @squares[c.x][c.y].piece.nil?
             end
             
-            false;
-        end        
+            false
+        end
     end
 
     class Square 
