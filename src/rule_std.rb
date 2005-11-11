@@ -94,6 +94,10 @@ module Rule_Std
                     v = chk_mv_king(src, dest, @state)
                 when "Knight"
                     v = chk_mv_knight(src, dest, @state)
+                when "Rook"
+                    v = chk_mv_rook(src, dest, @state)
+                when "Queen"
+                    v = chk_mv_queen(src, dest, @state)
             end
             
             v
@@ -141,6 +145,20 @@ module Rule_Std
             pc_src = state.board.sq_at(src).piece
             
             (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true
+        end
+        
+        def chk_mv_rook(src, dest, state) 
+            return false unless (src.on_rank?(dest) || src.on_file?(dest)) && !state.blocked?(src, dest)
+            
+            # If a piece is on the dest square, make sure it's a capture.
+            pc_dest = state.board.sq_at(dest).piece
+            pc_src = state.board.sq_at(src).piece
+            
+            (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true            
+        end
+        
+        def chk_mv_queen(src, dest, state)
+            chk_mv_bishop(src, dest, state) || chk_mv_rook(src, dest, state)
         end
         
         def chk_mv_king(src, dest, state)
