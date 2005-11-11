@@ -72,6 +72,10 @@ module Rule_Std
                 @state.move_piece(src.to_coord, dest.to_coord)
             end
         end
+        
+        def move?(src, dest)
+            chk_mv(src.to_coord, dest.to_coord)
+        end
                 
         def Engine.coord_to_alg(coord)
             Rule_Std::AlgCoord.new((97 + coord.x).chr, (coord.y + 1))
@@ -210,13 +214,5 @@ module Rule_Std
             Coord.new(@file[0] - 97, @rank - 1)            
         end
     end
-    
-    e = Rule_Std::Engine.new
-    e.move(Rule_Std::AlgCoord.new("e", 2), Rule_Std::AlgCoord.new("e", 4))
-    e.move(Rule_Std::AlgCoord.new("e", 7), Rule_Std::AlgCoord.new("e", 5))    
-    e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
-    e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
-    e.move(Rule_Std::AlgCoord.new("f", 1), Rule_Std::AlgCoord.new("b", 5))
-    e.move(Rule_Std::AlgCoord.new("b", 1), Rule_Std::AlgCoord.new("d", 3))
-    puts e.state.to_txt
+
 end
