@@ -92,6 +92,8 @@ module Rule_Std
                     v = chk_mv_bishop(src, dest, @state)
                 when "King"
                     v = chk_mv_king(src, dest, @state)
+                when "Knight"
+                    v = chk_mv_knight(src, dest, @state)
             end
             
             v
@@ -138,9 +140,7 @@ module Rule_Std
             pc_dest = state.board.sq_at(dest).piece
             pc_src = state.board.sq_at(src).piece
             
-            return false if !pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)
-            
-            true
+            (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true
         end
         
         def chk_mv_king(src, dest, state)
@@ -153,7 +153,18 @@ module Rule_Std
             king = state.board.sq_at(src).piece
             dest_pc = state.board.sq_at(dest).piece
             
-            return false if !dest_pc.nil? && !king.color.opposite?(dest_pc.color)
+            (!dest_pc.nil? && !king.color.opposite?(dest_pc.color)) || true
+        end
+        
+        def chk_mv_knight(src, dest, state)
+            # Knights move in an "L" shape
+            return false unless ((src.x - dest.x).abs + (src.y - dest.y).abs) == 3
+
+            # Can only capture opposite coloured pieces
+            knight = state.board.sq_at(src).piece
+            dest_pc = state.board.sq_at(dest).piece
+            
+            (!dest_pc.nil? && !knight.color.opposite?(dest_pc.color)) || true
         end
     end
     
@@ -188,5 +199,6 @@ module Rule_Std
     e.move(Rule_Std::AlgCoord.new("g", 1), Rule_Std::AlgCoord.new("f", 3))
     e.move(Rule_Std::AlgCoord.new("b", 8), Rule_Std::AlgCoord.new("c", 6))
     e.move(Rule_Std::AlgCoord.new("f", 1), Rule_Std::AlgCoord.new("b", 5))
+    e.move(Rule_Std::AlgCoord.new("b", 1), Rule_Std::AlgCoord.new("d", 3))
     puts e.state.to_txt
 end
