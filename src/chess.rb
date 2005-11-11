@@ -112,7 +112,7 @@ module Chess
             # Now check where we're going
             if src.on_diag?(dest) 
                 y_inc = src.y < dest.y ? 1 : -1
-                y = 0 + y_inc
+                y = src.y + y_inc
                 ((src.x + 1)...dest.x).each do |x|
                     return true unless @squares[x][y].piece.nil?
                     y += y_inc
