@@ -90,7 +90,8 @@ module Rule_Std
                     v = chk_mv_pawn(src, dest, @state)
                 when "Bishop"
                     v = chk_mv_bishop(src, dest, @state)
-                
+                when "King"
+                    v = chk_mv_king(src, dest, @state)
             end
             
             v
@@ -140,6 +141,19 @@ module Rule_Std
             return false if !pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)
             
             true
+        end
+        
+        def chk_mv_king(src, dest, state)
+            l = Line.new(src, dest)
+            
+            # Kings can only move one square
+            return false unless l.len == 1
+            
+            # Can only capture opposite coloured pieces
+            king = state.board.sq_at(src).piece
+            dest_pc = state.board.sq_at(dest).piece
+            
+            return false if !dest_pc.nil? && !king.color.opposite?(dest_pc.color)
         end
     end
     
