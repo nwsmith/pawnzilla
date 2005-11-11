@@ -79,16 +79,18 @@ class Line
         # First, normalize the coords (i.e. make sure they go W-E)
         c0, c1 = c0, c1 if (c0.x > c1.x) 
             
+        # Then make sure we know if we're going N->S or S->N
+        y_inc = c0.y < c1.y ? 1 : -1
+        y = c0.y + y_inc
+                    
         # Now check where we're going
         if c0.on_diag?(c1) 
-            y_inc = c0.y < c1.y ? 1 : -1
-            y = c0.y + y_inc
             ((c0.x + 1)..c1.x).each do |x|
                 yield Coord.new(x, y)                    
                 y += y_inc
             end
         elsif c0.on_file?(c1)
-            ((c0.y + 1)..c1.y).each do |y|
+            y.step(c1.y, y_inc) do |y|
                 yield Coord.new(c0.x, y)
             end
         elsif c0.on_rank?(c1)
