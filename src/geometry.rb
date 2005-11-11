@@ -26,7 +26,11 @@ class Coord
     
     # Two coordinates are equal iff both their x and y coordinates are equal        
     def ==(c) 
-     (@x == c.x) && (@y == c.y)
+        (@x == c.x) && (@y == c.y)
+    end
+    
+    def to_s
+        "(#{x}, #{y})"
     end
     
     # Checks if the specified coordinate is on the same diagonal as this object
