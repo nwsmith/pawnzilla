@@ -19,28 +19,35 @@
 # with a command similiar to the one given blow:
 # "C:\Program Files\WinBoard\winboard.exe" \
 #     /fcp "c:\ruby\bin\ruby.exe c:\cygwin\home\ron\pawnzilla\src\xboard.rb
+#     /fd "c:\cygwin\home\ron\pawnzilla\src"
+
+require "network"
+
 module XBoard
     class XBoard
-    @log_file
+        @log_file
+        @client
 
         def initialize()
             @log_file = File.open("pawnzilla_xb.log", "w+")
-        @log_file.puts "Game Started"
+            @log_file.puts "Game Started"
+            @client = Network::Client.new()
         end
 
         def process_cmd(command) 
             @log_file.puts "RECEIVED: " + command
 
-            send_msg = false;
+            send_msg = false
             if (command == "xboard")
-                send_msg = true;
+                send_msg = true
                 msg = ""
             elsif (command[0..7] == "protover")
-                send_msg = true;
-                msg = get_features(command[9..9]);
-            elsif (command[/.\d.\d/])
-                send_msg = true;
-                msg = "move d7d5"
+                send_msg = true
+                msg = get_features(command[9..9])
+            elsif (command[/^.\d.\d$/])
+                send_msg = true
+                @client.send_move(command)
+                msg = "move " + @client.recieve_move()
             else
                 # do nothing
             end
@@ -49,6 +56,8 @@ module XBoard
                 @log_file.puts "SENT:     " + msg
                 STDOUT.puts msg
                 STDOUT.flush
+            else
+                @log_file.puts "SENT: <NOTHING>"
             end
         end
 
@@ -61,7 +70,7 @@ module XBoard
         end
     end
 
-    xboard_conn = XBoard.new();
+    xboard_conn = XBoard.new()
     while input = STDIN.gets
         input.chop!
         xboard_conn.process_cmd(input)
