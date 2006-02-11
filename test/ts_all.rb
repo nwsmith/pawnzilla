@@ -1,0 +1,5 @@
+require 'test/unit'
+require 'tc_bitboard'
+require 'tc_chess'
+require 'tc_geometry'
+require 'tc_rule_std'
