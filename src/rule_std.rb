@@ -115,7 +115,7 @@ module Rule_Std
             dst = dest.y - src.y
             
             # in the coordinate system, a forward move is a reduction in y for black
-            dst = -dst if pc_src.color.black?
+            dst = -dst if pc_src.colour.black?
            
             return false unless dst > 0           
 
@@ -124,14 +124,14 @@ module Rule_Std
             
             # pawns can move one square forward except for first move
             # I'm not a fan of this, but it works for now:
-            at_strt = (pc_src.color.white? ? src.y == 1 : src.y == 6)
+            at_strt = (pc_src.colour.white? ? src.y == 1 : src.y == 6)
             if at_strt && ![1,2].include?(dst) || !at_strt && dst != 1
                 return false
             end
            
             if dst == 1 && [src.x + 1, src.x - 1].include?(dest.x)
                 # it's a diagonal move, ensure it's a capture
-                return false unless !pc_dest.nil? && pc_dest.color.opposite?(pc_src.color)
+                return false unless !pc_dest.nil? && pc_dest.colour.opposite?(pc_src.colour)
             else 
                 # it's a straight move, ensure it's not blocked                                
                 return false if !pc_dest.nil? || state.blocked?(src, dest)

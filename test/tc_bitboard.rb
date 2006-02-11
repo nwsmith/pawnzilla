@@ -27,7 +27,7 @@ class TestBitboard < Test::Unit::TestCase
         
         square = board.sq_at(Coord.new(0, 0))        
         assert(square.colour.black?)
-        assert(square.piece.color.white?)
+        assert(square.piece.colour.white?)
         assert(square.piece.name == "Rook")
         
         square = board.sq_at(Coord.new(0, 2))
@@ -36,7 +36,7 @@ class TestBitboard < Test::Unit::TestCase
         
         square = board.sq_at(Coord.new(2, 7))
         assert(square.colour.white?)
-        assert(square.piece.color.black?)
+        assert(square.piece.colour.black?)
         assert(square.piece.name == "Bishop")
     end
 end

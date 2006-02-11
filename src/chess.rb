@@ -71,11 +71,11 @@ module Chess
     end
     
     class Piece
-        attr_reader :color
+        attr_reader :colour
         attr_reader :name
 
-        def initialize(color, name)
-            @color = color
+        def initialize(colour, name)
+            @colour = colour
             @name = name
         end
     end    
