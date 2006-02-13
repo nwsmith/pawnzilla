@@ -38,6 +38,9 @@ class TestBitboard < Test::Unit::TestCase
         assert(square.colour.white?)
         assert(square.piece.colour.black?)
         assert(square.piece.name == "Bishop")
+        
+        square = board.sq_at(Coord.new(0, 5))
+        assert(square.piece.nil?)
     end
     
     def test_move_piece
@@ -53,7 +56,7 @@ class TestBitboard < Test::Unit::TestCase
     
     def test_place_piece
         board = Bitboard.new()
-        coord = Coord.new(0,6)
+        coord = Coord.new(0,5)
         piece = Chess::Piece.new(Chess::Colour.new_black(), "Rook")
         board.place_piece(coord, piece)
         square = board.sq_at(coord)
