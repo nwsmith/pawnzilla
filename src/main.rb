@@ -28,16 +28,18 @@ e = Rule_Std::Engine.new();
 num_mv = 1
 
 loop do
+
     puts e.state.to_txt
     puts
     clr = (num_mv & 1 == 1) ? "White" : "Black" 
     print "Enter move #{num_mv} for #{clr}: "
+    $stdout.flush
     mv = gets
     mv.chop!
     
     break if !(mv[/^q$/i].nil?)
    
-    puts 
+    puts
     src = Rule_Std::AlgCoord.new(mv[0].chr, mv[1].chr.to_i)
     dest = Rule_Std::AlgCoord.new(mv[2].chr, mv[3].chr.to_i)
     
