@@ -65,4 +65,17 @@ class TestBitboard < Test::Unit::TestCase
         assert(square.piece.name == "Rook")
     end
     
+    def test_remove_piece
+        board = Bitboard.new()
+        coord = Coord.new(0,0)
+        board.remove_piece(coord)
+        square = board.sq_at(coord)
+        assert(square.piece.nil?)
+        
+        # Make sure an empty square stays that way
+        coord = Coord.new(0, 5)
+        board.remove_piece(coord)
+        square = board.sq_at(coord)
+        assert(square.piece.nil?)
+    end
 end
