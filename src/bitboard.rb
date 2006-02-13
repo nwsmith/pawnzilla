@@ -72,6 +72,33 @@ class Bitboard
         square
     end
     
+    def place_piece(coord, piece) 
+        pc_bv = 0x1 << get_sw(coord)
+        
+        if piece.colour.black?
+            @blk_pc |= pc_bv
+        else 
+            @wht_pc |= pc_bv
+        end
+                
+        case piece.name
+            when "Pawn"
+                @p |= pc_bv
+            when "Rook"
+                @r |= pc_bv
+            when "Knight"
+                @n |= pc_bv
+            when "Bishop"
+                @b |= pc_bv
+            when "Queen"
+                @q |= pc_bv
+            when "King"
+                @k |= pc_bv
+            else
+                throw "Unknown piece: " + piece.name
+        end
+    end
+    
     #
     # Modify the bitboards so that the piece on the src square is moved to the dest square
     #
