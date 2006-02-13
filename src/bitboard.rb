@@ -40,6 +40,18 @@ class Bitboard
         @k = 0x08_00_00_00_00_00_00_08
     end
     
+    def clear()
+        @blk_pc = 0
+        @wht_pc = 0
+        
+        @p = 0
+        @r = 0
+        @n = 0
+        @b = 0
+        @q = 0
+        @k = 0
+    end
+    
     # get the shift width required to get the square specified by the provided coord
     #
     # This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes to 
@@ -182,6 +194,22 @@ class Bitboard
             return
         end
     end
+    
+    #
+    # TODO: This is a placeholder implementation based on sq_at, so it's quite inefficient
+    # 
+    def blocked?(src, dest) 
+        l = Line.new(src, dest)
+            
+        l.each_coord do |c|
+            # a piece on the destination square isn't a block
+            break if c == dest
+                
+            return true unless sq_at(c).piece.nil?
+        end
+        
+        false
+    end    
     
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
