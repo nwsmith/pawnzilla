@@ -20,17 +20,17 @@ module Translator
         def to_txt(piece) 
             case piece.name
                when "Pawn"     
-                   parseFen(piece.color, "p", "P")
+                   parseFen(piece.colour, "p", "P")
                when "Knight"
-                   parseFen(piece.color, "n", "N")
+                   parseFen(piece.colour, "n", "N")
                when "Bishop"
-                   parseFen(piece.color, "b", "B")
+                   parseFen(piece.colour, "b", "B")
                when "Rook"
-                   parseFen(piece.color, "r", "R")
+                   parseFen(piece.colour, "r", "R")
                when "Queen"
-                   parseFen(piece.color, "q", "Q")
+                   parseFen(piece.colour, "q", "Q")
                when "King"
-                   parseFen(piece.color, "k", "K")
+                   parseFen(piece.colour, "k", "K")
                else
                    "N/A"
             end
