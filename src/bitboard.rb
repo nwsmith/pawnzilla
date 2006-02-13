@@ -18,15 +18,15 @@
 require "chess"
 
 class Bitboard
-    # Each property it an individual bitboard
-    attr :blk_pc  # All black pieces
-    attr :wht_pc  # All white pieces
-    attr :p       # All pawns
-    attr :r       # All rooks
-    attr :n       # All knights
-    attr :b       # All bishops
-    attr :q       # All queens
-    attr :k       # All kings
+    # Each property it an individual bitboard 
+    :blk_pc  # All black pieces
+    :wht_pc  # All white pieces
+    :p       # All pawns
+    :r       # All rooks
+    :n       # All knights
+    :b       # All bishops
+    :q       # All queens
+    :k       # All kings
     
     def initialize()         
         @blk_pc = 0x00_00_00_00_00_00_FF_FF
@@ -64,5 +64,67 @@ class Bitboard
         square.piece = piece if ! piece.nil?
         
         square
+    end
+    
+    #
+    # Modify the bitboards so that the piece on the src square is moved to the dest square
+    #
+    def move_piece(src, dest)
+        # bit vector representing the source square
+        src_bv = 0x1 << (63 - (8 * src.y) - src.x)
+        
+        # bit vector representing the destination square
+        dest_bv = 0x1 << (63 - (8 * dest.y) - dest.x)
+        
+        # bit vector representing the change required for the move
+        ch_bv = (src_bv | dest_bv)
+        
+        if (@wht_pc & src_bv) == src_bv
+            @wht_pc ^= ch_bv
+        end
+        
+        if (@wht_pc & src_bv) == src_bv
+            @blk_pc ^= ch_bv
+        end
+
+        if (@p & src_bv) == src_bv
+            @p ^= ch_bv  
+            return
+        end
+        
+        if (@r & src_bv) == src_bv
+            @r ^= ch_bv
+            return
+        end
+        
+        if (@n & src_bv) == src_bv
+            @n ^= ch_bv
+            return
+        end
+        
+        if (@b & src_bv) == src_bv
+            @b ^= ch_bv
+            return
+        end
+        
+        if (@q & src_bv) == src_bv
+            @q ^= ch_bv
+            return
+        end
+        
+        if (@k & src_bv) == src_bv
+            @k ^= ch_bv
+            return
+        end
+    end
+    
+    # return the provided 64 bit vector as a formatted binary string
+    def pp_bv(bv) 
+        out = ""
+        63.downto(0) do |i|
+            out += bv[i].to_s     
+            out += " " if (i % 8 == 0)                       
+        end
+        out
     end
 end
