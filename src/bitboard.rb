@@ -40,10 +40,16 @@ class Bitboard
         @k = 0x08_00_00_00_00_00_00_08
     end
     
+    # get the shift width required to get the square specified by the provided coord
+    #
+    # This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes to 
+    # get to the proper rank, then by bits to get to the proper file
+    def get_sw(coord) 
+        63 - (8 * coord.y) - coord.x
+    end
+    
     def sq_at(coord) 
-        # First determine which bit in the vector this coord represents
-        # derived from (8 * (7 - y)) + (7 - x)
-        pos = 63 - (8 * coord.y) - coord.x
+        pos = get_sw(coord)
         
         # Look for a piece of either colour in that square
         piece = nil;
@@ -71,10 +77,10 @@ class Bitboard
     #
     def move_piece(src, dest)
         # bit vector representing the source square
-        src_bv = 0x1 << (63 - (8 * src.y) - src.x)
+        src_bv = 0x1 << get_sw(src)
         
         # bit vector representing the destination square
-        dest_bv = 0x1 << (63 - (8 * dest.y) - dest.x)
+        dest_bv = 0x1 << get_sw(dest)
         
         # bit vector representing the change required for the move
         ch_bv = (src_bv | dest_bv)
