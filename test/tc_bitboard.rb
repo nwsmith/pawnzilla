@@ -51,4 +51,15 @@ class TestBitboard < Test::Unit::TestCase
         assert(board.sq_at(dest).piece.name == "Pawn")
     end
     
+    def test_place_piece
+        board = Bitboard.new()
+        coord = Coord.new(0,6)
+        piece = Chess::Piece.new(Chess::Colour.new_black(), "Rook")
+        board.place_piece(coord, piece)
+        square = board.sq_at(coord)
+        assert(!square.piece.nil?)
+        assert(square.piece.colour.black?) 
+        assert(square.piece.name == "Rook")
+    end
+    
 end
