@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+require "bitboard"
 require "chess"
 require "geometry"
 require "tr"
@@ -26,21 +27,19 @@ module Game
         attr_accessor :board
     
         def initialize(b_sz) 
-            @board = Chess::Board.new(b_sz)
+            @board = Bitboard.new()
         end
      
         def place_piece(coord, piece) 
-        	@board.squares[coord.x][coord.y].piece = piece    
+            @board.place_piece(coord, piece)
         end
     
         def remove_piece(coord)
-    	    @board.squares[coord.x][coord.y].piece = nil 
+            @board.remove_piece(coord, piece)
         end
     
         def move_piece(from_coord, to_coord)
-            piece = @board.squares[from_coord.x][from_coord.y].piece
-            place_piece(to_coord, piece)
-            remove_piece(from_coord)
+            @board.move_piece(from_coord, to_coord)
         end
         
         def blocked?(src, dest) 
@@ -51,18 +50,18 @@ module Game
         # If no separator is defined, the default separator is used.
         def to_txt(sep = DEFAULT_SEPARATOR)
             tr = Translator::PieceTranslator.new()
-            txt, row = '', @board.size;
+            txt, row = '', 8;
 
             # Because we store the board in a standard orientation, in order to make the board
             # look "right side up" in a textual representation, we have to do the y-axis in
             # reverse.            
-            (@board.size - 1).downto(0) do |y|
+            (7).downto(0) do |y|
                 # Output the rank number (for alg coord)
                 txt += "#{row}" + sep
                 row -= 1
                 
                 # Output the pieces on the rank
-                (0...@board.size).each do |x|
+                (0...8).each do |x|
                     sq = @board.sq_at(Coord.new(x, y))
                     txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                     txt += sep
@@ -77,7 +76,7 @@ module Game
             end
     
             # Output the file letters
-            (COLUMN_A...(COLUMN_A + @board.size)).each do |col|
+            (COLUMN_A...(COLUMN_A + 8)).each do |col|
                 txt += col.chr + sep
             end 
     
