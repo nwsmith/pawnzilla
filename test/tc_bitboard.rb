@@ -22,7 +22,7 @@ require "chess"
 require "geometry"
 
 class TestBitboard < Test::Unit::TestCase
-    def test_sq_at?
+    def test_sq_at
         board = Bitboard.new();
         
         square = board.sq_at(Coord.new(0, 0))        
@@ -39,4 +39,16 @@ class TestBitboard < Test::Unit::TestCase
         assert(square.piece.colour.black?)
         assert(square.piece.name == "Bishop")
     end
+    
+    def test_move_piece
+        board = Bitboard.new()
+        src = Coord.new(0, 1)
+        dest = Coord.new(0, 2)
+        board.move_piece(src, dest)
+        assert(board.sq_at(src).piece.nil?)
+        assert(!board.sq_at(dest).piece.nil?)
+        assert(board.sq_at(dest).piece.colour.white?)
+        assert(board.sq_at(dest).piece.name == "Pawn")
+    end
+    
 end
