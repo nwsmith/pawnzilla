@@ -20,6 +20,7 @@ require "test/unit"
 require "bitboard"
 require "chess"
 require "geometry"
+require "rule_std"
 
 class TestBitboard < Test::Unit::TestCase
     def test_sq_at
@@ -78,4 +79,40 @@ class TestBitboard < Test::Unit::TestCase
         square = board.sq_at(coord)
         assert(square.piece.nil?)
     end
+    
+    def test_blocked
+        b = Bitboard.new()
+        b.clear()
+
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))        
+        b.place_piece(Coord.new(3, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
+        
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
+        
+        b.place_piece(Coord.new(3, 0), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
+        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
+        
+        # Make sure it works for squares other than the origin
+        c0 = Coord.new(2, 3)
+        c1 = Coord.new(5, 6)
+        
+        b.place_piece(c0, Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(c1, Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        assert(b.blocked?(c0, Coord.new(6, 7)))
+        assert(!b.blocked?(c0, Coord.new(4, 5)))
+        assert(!b.blocked?(c0, c1))
+        
+        # Unit test for a bug condition -> Rook can hop a pawn
+        e = Rule_Std::Engine.new()
+        b = e.state.board
+        assert(b.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
+    end      
 end
