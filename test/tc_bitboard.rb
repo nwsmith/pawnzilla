@@ -55,6 +55,21 @@ class TestBitboard < Test::Unit::TestCase
         assert(board.sq_at(dest).piece.name == "Pawn")
     end
     
+    def test_move_colour
+        # Ensure that the peice remains the same colour on move
+        board = Bitboard.new()
+        src = Coord.new(4, 6);
+        dest = Coord.new(4, 4);
+        board.move_piece(src, dest);
+        assert(board.sq_at(dest).piece.colour.black?);
+
+        src = Coord.new(4, 1);
+        dest = Coord.new(4, 3);
+        board.move_piece(src, dest);
+        assert(board.sq_at(dest).piece.colour.white?);
+        
+    end
+    
     def test_place_piece
         board = Bitboard.new()
         coord = Coord.new(0,5)

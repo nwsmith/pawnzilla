@@ -31,6 +31,7 @@ module XBoard
         def initialize()
             @log_file = File.open("pawnzilla_xb.log", "w+")
             @log_file.puts "Game Started"
+            @log_file.flush
             @client = Network::Client.new()
         end
 

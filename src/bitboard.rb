@@ -160,7 +160,7 @@ class Bitboard
             @wht_pc ^= ch_bv
         end
         
-        if (@wht_pc & src_bv) == src_bv
+        if (@blk_pc & src_bv) == src_bv
             @blk_pc ^= ch_bv
         end
 
