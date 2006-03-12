@@ -32,30 +32,12 @@ module Rule_Std
           
         def initialize 
             @pc_val = {
-                "Bishop" => {
-                  "value" => 3.5,
-                  "check_mv_fn" => method(:chk_mv_bishop)
-                },
-                "King" => {
-                  "value" => 1_000_000,
-                  "check_mv_fn" => method(:chk_mv_king)
-                },
-                "Knight" => {
-                  "value" => 3.5,
-                  "check_mv_fn" => method(:chk_mv_knight)
-                },
-                "Pawn" => {
-                  "value" => 1,
-                  "check_mv_fn" => method(:chk_mv_pawn)
-                },
-                "Queen" => {
-                  "value" => 9,
-                  "check_mv_fn" => method(:chk_mv_queen)
-                },
-                "Rook" => {
-                  "value" => 5,
-                  "check_mv_fn" => method(:chk_mv_rook)
-                }
+                "Bishop" => PieceInfo.new(3.5, method(:chk_mv_bishop)),
+                "King" => PieceInfo.new(1_000_000, method(:chk_mv_king)),
+                "Knight" => PieceInfo.new(3.5, method(:chk_mv_knight)),
+                "Pawn" => PieceInfo.new(1, method(:chk_mv_pawn)),
+                "Queen" => PieceInfo.new(9, method(:chk_mv_queen)),
+                "Rook" => PieceInfo.new(5, method(:chk_mv_rook))
             }
         
             @state = Game::State.new(B_SZ)
@@ -106,7 +88,7 @@ module Rule_Std
                 return false
             end
             
-            fp = @pc_val[pc.name]["check_mv_fn"];
+            fp = @pc_val[pc.name].function;
             fp.call(src, dest, @state);
         end
         
@@ -215,6 +197,16 @@ module Rule_Std
         
         def to_coord
             Coord.new(@file[0] - 97, @rank - 1)            
+        end
+    end
+    
+    class PieceInfo
+        attr_accessor :value
+        attr_accessor :function
+        
+        def initialize(value, function)
+            @value = value
+            @function = function
         end
     end
 
