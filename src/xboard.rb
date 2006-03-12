@@ -75,4 +75,5 @@ module XBoard
         input.chop!
         xboard_conn.process_cmd(input)
     end
+    
 end
