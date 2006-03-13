@@ -203,73 +203,69 @@ class TestBitboard < Test::Unit::TestCase
     
     def test_on_file? 
         b = Bitboard.new;
-        assert(b.on_file?(Coord.new(0, 7), Coord.new(0, 4)))
-        assert(b.on_file?(Coord.new(0, 4), Coord.new(0, 7)))
         
-        assert(b.on_file?(Coord.new(0, 7), Coord.new(0, 7)))
+        bv0_7 = 0x01 << Bitboard.get_sw(Coord.new(0, 7))
+        bv0_4 = 0x01 << Bitboard.get_sw(Coord.new(0, 4))
+        bv4_7 = 0x01 << Bitboard.get_sw(Coord.new(4, 7))
         
-        assert(!b.on_file?(Coord.new(0, 7), Coord.new(4, 7)))        
-        assert(!b.on_file?(Coord.new(4, 7), Coord.new(0, 7)))
+        assert(b.on_file?(bv0_7, bv0_4))
+        assert(b.on_file?(bv0_4, bv0_7))
+        
+        assert(b.on_file?(bv0_7, bv0_7))
+        
+        assert(!b.on_file?(bv0_7, bv4_7))
+        assert(!b.on_file?(bv4_7, bv0_7))        
     end
     
     def test_on_rank?
         b = Bitboard.new;
-        assert(b.on_rank?(Coord.new(0, 7), Coord.new(4, 7)))
-        assert(b.on_rank?(Coord.new(4, 7), Coord.new(0, 7)))
+
+        bv0_0 = 0x01 << Bitboard.get_sw(Coord.new(0, 0))        
+        bv0_4 = 0x01 << Bitboard.get_sw(Coord.new(0, 4))        
+        bv0_7 = 0x01 << Bitboard.get_sw(Coord.new(0, 7))
+        bv4_7 = 0x01 << Bitboard.get_sw(Coord.new(4, 7))
+        bv7_0 = 0x01 << Bitboard.get_sw(Coord.new(7, 0))        
         
-        assert(b.on_rank?(Coord.new(0, 0), Coord.new(7, 0)))
+        assert(b.on_rank?(bv0_7, bv4_7))
+        assert(b.on_rank?(bv4_7, bv0_7))
         
-        assert(b.on_rank?(Coord.new(0, 7), Coord.new(0, 7)))
-                
-        assert(!b.on_rank?(Coord.new(0, 7), Coord.new(0, 4)))
-        assert(!b.on_rank?(Coord.new(0, 4), Coord.new(0, 7)))
+        assert(b.on_rank?(bv0_0, bv7_0))
+        
+        assert(b.on_rank?(bv0_7, bv0_7))
+        
+        assert(!b.on_rank?(bv0_7, bv0_4))
+        assert(!b.on_rank?(bv0_4, bv0_7))
     end
     
-    def test_on_diagonal_sw_to_ne
+    def test_on_diagonal_sw_ne
         b = Bitboard.new
         
-        bv0 = 0x1 << Bitboard.get_sw(Coord.new(1, 3))
-        bv1 = 0x1 << Bitboard.get_sw(Coord.new(2, 4))
-        bv2 = 0x1 << Bitboard.get_sw(Coord.new(3, 5))
+        bv1_3 = 0x1 << Bitboard.get_sw(Coord.new(1, 3))
+        bv2_4 = 0x1 << Bitboard.get_sw(Coord.new(2, 4))
+        bv3_5 = 0x1 << Bitboard.get_sw(Coord.new(3, 5))
         
-        assert(b.on_diagonal?(bv0, bv1))
-        assert(b.on_diagonal?(bv0, bv2))
-        assert(b.on_diagonal?(bv1, bv2))
+        assert(b.on_diagonal?(bv1_3, bv2_4))
+        assert(b.on_diagonal?(bv1_3, bv3_5))
+        assert(b.on_diagonal?(bv2_4, bv3_5))
+        
+        assert(b.on_diagonal?(bv2_4, bv1_3))
+        assert(b.on_diagonal?(bv3_5, bv1_3))
+        assert(b.on_diagonal?(bv3_5, bv2_4))        
     end
     
-    def test_on_diagonal_ne_to_sw
+    def test_on_diagonal_nw_se
         b = Bitboard.new
         
-        bv0 = 0x1 << Bitboard.get_sw(Coord.new(1, 3))
-        bv1 = 0x1 << Bitboard.get_sw(Coord.new(2, 4))
-        bv2 = 0x1 << Bitboard.get_sw(Coord.new(3, 5))
+        bv1_6 = 0x1 << Bitboard.get_sw(Coord.new(1, 6))
+        bv2_5 = 0x1 << Bitboard.get_sw(Coord.new(2, 5))
+        bv5_2 = 0x1 << Bitboard.get_sw(Coord.new(5, 2))
         
-        assert(b.on_diagonal?(bv1, bv0))
-        assert(b.on_diagonal?(bv2, bv0))
-        assert(b.on_diagonal?(bv2, bv1))
-    end
-    
-    def test_on_diagonal_nw_to_se
-        b = Bitboard.new
+        assert(b.on_diagonal?(bv1_6, bv2_5))
+        assert(b.on_diagonal?(bv2_5, bv5_2))
+        assert(b.on_diagonal?(bv1_6, bv5_2))
         
-        bv0 = 0x1 << Bitboard.get_sw(Coord.new(1, 6))
-        bv1 = 0x1 << Bitboard.get_sw(Coord.new(2, 5))
-        bv2 = 0x1 << Bitboard.get_sw(Coord.new(5, 2))
-        
-        assert(b.on_diagonal?(bv0, bv1))
-        assert(b.on_diagonal?(bv1, bv2))
-        assert(b.on_diagonal?(bv0, bv2))
-    end
-    
-    def test_on_diagonal_se_to_nw
-        b = Bitboard.new
-        
-        bv0 = 0x1 << Bitboard.get_sw(Coord.new(1, 6))
-        bv1 = 0x1 << Bitboard.get_sw(Coord.new(2, 5))
-        bv2 = 0x1 << Bitboard.get_sw(Coord.new(5, 2))
-        
-        assert(b.on_diagonal?(bv1, bv0))
-        assert(b.on_diagonal?(bv2, bv1))
-        assert(b.on_diagonal?(bv2, bv0))
+        assert(b.on_diagonal?(bv2_5, bv1_6))
+        assert(b.on_diagonal?(bv5_2, bv2_5))
+        assert(b.on_diagonal?(bv5_2, bv1_6))        
     end
 end
