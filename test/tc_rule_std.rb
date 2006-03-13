@@ -70,6 +70,12 @@ class TestRule_Std < Test::Unit::TestCase
         assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
                                 Rule_Std::AlgCoord.new('d', 3).to_coord), false)
                                 
+        # make sure it works both ways
+        e.state.place_piece(Rule_Std::AlgCoord.new('d', 6).to_coord,
+                            Chess::Piece.new(Chess::Colour.new_black, "Bishop"))
+        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 7).to_coord,
+                                Rule_Std::AlgCoord.new('f',6).to_coord), false)                       
+                                
     end
     
     def test_check_mv_bishop

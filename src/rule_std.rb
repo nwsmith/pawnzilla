@@ -32,12 +32,12 @@ module Rule_Std
           
         def initialize 
             @pc_val = {
-                "Bishop" => 3.5,
-                "King" => 1_000_000,
-                "Knight" => 3.5,
-                "Pawn" => 1,
-                "Queen" => 9,
-                "Rook" => 5
+                "Bishop" => PieceInfo.new(3.5, method(:chk_mv_bishop)),
+                "King" => PieceInfo.new(1_000_000, method(:chk_mv_king)),
+                "Knight" => PieceInfo.new(3.5, method(:chk_mv_knight)),
+                "Pawn" => PieceInfo.new(1, method(:chk_mv_pawn)),
+                "Queen" => PieceInfo.new(9, method(:chk_mv_queen)),
+                "Rook" => PieceInfo.new(5, method(:chk_mv_rook))
             }
         
             @state = Game::State.new(B_SZ)
@@ -83,28 +83,13 @@ module Rule_Std
         
         def chk_mv(src, dest) 
             pc = @state.board.sq_at(src).piece
-            v = true
             
             if pc.nil?
                 return false
             end
             
-            case pc.name 
-                when "Pawn"
-                    v = chk_mv_pawn(src, dest, @state)
-                when "Bishop"
-                    v = chk_mv_bishop(src, dest, @state)
-                when "King"
-                    v = chk_mv_king(src, dest, @state)
-                when "Knight"
-                    v = chk_mv_knight(src, dest, @state)
-                when "Rook"
-                    v = chk_mv_rook(src, dest, @state)
-                when "Queen"
-                    v = chk_mv_queen(src, dest, @state)
-            end
-            
-            v
+            fp = @pc_val[pc.name].function;
+            fp.call(src, dest, @state);
         end
         
         def chk_mv_pawn(src, dest, state)
@@ -212,6 +197,16 @@ module Rule_Std
         
         def to_coord
             Coord.new(@file[0] - 97, @rank - 1)            
+        end
+    end
+    
+    class PieceInfo
+        attr_accessor :value
+        attr_accessor :function
+        
+        def initialize(value, function)
+            @value = value
+            @function = function
         end
     end
 
