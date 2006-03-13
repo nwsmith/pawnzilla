@@ -129,5 +129,75 @@ class TestBitboard < Test::Unit::TestCase
         e = Rule_Std::Engine.new()
         b = e.state.board
         assert(b.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
+    end
+    
+    def test_gen_pwn_attack()
+        b = Bitboard.new()
+        
+        # Test the middle board attacks
+        b.clear()
+        
+        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_white)
+
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(2, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
+
+        b.clear()
+        
+        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_black)
+
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(0, 2)))
+        assert(b.attacked?(Chess::Colour.new_black, Coord.new(1, 2)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(2, 2)))
+        assert(b.attacked?(Chess::Colour.new_black, Coord.new(3, 2)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(4, 2)))
+
+        # Test the left edge
+        b.clear()
+        
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_white)
+
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(7, 3)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(2, 4)))
+
+        b.clear()
+        
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_black)
+
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(7, 3)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(0, 2)))
+        assert(b.attacked?(Chess::Colour.new_black, Coord.new(1, 2)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(2, 2)))
+
+        # Test the right edge
+        b.clear()
+        
+        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_white)
+
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(5, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(7, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 5)))
+
+        b.clear()
+        
+        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.gen_pwn_attack(Chess::Colour.new_black)
+
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(5, 2)))
+        assert(b.attacked?(Chess::Colour.new_black, Coord.new(6, 2)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(7, 2)))
+        assert(!b.attacked?(Chess::Colour.new_black, Coord.new(0, 1)))
+
     end      
 end

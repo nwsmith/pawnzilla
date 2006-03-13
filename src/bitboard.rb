@@ -28,6 +28,10 @@ class Bitboard
     :q       # All queens
     :k       # All kings
     
+    attr :blk_pwn_attk # Black Pawn Attacks
+    
+    attr :wht_pwn_attk # Black Pawn Attacks
+    
     def initialize()         
         @blk_pc = 0x00_00_00_00_00_00_FF_FF
         @wht_pc = 0xFF_FF_00_00_00_00_00_00
@@ -38,6 +42,10 @@ class Bitboard
         @b = 0x24_00_00_00_00_00_00_24
         @q = 0x10_00_00_00_00_00_00_10
         @k = 0x08_00_00_00_00_00_00_08
+        
+        @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
+
+        @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
     end
     
     def clear()
@@ -212,8 +220,53 @@ class Bitboard
         end
         
         false
+    end
+    
+    def attacked?(clr, coord)
+        (1 << get_sw(coord)) & gen_combined_attk(clr) != 0
     end    
     
+    def gen_pwn_attack(clr)
+        bv = clr.white? ? @wht_pwn_attk : @blk_pwn_attk
+        bv = 0
+        
+        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        
+        0.upto(63) do |i|
+            pwn = bv_piece & @p & (1 << i) > 0
+            
+            if (clr.white? && i < 8)
+                next
+            elsif (clr.black? && i > 55)
+                break
+            end
+            
+            if (pwn)
+                if (i % 8 != 7)
+                    bv |= 1 << (i + (clr.white? ? -7 : 9))
+                end
+
+                if (i % 8 != 0)
+                    bv |= 1 << (i + (clr.white? ? -9 : 7))
+                end
+            end
+        end
+        
+        if (clr.white?)
+            @wht_pwn_attk = bv
+        else
+            @blk_pwn_attk = bv
+        end
+        
+        bv
+    end
+    
+    def gen_combined_attk(clr)
+        clr.white? \
+            ? @wht_pwn_attk \
+            : @blk_pwn_attk
+    end
+
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""
