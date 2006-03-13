@@ -217,10 +217,6 @@ class TestBitboard < Test::Unit::TestCase
         assert(b.on_rank?(Coord.new(0, 7), Coord.new(4, 7)))
         assert(b.on_rank?(Coord.new(4, 7), Coord.new(0, 7)))
         
-        c0 = 0x01 << Bitboard.get_sw(Coord.new(0, 7))
-        c1 = 0x01 << Bitboard.get_sw(Coord.new(4, 7))
-        puts "#{c0 - c1}"
-        
         assert(b.on_rank?(Coord.new(0, 0), Coord.new(7, 0)))
         
         assert(b.on_rank?(Coord.new(0, 7), Coord.new(0, 7)))
@@ -254,7 +250,6 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_on_diagonal_nw_to_se
-        puts "1-0-0-0-0-0-"
         b = Bitboard.new
         
         bv0 = 0x1 << Bitboard.get_sw(Coord.new(1, 6))
