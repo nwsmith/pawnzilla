@@ -282,32 +282,26 @@ class Bitboard
     end
     
     def on_file?(src, dest) 
-        src_bv = 0x1 << get_sw(src)
-        dest_bv = 0x1 << get_sw(dest)
-    
-        src_bv, dest_bv = dest_bv, src_bv if dest_bv < src_bv
+        src, dest = dest, src if dest < src
         
-        while dest_bv > 0
-            return true if src_bv == dest_bv
-            dest_bv >>= 8
+        while dest > 0
+            return true if src == dest
+            dest >>= 8
         end
         
         false
     end
     
     def on_rank?(src, dest) 
-        src_bv = 0x1 << get_sw(src)
-        dest_bv = 0x1 << get_sw(dest)
-        
-        src_bv, dest_bv = dest_bv, src_bv if dest_bv < src_bv
+        src, dest = dest, src if dest < src
         
         # shift source to the populated rank and ensure dest is shifted to same rank
-        while !(src_bv.between?(0x00, 0xFF))
-            src_bv >>= 8
-            dest_bv >>= 8 
+        while !(src.between?(0x00, 0xFF))
+            src >>= 8
+            dest >>= 8 
         end
         
-        return (dest_bv - src_bv).between?(0x00, 0xFF)
+        return (dest - src).between?(0x00, 0xFF)
     end 
     
     def on_diagonal?(src, dest) 
