@@ -65,6 +65,10 @@ class Bitboard
     # This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes to 
     # get to the proper rank, then by bits to get to the proper file
     def get_sw(coord) 
+        Bitboard.get_sw(coord)
+    end
+    
+    def Bitboard.get_sw(coord)
         63 - (8 * coord.y) - coord.x
     end
     
@@ -275,5 +279,57 @@ class Bitboard
             out += " " if (i % 8 == 0)                       
         end
         out
+    end
+    
+    def on_file?(src, dest) 
+        src_bv = 0x1 << get_sw(src)
+        dest_bv = 0x1 << get_sw(dest)
+    
+        src_bv, dest_bv = dest_bv, src_bv if dest_bv < src_bv
+        
+        while dest_bv > 0
+            return true if src_bv == dest_bv
+            dest_bv >>= 8
+        end
+        
+        false
+    end
+    
+    def on_rank?(src, dest) 
+        src_bv = 0x1 << get_sw(src)
+        dest_bv = 0x1 << get_sw(dest)
+        
+        src_bv, dest_bv = dest_bv, src_bv if dest_bv < src_bv
+        
+        # shift source to the populated rank and ensure dest is shifted to same rank
+        while !(src_bv.between?(0x00, 0xFF))
+            src_bv >>= 8
+            dest_bv >>= 8 
+        end
+        
+        return (dest_bv - src_bv).between?(0x00, 0xFF)
+    end 
+    
+    def on_diagonal?(src, dest) 
+        # Normalize coordinates to be west to east
+        src, dest = dest, src if dest < src
+        
+        dest_orig = dest
+
+        # Check south to north
+        while dest > 0
+            return true if (src & dest) == dest
+            dest >>= 9
+        end
+        
+        # Check north to South
+        dest = dest_orig
+        
+        while dest > 0
+            return true if (src & dest) == dest
+            dest >>= 7
+        end
+        
+        false
     end
 end
