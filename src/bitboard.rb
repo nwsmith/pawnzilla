@@ -87,6 +87,9 @@ class Bitboard
     def place_piece(coord, piece) 
         pc_bv = 0x1 << get_sw(coord)
         
+        #remove any existing piece at the coord
+        remove_piece(coord)
+                
         if piece.colour.black?
             @blk_pc |= pc_bv
         else 
