@@ -401,10 +401,10 @@ class Bitboard
     end
 
     def gen_kng_attack(clr)
-        bv = clr.white? ? @wht_pwn_attk : @blk_pwn_attk
+        bv = clr.white? ? @wht_kng_attk : @blk_kng_attk
         bv = 0
         
-        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @k
         
         index = -1
         0.upto(63) do |i|
