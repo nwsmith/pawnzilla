@@ -60,9 +60,6 @@ class Bitboard
     
     def clear()
     
-    puts pp_bv(@wht_kng_attk)
-    puts pp_bv(@blk_kng_attk)
-    
         @blk_pc = 0
         @wht_pc = 0
         
