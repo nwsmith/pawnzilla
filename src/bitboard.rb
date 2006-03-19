@@ -30,10 +30,12 @@ class Bitboard
     
     :blk_pwn_attk # Black Pawn Attacks
     :blk_kni_attk # Black Knight Attacks
+    :blk_kng_attk # Black King Attacks
     :blk_attk # All black attacks
     
     :wht_pwn_attk # White Pawn Attacks
     :wht_kni_attk # While Knight Attacks
+    :wht_kng_attk # While King Attacks
     :wht_attk # All white attacks    
     
     def initialize()         
@@ -49,12 +51,18 @@ class Bitboard
         
         @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
         @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
+        @blk_kng_attk = 0x00_00_00_00_00_00_1C_14
 
         @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
-        @whi_kni_attk = 0x00_18_A5_00_00_00_00_00
+        @wht_kni_attk = 0x00_18_A5_00_00_00_00_00
+        @wht_kng_attk = 0x14_1C_00_00_00_00_00_00
     end
     
     def clear()
+    
+    puts pp_bv(@wht_kng_attk)
+    puts pp_bv(@blk_kng_attk)
+    
         @blk_pc = 0
         @wht_pc = 0
         
@@ -67,9 +75,11 @@ class Bitboard
 
         @blk_pwn_attk = 0
         @blk_kni_attk = 0
+        @blk_kng_attk = 0
 
         @wht_pwn_attk = 0
         @wht_kni_attk = 0
+        @wht_kng_attk = 0
     end
     
     # get the shift width required to get the square specified by the provided coord
@@ -392,12 +402,65 @@ class Bitboard
             @blk_kni_attk = bv
         end
     end
+
+    def gen_kng_attack(clr)
+        bv = clr.white? ? @wht_pwn_attk : @blk_pwn_attk
+        bv = 0
+        
+        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        
+        index = -1
+        0.upto(63) do |i|
+            if (1 << i == bv_piece)
+                index = i;
+                break;
+            end                        
+        end
+        
+        col = index % 8;
+        
+        # row below king
+        if (index > 7)
+            if (col != 7)
+                bv |= bv_piece >> 7
+            end
+            bv |= bv_piece >> 8
+            if (col != 0)
+                bv |= bv_piece >> 9
+            end
+        end
+
+        # same row as king        
+        if (col != 7)
+            bv |= bv_piece << 1
+        end
+        if (col != 0)
+            bv |= bv_piece >> 1
+        end
+        
+        # row above king
+        if (index < 56)
+            if (col != 7)
+                bv |= bv_piece << 9
+            end
+            bv |= bv_piece << 8
+            if (col != 0)
+                bv |= bv_piece << 7
+            end
+        end
+        
+        if (clr.white?)
+            @wht_kng_attk = bv
+        else
+            @blk_kng_attk = bv
+        end
+    end
     
     def gen_combined_attk(clr)
         if (clr.white?)
-            @wht_attk = @wht_pwn_attk | @wht_kni_attk
+            @wht_attk = @wht_pwn_attk | @wht_kni_attk | @wht_kng_attk
         else
-            @blk_attk = @blk_pwn_attk | @blk_kni_attk
+            @blk_attk = @blk_pwn_attk | @blk_kni_attk | @blk_kng_attk
         end
     end
 
