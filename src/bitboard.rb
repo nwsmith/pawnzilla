@@ -30,7 +30,7 @@ class Bitboard
     
     attr :blk_pwn_attk # Black Pawn Attacks
     
-    attr :wht_pwn_attk # Black Pawn Attacks
+    attr :wht_pwn_attk # White Pawn Attacks
     
     def initialize()         
         @blk_pc = 0x00_00_00_00_00_00_FF_FF
@@ -44,8 +44,10 @@ class Bitboard
         @k = 0x08_00_00_00_00_00_00_08
         
         @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
+        @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
 
         @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
+        @whi_kni_attk = 0x00_18_A5_00_00_00_00_00
     end
     
     def clear()
@@ -58,6 +60,12 @@ class Bitboard
         @b = 0
         @q = 0
         @k = 0
+
+        @blk_pwn_attk = 0
+        @blk_kni_attk = 0
+
+        @wht_pwn_attk = 0
+        @wht_kni_attk = 0
     end
     
     # get the shift width required to get the square specified by the provided coord
@@ -237,7 +245,7 @@ class Bitboard
         bv_piece = clr.white? ? @wht_pc : @blk_pc
         
         0.upto(63) do |i|
-            pwn = bv_piece & @p & (1 << i) > 0
+            pwn = bv_piece & @p & (1 << i) != 0
             
             if (clr.white? && i < 8)
                 next
@@ -265,18 +273,137 @@ class Bitboard
         bv
     end
     
+    def gen_kni_attack(clr)
+        bv = clr.white? ? @wht_kni_attk : @blk_kni_attk
+        bv = 0
+        
+        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        
+        # knight attack position legend for below (k == knight)
+        #  B C
+        # A   D
+        #   K
+        # E   H
+        #  F G
+        
+        0.upto(63) do |i|
+            kni_exist = bv_piece & @n & (1 << i) != 0
+
+            if (!kni_exist)
+                next
+            end
+            
+            place_a = true
+            place_b = true
+            place_c = true
+            place_d = true
+            place_e = true
+            place_f = true
+            place_g = true
+            place_h = true
+            
+            # disable marking of squares based off of rows
+            if (i > 47)
+                place_b = false
+                place_c = false
+                
+                if (i > 55)
+                    place_a = false
+                    place_d = false
+                end
+            end
+            
+            if (i < 16)
+                place_f = false
+                place_g = false
+                
+                if (i < 8)
+                    place_e = false
+                    place_h = false
+                end
+            end
+
+            # disable marking of squares based off of cols
+            col_index = i % 8;
+            if (col_index <= 1)
+                place_a = false
+                place_e = false
+                if (col_index == 0)
+                    place_b = false
+                    place_f = false
+                end
+            end
+
+            if (col_index >= 6)
+                place_d = false
+                place_h = false
+                if (col_index == 7)
+                    place_c = false
+                    place_g = false
+                end
+            end
+            
+            # A = K_pos + 6
+            # B = K_pos + 15
+            # C = K_pos + 17
+            # D = K_pos + 10
+            # E = K_pos - 10
+            # F = K_pos - 17
+            # G = K_pos - 15
+            # H = K_pos - 6
+            if (place_a)
+                bv |= 1 << (i + 6);
+            end                
+            
+            if (place_b)
+                bv |= 1 << (i + 15);
+            end                
+
+            if (place_c)
+                bv |= 1 << (i + 17);
+            end                
+
+            if (place_d)
+                bv |= 1 << (i + 10);
+            end                
+
+            if (place_e)
+                bv |= 1 << (i - 10);
+            end                
+
+            if (place_f)
+                bv |= 1 << (i - 17);
+            end                
+
+            if (place_g)
+                bv |= 1 << (i - 15);
+            end                
+ 
+            if (place_h)
+                bv |= 1 << (i - 6);
+            end                
+        end
+        
+        if (clr.white?)
+            @wht_kni_attk = bv
+        else
+            @blk_kni_attk = bv
+        end
+        
+        bv
+    end
+    
     def gen_combined_attk(clr)
         clr.white? \
-            ? @wht_pwn_attk \
-            : @blk_pwn_attk
+            ? @wht_pwn_attk | @wht_kni_attk \
+            : @blk_pwn_attk | @blk_kni_attk
     end
 
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""
         63.downto(0) do |i|
-            out += bv[i].to_s     
-            out += " " if (i % 8 == 0)                       
+            out += bv[i].to_s                 out += " " if (i % 8 == 0)                       
         end
         out
     end

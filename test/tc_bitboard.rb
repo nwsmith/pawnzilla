@@ -199,6 +199,45 @@ class TestBitboard < Test::Unit::TestCase
         assert(!b.attacked?(Chess::Colour.new_black, Coord.new(7, 2)))
         assert(!b.attacked?(Chess::Colour.new_black, Coord.new(0, 1)))
 
+    end
+    
+    def test_gen_kni_attack()
+        b = Bitboard.new()
+        
+        # Test the middle board attacks
+        b.clear()
+        
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.place_piece(Coord.new(0, 7), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.place_piece(Coord.new(7, 0), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.place_piece(Coord.new(7, 7), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.gen_kni_attack(Chess::Colour.new_white)
+    
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 1)))
+
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 6)))
+
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 1)))
+
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 6)))
+
+        b.clear()
+        
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.gen_kni_attack(Chess::Colour.new_white)
+
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 6)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 6)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 5)))
     end      
     
     def test_on_file? 
