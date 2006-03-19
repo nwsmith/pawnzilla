@@ -28,9 +28,13 @@ class Bitboard
     :q       # All queens
     :k       # All kings
     
-    attr :blk_pwn_attk # Black Pawn Attacks
+    :blk_pwn_attk # Black Pawn Attacks
+    :blk_kni_attk # Black Knight Attacks
+    :blk_attk # All black attacks
     
-    attr :wht_pwn_attk # White Pawn Attacks
+    :wht_pwn_attk # White Pawn Attacks
+    :wht_kni_attk # While Knight Attacks
+    :wht_attk # All white attacks    
     
     def initialize()         
         @blk_pc = 0x00_00_00_00_00_00_FF_FF
@@ -269,8 +273,6 @@ class Bitboard
         else
             @blk_pwn_attk = bv
         end
-        
-        bv
     end
     
     def gen_kni_attack(clr)
@@ -389,21 +391,22 @@ class Bitboard
         else
             @blk_kni_attk = bv
         end
-        
-        bv
     end
     
     def gen_combined_attk(clr)
-        clr.white? \
-            ? @wht_pwn_attk | @wht_kni_attk \
-            : @blk_pwn_attk | @blk_kni_attk
+        if (clr.white?)
+            @wht_attk = @wht_pwn_attk | @wht_kni_attk
+        else
+            @blk_attk = @blk_pwn_attk | @blk_kni_attk
+        end
     end
 
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""
         63.downto(0) do |i|
-            out += bv[i].to_s                 out += " " if (i % 8 == 0)                       
+            out += bv[i].to_s
+            out += " " if (i % 8 == 0)                       
         end
         out
     end
