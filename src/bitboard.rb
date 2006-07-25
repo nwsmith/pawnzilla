@@ -50,10 +50,12 @@ class Bitboard
         @k = 0x08_00_00_00_00_00_00_08
         
         @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
+        @blk_rok_attk = 0x00_00_00_00_00_00_00_00
         @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
         @blk_kng_attk = 0x00_00_00_00_00_00_1C_14
 
         @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
+        @wht_rok_attk = 0x00_00_00_00_00_00_00_00
         @wht_kni_attk = 0x00_18_A5_00_00_00_00_00
         @wht_kng_attk = 0x14_1C_00_00_00_00_00_00
     end
@@ -282,6 +284,32 @@ class Bitboard
         end
     end
     
+    def gen_rok_attack(clr)
+        bv = clr.white? ? @wht_rok_attk : @blk_rok_attk
+        bv = 0
+        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        
+        if (bv_piece & @r == 0)
+            return
+        end
+        
+        0.upto(7) do |i|
+            bv = bv | gen_file_attk(clr, Chess::Piece.new(clr, "Rook"), i)
+        end
+        
+        0.upto(7) do |i|
+            bv = bv | gen_rank_attk(clr, Chess::Piece.new(clr, "Rook"), i)
+        end
+        
+        
+        if (clr.white?)
+            @wht_rok_attk = bv
+        else
+            @blk_rok_attk = bv
+        end
+        
+    end
+    
     def gen_kni_attack(clr)
         bv = clr.white? ? @wht_kni_attk : @blk_kni_attk
         bv = 0
@@ -455,9 +483,9 @@ class Bitboard
     
     def gen_combined_attk(clr)
         if (clr.white?)
-            @wht_attk = @wht_pwn_attk | @wht_kni_attk | @wht_kng_attk
+            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_kng_attk
         else
-            @blk_attk = @blk_pwn_attk | @blk_kni_attk | @blk_kng_attk
+            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @blk_kng_attk
         end
     end
 
@@ -515,5 +543,106 @@ class Bitboard
         end
         
         false
+    end
+    
+    # generate a bv for this piece on the given file
+    def gen_file_attk(clr, peice, file)
+        if (file == 0)
+            mask = 0x80_80_80_80_80_80_80_80
+        elsif (file == 1)
+            mask = 0x40_40_40_40_40_40_40_40
+        elsif (file == 2)
+            mask = 0x20_20_20_20_20_20_20_20
+        elsif (file == 3)
+            mask = 0x10_10_10_10_10_10_10_10
+        elsif (file == 4)
+            mask = 0x08_08_08_08_08_08_08_08
+        elsif (file == 5)
+            mask = 0x04_04_04_04_04_04_04_04
+        elsif (file == 6)
+            mask = 0x02_02_02_02_02_02_02_02
+        elsif (file == 7)
+            mask = 0x01_01_01_01_01_01_01_01
+        end
+
+        bv = 0
+        friendly_piece = clr.white? ? @wht_pc : @blk_pc
+        enemy_piece = clr.white?    ? @blk_pc : @wht_pc
+        concerned_piece =  friendly_piece & @r  & mask
+        
+        # eliminate the simple cases
+        if (concerned_piece == 0)
+            return 0
+        end
+        
+        cell = 1 << (7 - file)
+        0.upto(7) do |i|
+            if (concerned_piece & cell != 0)
+                (i-1).downto(0) do |j|
+                  chk_cell = cell >> (8 * (i - j));
+                  bv = bv | chk_cell
+                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                end
+
+                (i+1).upto(7) do |j|
+                  chk_cell = cell << (8 * (j - i));
+                  bv = bv | chk_cell
+                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                end
+            end
+            cell = cell << 8
+        end
+        bv
+    end
+    
+    
+    # generate a bv for this piece on the given rank
+    def gen_rank_attk(clr, peice, rank)
+        if (rank == 0)
+            mask = 0x00_00_00_00_00_00_00_FF
+        elsif (rank == 1)
+            mask = 0x00_00_00_00_00_00_FF_00
+        elsif (rank == 2)
+            mask = 0x00_00_00_00_00_FF_00_00
+        elsif (rank == 3)
+            mask = 0x00_00_00_00_FF_00_00_00
+        elsif (rank == 4)
+            mask = 0x00_00_00_FF_00_00_00_00
+        elsif (rank == 5)
+            mask = 0x00_00_FF_00_00_00_00_00
+        elsif (rank == 6)
+            mask = 0x00_FF_00_00_00_00_00_00
+        elsif (rank == 7)
+            mask = 0xFF_00_00_00_00_00_00_00
+        end
+
+        bv = 0
+        friendly_piece = clr.white? ? @wht_pc : @blk_pc
+        enemy_piece = clr.white?    ? @blk_pc : @wht_pc
+        concerned_piece =  friendly_piece & @r  & mask
+        
+        # eliminate the simple cases
+        if (concerned_piece == 0)
+            return 0
+        end
+        
+        cell = 1 << (8 * rank)
+        0.upto(7) do |i|
+            if (concerned_piece & cell != 0)
+                (i-1).downto(0) do |j|
+                  chk_cell = cell >> (i - j);
+                  bv = bv | chk_cell
+                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                end
+
+                (i+1).upto(7) do |j|
+                  chk_cell = cell << (j - i);
+                  bv = bv | chk_cell
+                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                end
+            end
+            cell = cell << 1
+        end
+        bv
     end
 end
