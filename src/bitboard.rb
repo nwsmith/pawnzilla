@@ -97,8 +97,8 @@ class Bitboard
         pos = get_sw(coord)
         
         # Look for a piece of either colour in that square
-        piece = nil;
-        color = @blk_pc[pos] == 1 ? Chess::Colour.new_black : @wht_pc[pos] ? Chess::Colour.new_white : nil;
+        piece = nil
+        color = @blk_pc[pos] == 1 ? Chess::Colour.new_black : @wht_pc[pos] ? Chess::Colour.new_white : nil
 
         # Determine piece type
         if !color.nil?
@@ -110,7 +110,7 @@ class Bitboard
             piece = Chess::Piece.new(color, "King") if @k[pos] == 1
         end
 
-        square = Chess::Square.new(coord, Chess::Board.get_colour(coord));
+        square = Chess::Square.new(coord, Chess::Board.get_colour(coord))
         
         square.piece = piece if ! piece.nil?
         
@@ -252,30 +252,17 @@ class Bitboard
     end    
     
     def gen_pwn_attack(clr)
-        bv = clr.white? ? @wht_pwn_attk : @blk_pwn_attk
-        bv = 0
-        
-        bv_piece = clr.white? ? @wht_pc : @blk_pc
-        
-        0.upto(63) do |i|
-            pwn = bv_piece & @p & (1 << i) != 0
-            
-            if (clr.white? && i < 8)
-                next
-            elsif (clr.black? && i > 55)
-                break
-            end
-            
-            if (pwn)
-                if (i % 8 != 7)
-                    bv |= 1 << (i + (clr.white? ? -7 : 9))
-                end
+        mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
+        mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-                if (i % 8 != 0)
-                    bv |= 1 << (i + (clr.white? ? -9 : 7))
-                end
-            end
-        end
+        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        bv_pwn = bv_piece & @p
+
+        # right attack
+        bv = mask_right & (clr.white? ? bv_pwn >> 7 : bv_pwn << 9)
+
+        # left attack
+        bv |= mask_left & (clr.white? ? bv_pwn >> 9 : bv_pwn << 7)
         
         if (clr.white?)
             @wht_pwn_attk = bv
@@ -361,7 +348,7 @@ class Bitboard
             end
 
             # disable marking of squares based off of cols
-            col_index = i % 8;
+            col_index = i % 8
             if (col_index <= 1)
                 place_a = false
                 place_e = false
@@ -389,35 +376,35 @@ class Bitboard
             # G = K_pos - 15
             # H = K_pos - 6
             if (place_a)
-                bv |= 1 << (i + 6);
+                bv |= 1 << (i + 6)
             end                
             
             if (place_b)
-                bv |= 1 << (i + 15);
+                bv |= 1 << (i + 15)
             end                
 
             if (place_c)
-                bv |= 1 << (i + 17);
+                bv |= 1 << (i + 17)
             end                
 
             if (place_d)
-                bv |= 1 << (i + 10);
+                bv |= 1 << (i + 10)
             end                
 
             if (place_e)
-                bv |= 1 << (i - 10);
+                bv |= 1 << (i - 10)
             end                
 
             if (place_f)
-                bv |= 1 << (i - 17);
+                bv |= 1 << (i - 17)
             end                
 
             if (place_g)
-                bv |= 1 << (i - 15);
+                bv |= 1 << (i - 15)
             end                
  
             if (place_h)
-                bv |= 1 << (i - 6);
+                bv |= 1 << (i - 6)
             end                
         end
         
@@ -437,12 +424,12 @@ class Bitboard
         index = -1
         0.upto(63) do |i|
             if (1 << i == bv_piece)
-                index = i;
-                break;
+                index = i
+                break
             end                        
         end
         
-        col = index % 8;
+        col = index % 8
         
         # row below king
         if (index > 7)
@@ -579,13 +566,13 @@ class Bitboard
         0.upto(7) do |i|
             if (concerned_piece & cell != 0)
                 (i-1).downto(0) do |j|
-                  chk_cell = cell >> (8 * (i - j));
+                  chk_cell = cell >> (8 * (i - j))
                   bv = bv | chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
 
                 (i+1).upto(7) do |j|
-                  chk_cell = cell << (8 * (j - i));
+                  chk_cell = cell << (8 * (j - i))
                   bv = bv | chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
@@ -630,13 +617,13 @@ class Bitboard
         0.upto(7) do |i|
             if (concerned_piece & cell != 0)
                 (i-1).downto(0) do |j|
-                  chk_cell = cell >> (i - j);
+                  chk_cell = cell >> (i - j)
                   bv = bv | chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
 
                 (i+1).upto(7) do |j|
-                  chk_cell = cell << (j - i);
+                  chk_cell = cell << (j - i)
                   bv = bv | chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
