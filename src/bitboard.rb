@@ -658,46 +658,25 @@ class Bitboard
         mask_right = 0x01_01_01_01_01_01_01_01
         bv = 0
 
-        # up-right
-        chk_sq = sq - 9
-        while (chk_sq >= 0)
-            bv |= 1 << chk_sq
-          
-            # do not continue to the next peice if this square contains a peice or we're off the right edge
-            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_right) != 0)
-            chk_sq -= 9
-        end
+        operations = [
+            [mask_right, -9], # btm right
+            [mask_left, -7],  # btm left
+            [mask_right, 7],  # up right
+            [mask_left, 9]    # up left
+        ]
         
-        # up-left
-        chk_sq = sq - 7
-        while (chk_sq >= 0)
-            bv |= 1 << chk_sq
-          
-            # do not continue to the next peice if this square contains a peice or we're off the left edge
-            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_left) != 0)
-            chk_sq -= 7
+        operations.each do |params|
+            chk_sq = sq + params[1]
+            
+            while (chk_sq >= 0 && chk_sq < 64)
+                bv |= 1 << chk_sq
+
+                # do not continue to the next peice if this square contains a peice or we're off the edge
+                break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & params[0]) != 0)
+                chk_sq += params[1]
+            end
         end
-        
-        # down-right
-        chk_sq = sq + 7
-        while (chk_sq < 64)
-            bv |= 1 << chk_sq
-          
-            # do not continue to the next peice if this square contains a peice or we're off the right edge
-            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_right) != 0)
-            chk_sq += 7
-        end
-        
-        # down-left
-        chk_sq = sq + 9
-        while (chk_sq < 64)
-            bv |= 1 << chk_sq
-          
-            # do not continue to the next peice if this square contains a peice or we're off the left edge
-            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_left) != 0)
-            chk_sq += 9
-        end
-        
+
         bv
     end
 end
