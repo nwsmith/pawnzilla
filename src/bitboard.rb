@@ -29,12 +29,18 @@ class Bitboard
     :k       # All kings
     
     :blk_pwn_attk # Black Pawn Attacks
+    :blk_rok_attk # Black Roow Attacks
     :blk_kni_attk # Black Knight Attacks
+    :blk_bsp_attk # Black Bishop Attacks
+    :blk_qun_attk # Black Queen Attacks
     :blk_kng_attk # Black King Attacks
     :blk_attk # All black attacks
     
     :wht_pwn_attk # White Pawn Attacks
-    :wht_kni_attk # While Knight Attacks
+    :wht_rok_attk # White Rook Attacks
+    :wht_kni_attk # White Knight Attacks
+    :wht_bsp_attk # White Bishop Attacks
+    :wht_qun_attk # White Queen Attacks
     :wht_kng_attk # While King Attacks
     :wht_attk # All white attacks    
     
@@ -53,12 +59,14 @@ class Bitboard
         @blk_rok_attk = 0x00_00_00_00_00_00_00_00
         @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
         @blk_bsp_attk = 0x00_00_00_00_00_00_00_00
+        @blk_qun_attk = 0x00_00_00_00_00_00_00_00
         @blk_kng_attk = 0x00_00_00_00_00_00_1C_14
 
         @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
         @wht_rok_attk = 0x00_00_00_00_00_00_00_00
         @wht_kni_attk = 0x00_18_A5_00_00_00_00_00
         @wht_bsp_attk = 0x00_00_00_00_00_00_00_00
+        @wht_qun_attk = 0x00_00_00_00_00_00_00_00
         @wht_kng_attk = 0x14_1C_00_00_00_00_00_00
     end
     
@@ -78,12 +86,14 @@ class Bitboard
         @blk_rok_attk = 0
         @blk_kni_attk = 0
         @blk_bsp_attk = 0
+        @blk_qun_attk = 0
         @blk_kng_attk = 0
 
         @wht_pwn_attk = 0
         @wht_rok_attk = 0
         @wht_kni_attk = 0
         @wht_bsp_attk = 0
+        @wht_qun_attk = 0
         @wht_kng_attk = 0
     end
     
@@ -435,6 +445,32 @@ class Bitboard
         end
         
     end
+    
+    def gen_qun_attack(clr)
+      bv = 0
+      bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @q
+
+      0.upto(63) do |i|
+          if (1 << i & bv_piece != 0)
+            bv |= gen_diagonal_attack(i)
+          end
+      end
+      
+      0.upto(7) do |i|
+          bv = bv | gen_file_attk(clr, Chess::Piece.new(clr, "Queen"), i)
+      end
+      
+      0.upto(7) do |i|
+          bv = bv | gen_rank_attk(clr, Chess::Piece.new(clr, "Queen"), i)
+      end
+      
+
+      if (clr.white?)
+          @wht_qun_attk = bv
+      else
+          @blk_qun_attk = bv
+      end
+    end
 
     def gen_kng_attack(clr)
         bv = 0
@@ -489,9 +525,9 @@ class Bitboard
     
     def gen_combined_attk(clr)
         if (clr.white?)
-            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_bsp_attk | @wht_kng_attk
+            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_bsp_attk | @wht_qun_attk | @wht_kng_attk
         else
-            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @wht_bsp_attk | @blk_kng_attk
+            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @blk_bsp_attk | @blk_qun_attk | @blk_kng_attk
         end
     end
 
@@ -570,11 +606,13 @@ class Bitboard
         elsif (file == 7)
             mask = 0x01_01_01_01_01_01_01_01
         end
+        
+        peice_bv = peice.name == "Rook" ? @r : @q 
 
         bv = 0
         friendly_piece = clr.white? ? @wht_pc : @blk_pc
         enemy_piece = clr.white?    ? @blk_pc : @wht_pc
-        concerned_piece =  friendly_piece & @r  & mask
+        concerned_piece =  friendly_piece & peice_bv  & mask
         
         # eliminate the simple cases
         if (concerned_piece == 0)
@@ -622,10 +660,12 @@ class Bitboard
             mask = 0xFF_00_00_00_00_00_00_00
         end
 
+        peice_bv = peice.name == "Rook" ? @r : @q 
+
         bv = 0
         friendly_piece = clr.white? ? @wht_pc : @blk_pc
         enemy_piece = clr.white?    ? @blk_pc : @wht_pc
-        concerned_piece =  friendly_piece & @r  & mask
+        concerned_piece =  friendly_piece & peice_bv  & mask
         
         # eliminate the simple cases
         if (concerned_piece == 0)
