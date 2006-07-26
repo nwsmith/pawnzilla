@@ -52,11 +52,13 @@ class Bitboard
         @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
         @blk_rok_attk = 0x00_00_00_00_00_00_00_00
         @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
+        @blk_bsp_attk = 0x00_00_00_00_00_00_00_00
         @blk_kng_attk = 0x00_00_00_00_00_00_1C_14
 
         @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
         @wht_rok_attk = 0x00_00_00_00_00_00_00_00
         @wht_kni_attk = 0x00_18_A5_00_00_00_00_00
+        @wht_bsp_attk = 0x00_00_00_00_00_00_00_00
         @wht_kng_attk = 0x14_1C_00_00_00_00_00_00
     end
     
@@ -73,11 +75,15 @@ class Bitboard
         @k = 0
 
         @blk_pwn_attk = 0
+        @blk_rok_attk = 0
         @blk_kni_attk = 0
+        @blk_bsp_attk = 0
         @blk_kng_attk = 0
 
         @wht_pwn_attk = 0
+        @wht_rok_attk = 0
         @wht_kni_attk = 0
+        @wht_bsp_attk = 0
         @wht_kng_attk = 0
     end
     
@@ -272,7 +278,6 @@ class Bitboard
     end
     
     def gen_rok_attack(clr)
-        bv = clr.white? ? @wht_rok_attk : @blk_rok_attk
         bv = 0
         bv_piece = clr.white? ? @wht_pc : @blk_pc
         
@@ -298,9 +303,7 @@ class Bitboard
     end
     
     def gen_kni_attack(clr)
-        bv = clr.white? ? @wht_kni_attk : @blk_kni_attk
         bv = 0
-        
         bv_piece = clr.white? ? @wht_pc : @blk_pc
         
         # knight attack position legend for below (k == knight)
@@ -414,11 +417,27 @@ class Bitboard
             @blk_kni_attk = bv
         end
     end
+    
+    def gen_bsp_attack(clr)
+        bv = 0
+        bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @b
+        
+        0.upto(63) do |i|
+            if (1 << i & bv_piece != 0)
+              bv |= gen_diagonal_attack(i)
+            end
+        end
+        
+        if (clr.white?)
+            @wht_kng_attk = bv
+        else
+            @blk_kng_attk = bv
+        end
+        
+    end
 
     def gen_kng_attack(clr)
-        bv = clr.white? ? @wht_kng_attk : @blk_kng_attk
         bv = 0
-        
         bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @k
         
         index = -1
@@ -470,9 +489,9 @@ class Bitboard
     
     def gen_combined_attk(clr)
         if (clr.white?)
-            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_kng_attk
+            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_bsp_attk | @wht_kng_attk
         else
-            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @blk_kng_attk
+            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @wht_bsp_attk | @blk_kng_attk
         end
     end
 
@@ -630,6 +649,55 @@ class Bitboard
             end
             cell = cell << 1
         end
+        bv
+    end
+    
+    # generates a bv for a diagonal attack given a square
+    def gen_diagonal_attack(sq)
+        mask_left  = 0x80_80_80_80_80_80_80_80
+        mask_right = 0x01_01_01_01_01_01_01_01
+        bv = 0
+
+        # up-right
+        chk_sq = sq - 9
+        while (chk_sq >= 0)
+            bv |= 1 << chk_sq
+          
+            # do not continue to the next peice if this square contains a peice or we're off the right edge
+            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_right) != 0)
+            chk_sq -= 9
+        end
+        
+        # up-left
+        chk_sq = sq - 7
+        while (chk_sq >= 0)
+            bv |= 1 << chk_sq
+          
+            # do not continue to the next peice if this square contains a peice or we're off the left edge
+            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_left) != 0)
+            chk_sq -= 7
+        end
+        
+        # down-right
+        chk_sq = sq + 7
+        while (chk_sq < 64)
+            bv |= 1 << chk_sq
+          
+            # do not continue to the next peice if this square contains a peice or we're off the right edge
+            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_right) != 0)
+            chk_sq += 7
+        end
+        
+        # down-left
+        chk_sq = sq + 9
+        while (chk_sq < 64)
+            bv |= 1 << chk_sq
+          
+            # do not continue to the next peice if this square contains a peice or we're off the left edge
+            break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & mask_left) != 0)
+            chk_sq += 9
+        end
+        
         bv
     end
 end

@@ -314,6 +314,77 @@ class TestBitboard < Test::Unit::TestCase
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 5)))
     end      
     
+    def test_gen_bsp_attack()
+        b = Bitboard.new()
+        
+        # Test the corner
+        b.clear()
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
+        b.gen_bsp_attack(Chess::Colour.new_white)
+        
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 1)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(1, 0)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 1)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 6)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 7)))
+    
+
+        # Test the middle
+        b.clear()
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
+        b.gen_bsp_attack(Chess::Colour.new_white)
+        
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 3)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 5)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(3, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(5, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 1)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 6)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 7)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 1)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 5)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 6)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 7)))
+
+        # Test the blocked peice
+        b.clear()
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
+        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
+        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
+        b.gen_bsp_attack(Chess::Colour.new_white)
+        
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 3)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 5)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(3, 4)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(5, 4)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(2, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 1)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 5)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(2, 6)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(1, 7)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 3)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 2)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 1)))
+        assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 5)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(6, 6)))
+        assert(!b.attacked?(Chess::Colour.new_white, Coord.new(7, 7)))
+    end
+
     def test_gen_kng_attack()
         b = Bitboard.new()
         
