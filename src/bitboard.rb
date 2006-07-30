@@ -705,6 +705,10 @@ class Bitboard
         file
     end
     
+    def Bitboard::get_file_mask(bv) 
+        return FILE_MASKS[get_file(bv)]
+    end
+    
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""
