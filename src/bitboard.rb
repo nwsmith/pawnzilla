@@ -622,53 +622,44 @@ class Bitboard
     
     
     # generate a bv for this piece on the given rank
-    def calculate_rank_attack(clr, peice, rank)
-        if (rank == 0)
-            mask = 0x00_00_00_00_00_00_00_FF
-        elsif (rank == 1)
-            mask = 0x00_00_00_00_00_00_FF_00
-        elsif (rank == 2)
-            mask = 0x00_00_00_00_00_FF_00_00
-        elsif (rank == 3)
-            mask = 0x00_00_00_00_FF_00_00_00
-        elsif (rank == 4)
-            mask = 0x00_00_00_FF_00_00_00_00
-        elsif (rank == 5)
-            mask = 0x00_00_FF_00_00_00_00_00
-        elsif (rank == 6)
-            mask = 0x00_FF_00_00_00_00_00_00
-        elsif (rank == 7)
-            mask = 0xFF_00_00_00_00_00_00_00
-        end
+    def calculate_rank_attack(clr, piece, rank)
+        rank_masks = [
+            0x00_00_00_00_00_00_00_FF,
+            0x00_00_00_00_00_00_FF_00,
+            0x00_00_00_00_00_FF_00_00,
+            0x00_00_00_00_FF_00_00_00,
+            0x00_00_00_FF_00_00_00_00,
+            0x00_00_FF_00_00_00_00_00,
+            0x00_FF_00_00_00_00_00_00,
+            0xFF_00_00_00_00_00_00_00
+        ]
 
-        peice_bv = peice.name == "Rook" ? @r : @q 
+        piece_bv = piece.name == "Rook" ? @r : @q 
 
         bv = 0
-        friendly_piece = clr.white? ? @wht_pc : @blk_pc
-        enemy_piece = clr.white?    ? @blk_pc : @wht_pc
-        concerned_piece =  friendly_piece & peice_bv  & mask
+        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & rank_masks[rank]
         
-        # eliminate the simple cases
-        if (concerned_piece == 0)
+        if (attacking_piece == 0)
+            # attacking piece is not on this rank, abort
             return 0
         end
         
-        cell = 1 << (8 * rank)
+        cell = 0x1 << (8 * rank)
         0.upto(7) do |i|
-            if (concerned_piece & cell != 0)
+            if (attacking_piece & cell != 0)
                 (i-1).downto(0) do |j|
                   chk_cell = cell >> (i - j)
-                  bv = bv | chk_cell
+                  bv |= chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
 
                 (i+1).upto(7) do |j|
                   chk_cell = cell << (j - i)
-                  bv = bv | chk_cell
+                  bv |= chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
             end
-            cell = cell << 1
+            cell <<= 1
         end
         bv
     end
