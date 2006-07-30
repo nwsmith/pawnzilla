@@ -28,20 +28,20 @@ class Bitboard
     :q       # All queens
     :k       # All kings
     
-    :blk_pwn_attk # Black Pawn Attacks
-    :blk_rok_attk # Black Roow Attacks
-    :blk_kni_attk # Black Knight Attacks
-    :blk_bsp_attk # Black Bishop Attacks
-    :blk_qun_attk # Black Queen Attacks
-    :blk_kng_attk # Black King Attacks
+    :blk_p_attk # Black Pawn Attacks
+    :blk_r_attk # Black Roow Attacks
+    :blk_n_attk # Black Knight Attacks
+    :blk_b_attk # Black Bishop Attacks
+    :blk_q_attk # Black Queen Attacks
+    :blk_k_attk # Black King Attacks
     :blk_attk # All black attacks
     
-    :wht_pwn_attk # White Pawn Attacks
-    :wht_rok_attk # White Rook Attacks
-    :wht_kni_attk # White Knight Attacks
-    :wht_bsp_attk # White Bishop Attacks
-    :wht_qun_attk # White Queen Attacks
-    :wht_kng_attk # While King Attacks
+    :wht_p_attk # White Pawn Attacks
+    :wht_r_attk # White Rook Attacks
+    :wht_n_attk # White Knight Attacks
+    :wht_b_attk # White Bishop Attacks
+    :wht_q_attk # White Queen Attacks
+    :wht_k_attk # While King Attacks
     :wht_attk # All white attacks    
     
     def initialize()         
@@ -55,23 +55,22 @@ class Bitboard
         @q = 0x10_00_00_00_00_00_00_10
         @k = 0x08_00_00_00_00_00_00_08
         
-        @blk_pwn_attk = 0x00_00_00_00_00_FF_00_00
-        @blk_rok_attk = 0x00_00_00_00_00_00_00_00
-        @blk_kni_attk = 0x00_00_00_00_00_A5_18_00
-        @blk_bsp_attk = 0x00_00_00_00_00_00_00_00
-        @blk_qun_attk = 0x00_00_00_00_00_00_00_00
-        @blk_kng_attk = 0x00_00_00_00_00_00_1C_14
+        @blk_p_attk = 0x00_00_00_00_00_FF_00_00
+        @blk_r_attk = 0x00_00_00_00_00_00_00_00
+        @blk_n_attk = 0x00_00_00_00_00_A5_18_00
+        @blk_b_attk = 0x00_00_00_00_00_00_00_00
+        @blk_q_attk = 0x00_00_00_00_00_00_00_00
+        @blk_k_attk = 0x00_00_00_00_00_00_1C_14
 
-        @wht_pwn_attk = 0x00_00_FF_00_00_00_00_00
-        @wht_rok_attk = 0x00_00_00_00_00_00_00_00
-        @wht_kni_attk = 0x00_18_A5_00_00_00_00_00
-        @wht_bsp_attk = 0x00_00_00_00_00_00_00_00
-        @wht_qun_attk = 0x00_00_00_00_00_00_00_00
-        @wht_kng_attk = 0x14_1C_00_00_00_00_00_00
+        @wht_p_attk = 0x00_00_FF_00_00_00_00_00
+        @wht_r_attk = 0x00_00_00_00_00_00_00_00
+        @wht_n_attk = 0x00_18_A5_00_00_00_00_00
+        @wht_b_attk = 0x00_00_00_00_00_00_00_00
+        @wht_q_attk = 0x00_00_00_00_00_00_00_00
+        @wht_k_attk = 0x14_1C_00_00_00_00_00_00
     end
     
-    def clear()
-    
+    def clear()    
         @blk_pc = 0
         @wht_pc = 0
         
@@ -82,19 +81,19 @@ class Bitboard
         @q = 0
         @k = 0
 
-        @blk_pwn_attk = 0
-        @blk_rok_attk = 0
-        @blk_kni_attk = 0
-        @blk_bsp_attk = 0
-        @blk_qun_attk = 0
-        @blk_kng_attk = 0
+        @blk_p_attk = 0
+        @blk_r_attk = 0
+        @blk_n_attk = 0
+        @blk_b_attk = 0
+        @blk_q_attk = 0
+        @blk_k_attk = 0
 
-        @wht_pwn_attk = 0
-        @wht_rok_attk = 0
-        @wht_kni_attk = 0
-        @wht_bsp_attk = 0
-        @wht_qun_attk = 0
-        @wht_kng_attk = 0
+        @wht_p_attk = 0
+        @wht_r_attk = 0
+        @wht_n_attk = 0
+        @wht_b_attk = 0
+        @wht_q_attk = 0
+        @wht_k_attk = 0
     end
     
     # get the shift width required to get the square specified by the provided coord
@@ -132,7 +131,54 @@ class Bitboard
         
         square
     end
+
+
+    def on_file?(src, dest) 
+        src, dest = dest, src if dest < src
+        
+        while dest > 0
+            return true if src == dest
+            dest >>= 8
+        end
+        
+        false
+    end
     
+    def on_rank?(src, dest) 
+        src, dest = dest, src if dest < src
+        
+        # shift source to the populated rank and ensure dest is shifted to same rank
+        while !(src.between?(0x00, 0xFF))
+            src >>= 8
+            dest >>= 8 
+        end
+        
+        return (dest - src).between?(0x00, 0xFF)
+    end 
+    
+    def on_diagonal?(src, dest) 
+        # Normalize coordinates to be west to east
+        src, dest = dest, src if dest < src
+        
+        dest_orig = dest
+
+        # Check south to north
+        while dest > 0
+            return true if (src & dest) == dest
+            dest >>= 9
+        end
+        
+        # Check north to South
+        dest = dest_orig
+        
+        while dest > 0
+            return true if (src & dest) == dest
+            dest >>= 7
+        end
+        
+        false
+    end
+        
     def place_piece(coord, piece) 
         pc_bv = 0x1 << get_sw(coord)
         
@@ -264,30 +310,30 @@ class Bitboard
     end
     
     def attacked?(clr, coord)
-        (1 << get_sw(coord)) & gen_combined_attk(clr) != 0
+        (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
     end    
     
-    def gen_pwn_attack(clr)
+    def calculate_pawn_attack(clr)
         mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
         mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
         bv_piece = clr.white? ? @wht_pc : @blk_pc
-        bv_pwn = bv_piece & @p
+        bv_p = bv_piece & @p
 
         # right attack
-        bv = mask_right & (clr.white? ? bv_pwn >> 7 : bv_pwn << 9)
+        bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
 
         # left attack
-        bv |= mask_left & (clr.white? ? bv_pwn >> 9 : bv_pwn << 7)
+        bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
         
         if (clr.white?)
-            @wht_pwn_attk = bv
+            @wht_p_attk = bv
         else
-            @blk_pwn_attk = bv
+            @blk_p_attk = bv
         end
     end
     
-    def gen_rok_attack(clr)
+    def calculate_rook_attack(clr)
         bv = 0
         bv_piece = clr.white? ? @wht_pc : @blk_pc
         
@@ -296,23 +342,23 @@ class Bitboard
         end
         
         0.upto(7) do |i|
-            bv = bv | gen_file_attk(clr, Chess::Piece.new(clr, "Rook"), i)
+            bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, "Rook"), i)
         end
         
         0.upto(7) do |i|
-            bv = bv | gen_rank_attk(clr, Chess::Piece.new(clr, "Rook"), i)
+            bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, "Rook"), i)
         end
         
         
         if (clr.white?)
-            @wht_rok_attk = bv
+            @wht_r_attk = bv
         else
-            @blk_rok_attk = bv
+            @blk_r_attk = bv
         end
         
     end
     
-    def gen_kni_attack(clr)
+    def calculate_knight_attack(clr)
         bv = 0
         bv_piece = clr.white? ? @wht_pc : @blk_pc
         
@@ -422,57 +468,57 @@ class Bitboard
         end
         
         if (clr.white?)
-            @wht_kni_attk = bv
+            @wht_n_attk = bv
         else
-            @blk_kni_attk = bv
+            @blk_n_attk = bv
         end
     end
     
-    def gen_bsp_attack(clr)
+    def calculate_bishop_attack(clr)
         bv = 0
         bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @b
         
         0.upto(63) do |i|
             if (1 << i & bv_piece != 0)
-              bv |= gen_diagonal_attack(i)
+              bv |= calculate_diagonal_attack(i)
             end
         end
         
         if (clr.white?)
-            @wht_kng_attk = bv
+            @wht_k_attk = bv
         else
-            @blk_kng_attk = bv
+            @blk_k_attk = bv
         end
         
     end
     
-    def gen_qun_attack(clr)
+    def calculate_queen_attack(clr)
       bv = 0
       bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @q
 
       0.upto(63) do |i|
           if (1 << i & bv_piece != 0)
-            bv |= gen_diagonal_attack(i)
+            bv |= calculate_diagonal_attack(i)
           end
       end
       
       0.upto(7) do |i|
-          bv = bv | gen_file_attk(clr, Chess::Piece.new(clr, "Queen"), i)
+          bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, "Queen"), i)
       end
       
       0.upto(7) do |i|
-          bv = bv | gen_rank_attk(clr, Chess::Piece.new(clr, "Queen"), i)
+          bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, "Queen"), i)
       end
       
 
       if (clr.white?)
-          @wht_qun_attk = bv
+          @wht_q_attk = bv
       else
-          @blk_qun_attk = bv
+          @blk_q_attk = bv
       end
     end
 
-    def gen_kng_attack(clr)
+    def calculate_king_attack(clr)
         bv = 0
         bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @k
         
@@ -517,78 +563,22 @@ class Bitboard
         end
         
         if (clr.white?)
-            @wht_kng_attk = bv
+            @wht_k_attk = bv
         else
-            @blk_kng_attk = bv
+            @blk_k_attk = bv
         end
     end
     
-    def gen_combined_attk(clr)
+    def calculate_colour_attack(clr)
         if (clr.white?)
-            @wht_attk = @wht_pwn_attk | @wht_rok_attk | @wht_kni_attk | @wht_bsp_attk | @wht_qun_attk | @wht_kng_attk
+            @wht_p_attk | @wht_r_attk | @wht_n_attk | @wht_b_attk | @wht_q_attk | @wht_k_attk
         else
-            @blk_attk = @blk_pwn_attk | @blk_rok_attk | @blk_kni_attk | @blk_bsp_attk | @blk_qun_attk | @blk_kng_attk
+            @blk_p_attk | @blk_r_attk | @blk_n_attk | @blk_b_attk | @blk_q_attk | @blk_k_attk
         end
-    end
-
-    # return the provided 64 bit vector as a formatted binary string
-    def pp_bv(bv) 
-        out = ""
-        63.downto(0) do |i|
-            out += bv[i].to_s
-            out += " " if (i % 8 == 0)                       
-        end
-        out
-    end
-    
-    def on_file?(src, dest) 
-        src, dest = dest, src if dest < src
-        
-        while dest > 0
-            return true if src == dest
-            dest >>= 8
-        end
-        
-        false
-    end
-    
-    def on_rank?(src, dest) 
-        src, dest = dest, src if dest < src
-        
-        # shift source to the populated rank and ensure dest is shifted to same rank
-        while !(src.between?(0x00, 0xFF))
-            src >>= 8
-            dest >>= 8 
-        end
-        
-        return (dest - src).between?(0x00, 0xFF)
-    end 
-    
-    def on_diagonal?(src, dest) 
-        # Normalize coordinates to be west to east
-        src, dest = dest, src if dest < src
-        
-        dest_orig = dest
-
-        # Check south to north
-        while dest > 0
-            return true if (src & dest) == dest
-            dest >>= 9
-        end
-        
-        # Check north to South
-        dest = dest_orig
-        
-        while dest > 0
-            return true if (src & dest) == dest
-            dest >>= 7
-        end
-        
-        false
     end
     
     # generate a bv for this piece on the given file
-    def gen_file_attk(clr, peice, file)
+    def calculate_file_attack(clr, peice, file)
         if (file == 0)
             mask = 0x80_80_80_80_80_80_80_80
         elsif (file == 1)
@@ -641,7 +631,7 @@ class Bitboard
     
     
     # generate a bv for this piece on the given rank
-    def gen_rank_attk(clr, peice, rank)
+    def calculate_rank_attack(clr, peice, rank)
         if (rank == 0)
             mask = 0x00_00_00_00_00_00_00_FF
         elsif (rank == 1)
@@ -693,7 +683,7 @@ class Bitboard
     end
     
     # generates a bv for a diagonal attack given a square
-    def gen_diagonal_attack(sq)
+    def calculate_diagonal_attack(sq)
         mask_left  = 0x80_80_80_80_80_80_80_80
         mask_right = 0x01_01_01_01_01_01_01_01
         bv = 0
@@ -719,4 +709,14 @@ class Bitboard
 
         bv
     end
+    
+    # return the provided 64 bit vector as a formatted binary string
+    def pp_bv(bv) 
+        out = ""
+        63.downto(0) do |i|
+            out += bv[i].to_s
+            out += " " if (i % 8 == 0)                       
+        end
+        out
+    end        
 end
