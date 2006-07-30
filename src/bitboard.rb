@@ -117,12 +117,12 @@ class Bitboard
 
         # Determine piece type
         if !color.nil?
-            piece = Chess::Piece.new(color, "Pawn") if @p[pos] == 1
-            piece = Chess::Piece.new(color, "Rook") if @r[pos] == 1
-            piece = Chess::Piece.new(color, "Knight") if @n[pos] == 1
-            piece = Chess::Piece.new(color, "Bishop") if @b[pos] == 1
-            piece = Chess::Piece.new(color, "Queen") if @q[pos] == 1
-            piece = Chess::Piece.new(color, "King") if @k[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::PAWN) if @p[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::ROOK) if @r[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::KNIGHT) if @n[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::BISHOP) if @b[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::QUEEN) if @q[pos] == 1
+            piece = Chess::Piece.new(color, Chess::Piece::KING) if @k[pos] == 1
         end
 
         square = Chess::Square.new(coord, Chess::Board.get_colour(coord))
@@ -192,17 +192,17 @@ class Bitboard
         end
                 
         case piece.name
-            when "Pawn"
+            when Chess::Piece::PAWN
                 @p |= pc_bv
-            when "Rook"
+            when Chess::Piece::ROOK
                 @r |= pc_bv
-            when "Knight"
+            when Chess::Piece::KNIGHT
                 @n |= pc_bv
-            when "Bishop"
+            when Chess::Piece::BISHOP
                 @b |= pc_bv
-            when "Queen"
+            when Chess::Piece::QUEEN
                 @q |= pc_bv
-            when "King"
+            when Chess::Piece::KING
                 @k |= pc_bv
             else
                 throw "Unknown piece: " + piece.name
@@ -224,17 +224,17 @@ class Bitboard
         end
         
         case piece.name
-            when "Pawn"
+            when Chess::Piece::PAWN
                 @p ^= pc_bv
-            when "Rook"
+            when Chess::Piece::ROOK
                 @r ^= pc_bv
-            when "Knight"
+            when Chess::Piece::KNIGHT
                 @n ^= pc_bv
-            when "Bishop"
+            when Chess::Piece::BISHOP
                 @b ^= pc_bv
-            when "Queen"
+            when Chess::Piece::QUEEN
                 @q ^= pc_bv
-            when "King"
+            when Chess::Piece::KING
                 @k ^= pc_bv
             else
                 throw "Unknown piece: " + piece.name
@@ -342,11 +342,11 @@ class Bitboard
         end
         
         0.upto(7) do |i|
-            bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, "Rook"), i)
+            bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
         end
         
         0.upto(7) do |i|
-            bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, "Rook"), i)
+            bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
         end
         
         
@@ -503,11 +503,11 @@ class Bitboard
       end
       
       0.upto(7) do |i|
-          bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, "Queen"), i)
+          bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
       end
       
       0.upto(7) do |i|
-          bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, "Queen"), i)
+          bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
       end
       
 

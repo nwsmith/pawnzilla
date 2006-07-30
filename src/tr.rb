@@ -19,17 +19,17 @@ module Translator
     class PieceTranslator
         def to_txt(piece) 
             case piece.name
-               when "Pawn"     
+               when Chess::Piece::PAWN     
                    parseFen(piece.colour, "p", "P")
-               when "Knight"
+               when Chess::Piece::KNIGHT
                    parseFen(piece.colour, "n", "N")
-               when "Bishop"
+               when Chess::Piece::BISHOP
                    parseFen(piece.colour, "b", "B")
-               when "Rook"
+               when Chess::Piece::ROOK
                    parseFen(piece.colour, "r", "R")
-               when "Queen"
+               when Chess::Piece::QUEEN
                    parseFen(piece.colour, "q", "Q")
-               when "King"
+               when Chess::Piece::KING
                    parseFen(piece.colour, "k", "K")
                else
                    "N/A"

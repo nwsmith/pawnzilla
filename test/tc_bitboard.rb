@@ -29,7 +29,7 @@ class TestBitboard < Test::Unit::TestCase
         square = board.sq_at(Coord.new(0, 0))        
         assert(square.colour.black?)
         assert(square.piece.colour.white?)
-        assert(square.piece.name == "Rook")
+        assert(square.piece.name == Chess::Piece::ROOK)
         
         square = board.sq_at(Coord.new(0, 2))
         assert(square.colour.black?)
@@ -38,7 +38,7 @@ class TestBitboard < Test::Unit::TestCase
         square = board.sq_at(Coord.new(2, 7))
         assert(square.colour.white?)
         assert(square.piece.colour.black?)
-        assert(square.piece.name == "Bishop")
+        assert(square.piece.name == Chess::Piece::BISHOP)
         
         square = board.sq_at(Coord.new(0, 5))
         assert(square.piece.nil?)
@@ -52,7 +52,7 @@ class TestBitboard < Test::Unit::TestCase
         assert(board.sq_at(src).piece.nil?)
         assert(!board.sq_at(dest).piece.nil?)
         assert(board.sq_at(dest).piece.colour.white?)
-        assert(board.sq_at(dest).piece.name == "Pawn")
+        assert(board.sq_at(dest).piece.name == Chess::Piece::PAWN)
     end
     
     def test_move_colour
@@ -73,12 +73,12 @@ class TestBitboard < Test::Unit::TestCase
     def test_place_piece
         board = Bitboard.new()
         coord = Coord.new(0,5)
-        piece = Chess::Piece.new(Chess::Colour.new_black(), "Rook")
+        piece = Chess::Piece.new(Chess::Colour.new_black(), Chess::Piece::ROOK)
         board.place_piece(coord, piece)
         square = board.sq_at(coord)
         assert(!square.piece.nil?)
         assert(square.piece.colour.black?) 
-        assert(square.piece.name == "Rook")
+        assert(square.piece.name == Chess::Piece::ROOK)
     end
     
     def test_remove_piece
@@ -99,18 +99,18 @@ class TestBitboard < Test::Unit::TestCase
         b = Bitboard.new()
         b.clear()
 
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))        
-        b.place_piece(Coord.new(3, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))        
+        b.place_piece(Coord.new(3, 3), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
         
-        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
         
-        b.place_piece(Coord.new(3, 0), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(3, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
@@ -119,8 +119,8 @@ class TestBitboard < Test::Unit::TestCase
         c0 = Coord.new(2, 3)
         c1 = Coord.new(5, 6)
         
-        b.place_piece(c0, Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
-        b.place_piece(c1, Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(c0, Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
+        b.place_piece(c1, Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         assert(b.blocked?(c0, Coord.new(6, 7)))
         assert(!b.blocked?(c0, Coord.new(4, 5)))
         assert(!b.blocked?(c0, c1))
@@ -137,7 +137,7 @@ class TestBitboard < Test::Unit::TestCase
         # Test the middle board attacks
         b.clear()
         
-        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_white)
 
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 4)))
@@ -148,7 +148,7 @@ class TestBitboard < Test::Unit::TestCase
 
         b.clear()
         
-        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.place_piece(Coord.new(2, 3), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_black)
 
         assert(!b.attacked?(Chess::Colour.new_black, Coord.new(0, 2)))
@@ -160,7 +160,7 @@ class TestBitboard < Test::Unit::TestCase
         # Test the left edge
         b.clear()
         
-        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_white)
 
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(7, 3)))
@@ -170,7 +170,7 @@ class TestBitboard < Test::Unit::TestCase
 
         b.clear()
         
-        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_black)
 
         assert(!b.attacked?(Chess::Colour.new_black, Coord.new(7, 3)))
@@ -181,7 +181,7 @@ class TestBitboard < Test::Unit::TestCase
         # Test the right edge
         b.clear()
         
-        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_white, "Pawn"))
+        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_white)
 
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(5, 4)))
@@ -191,7 +191,7 @@ class TestBitboard < Test::Unit::TestCase
 
         b.clear()
         
-        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_black, "Pawn"))
+        b.place_piece(Coord.new(7, 3), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::PAWN))
         b.calculate_pawn_attack(Chess::Colour.new_black)
 
         assert(!b.attacked?(Chess::Colour.new_black, Coord.new(5, 2)))
@@ -206,7 +206,7 @@ class TestBitboard < Test::Unit::TestCase
         
         # Test the corner
         b.clear()
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Rook"))
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::ROOK))
         b.calculate_rook_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
@@ -228,7 +228,7 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the middle
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Rook"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::ROOK))
         b.calculate_rook_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
@@ -250,11 +250,11 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the blocked peice
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Rook"))
-        b.place_piece(Coord.new(2, 4), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(6, 4), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(4, 6), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(2, 4), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(6, 4), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(4, 6), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
         b.calculate_rook_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
@@ -281,10 +281,10 @@ class TestBitboard < Test::Unit::TestCase
         # Test the middle board attacks
         b.clear()
         
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
-        b.place_piece(Coord.new(0, 7), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
-        b.place_piece(Coord.new(7, 0), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
-        b.place_piece(Coord.new(7, 7), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KNIGHT))
+        b.place_piece(Coord.new(0, 7), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KNIGHT))
+        b.place_piece(Coord.new(7, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KNIGHT))
+        b.place_piece(Coord.new(7, 7), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KNIGHT))
         b.calculate_knight_attack(Chess::Colour.new_white)
     
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(1, 2)))
@@ -301,7 +301,7 @@ class TestBitboard < Test::Unit::TestCase
 
         b.clear()
         
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Knight"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KNIGHT))
         b.calculate_knight_attack(Chess::Colour.new_white)
 
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(3, 2)))
@@ -319,7 +319,7 @@ class TestBitboard < Test::Unit::TestCase
         
         # Test the corner
         b.clear()
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::BISHOP))
         b.calculate_bishop_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
@@ -336,7 +336,7 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the middle
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::BISHOP))
         b.calculate_bishop_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 3)))
@@ -360,9 +360,9 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the blocked peice
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Bishop"))
-        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::BISHOP))
+        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
         b.calculate_bishop_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 3)))
@@ -390,7 +390,7 @@ class TestBitboard < Test::Unit::TestCase
         
         # Test the corner
         b.clear()
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, "Queen"))
+        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::QUEEN))
         b.calculate_queen_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 0)))
@@ -419,7 +419,7 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the middle
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Queen"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::QUEEN))
         b.calculate_queen_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
@@ -461,10 +461,10 @@ class TestBitboard < Test::Unit::TestCase
 
         # Test the blocked peice
         b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "Queen"))
-        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
-        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour.new_black, "Rook"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::QUEEN))
+        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
+        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
         b.calculate_queen_attack(Chess::Colour.new_white)
         
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
@@ -511,7 +511,7 @@ class TestBitboard < Test::Unit::TestCase
         # Test the middle board attacks
         b.clear()
         
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, "King"))
+        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KING))
         b.calculate_king_attack(Chess::Colour.new_white)
     
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(2, 2)))
@@ -539,13 +539,13 @@ class TestBitboard < Test::Unit::TestCase
 
         # Left side
         b.clear()
-        b.place_piece(Coord.new(0, 4), Chess::Piece.new(Chess::Colour.new_white, "King"))
+        b.place_piece(Coord.new(0, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KING))
         b.calculate_king_attack(Chess::Colour.new_white)
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(7, 4)))
         
         #Right side
         b.clear()
-        b.place_piece(Coord.new(7, 4), Chess::Piece.new(Chess::Colour.new_white, "King"))
+        b.place_piece(Coord.new(7, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::KING))
         b.calculate_king_attack(Chess::Colour.new_white)
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(0, 4)))
     end      

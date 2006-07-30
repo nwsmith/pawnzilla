@@ -75,18 +75,18 @@ class TestBoard < Test::Unit::TestCase
     def test_blocked
         b = Chess::Board.new(8)
         
-        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
-        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
         
-        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
         
-        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
@@ -95,8 +95,8 @@ class TestBoard < Test::Unit::TestCase
         c0 = Coord.new(2, 3)
         c1 = Coord.new(5, 6)
         
-        b.sq_at(c0).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
-        b.sq_at(c1).piece = Chess::Piece.new(Chess::Colour.new_white, "Pawn")
+        b.sq_at(c0).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(c1).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
         assert(b.blocked?(c0, Coord.new(6, 7)))
         assert(!b.blocked?(c0, Coord.new(4, 5)))
         assert(!b.blocked?(c0, c1))

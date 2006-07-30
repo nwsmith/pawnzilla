@@ -26,40 +26,40 @@ class TestTranslator < Test::Unit::TestCase
         white = Chess::Colour::new_white
         black = Chess::Colour::new_black
         
-        piece = Chess::Piece.new(white, "Pawn")   
+        piece = Chess::Piece.new(white, Chess::Piece::PAWN)   
         assert(tr.to_txt(piece) == "p")
         
-        piece = Chess::Piece.new(black, "Pawn")
+        piece = Chess::Piece.new(black, Chess::Piece::PAWN)
         assert(tr.to_txt(piece) == "P")
         
-        piece = Chess::Piece.new(white, "Rook")
+        piece = Chess::Piece.new(white, Chess::Piece::ROOK)
         assert(tr.to_txt(piece) == "r")
         
-        piece = Chess::Piece.new(black, "Rook")
+        piece = Chess::Piece.new(black, Chess::Piece::ROOK)
         assert(tr.to_txt(piece) == "R")
         
-        piece = Chess::Piece.new(white, "Knight")
+        piece = Chess::Piece.new(white, Chess::Piece::KNIGHT)
         assert(tr.to_txt(piece) == "n")
         
-        piece = Chess::Piece.new(black, "Knight")
+        piece = Chess::Piece.new(black, Chess::Piece::KNIGHT)
         assert(tr.to_txt(piece) == "N")
         
-        piece = Chess::Piece.new(white, "Bishop")
+        piece = Chess::Piece.new(white, Chess::Piece::BISHOP)
         assert(tr.to_txt(piece) == "b")
         
-        piece = Chess::Piece.new(black, "Bishop")
+        piece = Chess::Piece.new(black, Chess::Piece::BISHOP)
         assert(tr.to_txt(piece) == "B")
         
-        piece = Chess::Piece.new(white, "Queen")
+        piece = Chess::Piece.new(white, Chess::Piece::QUEEN)
         assert(tr.to_txt(piece) == "q")
         
-        piece = Chess::Piece.new(black, "Queen")
+        piece = Chess::Piece.new(black, Chess::Piece::QUEEN)
         assert(tr.to_txt(piece) == "Q")
         
-        piece = Chess::Piece.new(white, "King")
+        piece = Chess::Piece.new(white, Chess::Piece::KING)
         assert(tr.to_txt(piece) == "k")
         
-        piece = Chess::Piece.new(black, "King")
+        piece = Chess::Piece.new(black, Chess::Piece::KING)
         assert(tr.to_txt(piece) == "K")
     end
 end

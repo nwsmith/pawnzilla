@@ -32,12 +32,12 @@ module Rule_Std
           
         def initialize 
             @pc_val = {
-                "Bishop" => PieceInfo.new(3.5, method(:chk_mv_bishop)),
-                "King" => PieceInfo.new(1_000_000, method(:chk_mv_king)),
-                "Knight" => PieceInfo.new(3.5, method(:chk_mv_knight)),
-                "Pawn" => PieceInfo.new(1, method(:chk_mv_pawn)),
-                "Queen" => PieceInfo.new(9, method(:chk_mv_queen)),
-                "Rook" => PieceInfo.new(5, method(:chk_mv_rook))
+                Chess::Piece::BISHOP => PieceInfo.new(3.5, method(:chk_mv_bishop)),
+                Chess::Piece::KING => PieceInfo.new(1_000_000, method(:chk_mv_king)),
+                Chess::Piece::KNIGHT => PieceInfo.new(3.5, method(:chk_mv_knight)),
+                Chess::Piece::PAWN => PieceInfo.new(1, method(:chk_mv_pawn)),
+                Chess::Piece::QUEEN => PieceInfo.new(9, method(:chk_mv_queen)),
+                Chess::Piece::ROOK => PieceInfo.new(5, method(:chk_mv_rook))
             }
         
             @state = Game::State.new(B_SZ)
@@ -48,14 +48,15 @@ module Rule_Std
             [1, 6].each do |y|
                 (0...B_SZ).each do |x|
                     state.place_piece(Coord.new(x, y),
-                        Chess::Piece.new(clr, "Pawn"))
+                        Chess::Piece.new(clr, Chess::Piece::PAWN))
                 end
                 
                 clr = clr.flip
             end
             
             # Back Rows                        
-            bck_row = ["Rook", "Knight", "Bishop", "Queen", "King", "Bishop", "Knight", "Rook"]
+            bck_row = [Chess::Piece::ROOK, Chess::Piece::KNIGHT, Chess::Piece::BISHOP, Chess::Piece::QUEEN, 
+                       Chess::Piece::KING, Chess::Piece::BISHOP, Chess::Piece::KNIGHT, Chess::Piece::ROOK]
             
             [0, 7].each do |y|
                 bck_row.each_index do |x|

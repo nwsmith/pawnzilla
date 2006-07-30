@@ -71,6 +71,13 @@ module Chess
     end
     
     class Piece
+        BISHOP = "Bishop";
+        KING = "King";
+        KNIGHT = "Knight";
+        PAWN = "Pawn";
+        QUEEN = "Queen";
+        ROOK = "Rook";
+        
         attr_reader :colour
         attr_reader :name
 
