@@ -130,6 +130,10 @@ class Bitboard
         63 - (8 * coord.y) - coord.x
     end
     
+    def Bitboard.get_bv(coord)
+        0x1 << get_sw(coord)
+    end
+    
     def sq_at(coord) 
         pos = get_sw(coord)
         
