@@ -578,53 +578,44 @@ class Bitboard
     end
     
     # generate a bv for this piece on the given file
-    def calculate_file_attack(clr, peice, file)
-        if (file == 0)
-            mask = 0x80_80_80_80_80_80_80_80
-        elsif (file == 1)
-            mask = 0x40_40_40_40_40_40_40_40
-        elsif (file == 2)
-            mask = 0x20_20_20_20_20_20_20_20
-        elsif (file == 3)
-            mask = 0x10_10_10_10_10_10_10_10
-        elsif (file == 4)
-            mask = 0x08_08_08_08_08_08_08_08
-        elsif (file == 5)
-            mask = 0x04_04_04_04_04_04_04_04
-        elsif (file == 6)
-            mask = 0x02_02_02_02_02_02_02_02
-        elsif (file == 7)
-            mask = 0x01_01_01_01_01_01_01_01
-        end
+    def calculate_file_attack(clr, piece, file)
+        file_masks = [
+            0x80_80_80_80_80_80_80_80,
+            0x40_40_40_40_40_40_40_40,
+            0x20_20_20_20_20_20_20_20,
+            0x10_10_10_10_10_10_10_10,
+            0x08_08_08_08_08_08_08_08,
+            0x04_04_04_04_04_04_04_04,
+            0x02_02_02_02_02_02_02_02,
+            0x01_01_01_01_01_01_01_01        
+        ]
         
-        peice_bv = peice.name == "Rook" ? @r : @q 
+        piece_bv = piece.name == Chess::Piece::ROOK ? @r : @q 
 
         bv = 0
-        friendly_piece = clr.white? ? @wht_pc : @blk_pc
-        enemy_piece = clr.white?    ? @blk_pc : @wht_pc
-        concerned_piece =  friendly_piece & peice_bv  & mask
+        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & file_masks[file]
         
-        # eliminate the simple cases
-        if (concerned_piece == 0)
+        if (attacking_piece == 0)
+            # attacking piece is not on this file, abort
             return 0
         end
         
-        cell = 1 << (7 - file)
+        cell = 0x1 << (7 - file)
         0.upto(7) do |i|
-            if (concerned_piece & cell != 0)
+            if (attacking_piece & cell != 0)
                 (i-1).downto(0) do |j|
                   chk_cell = cell >> (8 * (i - j))
-                  bv = bv | chk_cell
+                  bv |= chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
 
                 (i+1).upto(7) do |j|
                   chk_cell = cell << (8 * (j - i))
-                  bv = bv | chk_cell
+                  bv |= chk_cell
                   break if (chk_cell & (@blk_pc | @wht_pc)) != 0
                 end
             end
-            cell = cell << 8
+            cell <<= 8
         end
         bv
     end
