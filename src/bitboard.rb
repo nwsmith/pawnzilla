@@ -696,6 +696,15 @@ class Bitboard
         bv
     end
     
+    def Bitboard::get_file(bv) 
+        file = 7;
+        while (bv & 0xFF) != bv
+            file -= 1
+            bv >>= 8
+        end
+        file
+    end
+    
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""

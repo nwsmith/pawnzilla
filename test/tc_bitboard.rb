@@ -619,6 +619,11 @@ class TestBitboard < Test::Unit::TestCase
     end
 
     def test_get_bv
-        assert(Bitboard.get_bv(Coord.new(7, 7)) == (0x1 << Bitboard.get_sw(Coord.new(7, 7))));
+        assert_equal(Bitboard.get_bv(Coord.new(7, 7)), (0x1 << Bitboard.get_sw(Coord.new(7, 7))))
+    end        
+    
+    def test_get_file
+        assert_equal(7, Bitboard.get_file(Bitboard.get_bv(Coord.new(7, 7))))
+        assert_equal(4, Bitboard.get_file(Bitboard.get_bv(Coord.new(3, 4))))
     end    
 end
