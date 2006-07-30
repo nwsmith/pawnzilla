@@ -18,6 +18,28 @@
 require "chess"
 
 class Bitboard
+    RANK_MASKS = [
+        0x00_00_00_00_00_00_00_FF,
+        0x00_00_00_00_00_00_FF_00,
+        0x00_00_00_00_00_FF_00_00,
+        0x00_00_00_00_FF_00_00_00,
+        0x00_00_00_FF_00_00_00_00,
+        0x00_00_FF_00_00_00_00_00,
+        0x00_FF_00_00_00_00_00_00,
+        0xFF_00_00_00_00_00_00_00
+    ]
+    
+    FILE_MASKS = [
+        0x80_80_80_80_80_80_80_80,
+        0x40_40_40_40_40_40_40_40,
+        0x20_20_20_20_20_20_20_20,
+        0x10_10_10_10_10_10_10_10,
+        0x08_08_08_08_08_08_08_08,
+        0x04_04_04_04_04_04_04_04,
+        0x02_02_02_02_02_02_02_02,
+        0x01_01_01_01_01_01_01_01        
+    ]
+            
     # Each property it an individual bitboard 
     :blk_pc  # All black pieces
     :wht_pc  # All white pieces
@@ -579,21 +601,10 @@ class Bitboard
     
     # generate a bv for this piece on the given file
     def calculate_file_attack(clr, piece, file)
-        file_masks = [
-            0x80_80_80_80_80_80_80_80,
-            0x40_40_40_40_40_40_40_40,
-            0x20_20_20_20_20_20_20_20,
-            0x10_10_10_10_10_10_10_10,
-            0x08_08_08_08_08_08_08_08,
-            0x04_04_04_04_04_04_04_04,
-            0x02_02_02_02_02_02_02_02,
-            0x01_01_01_01_01_01_01_01        
-        ]
-        
         piece_bv = piece.name == Chess::Piece::ROOK ? @r : @q 
 
         bv = 0
-        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & file_masks[file]
+        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & FILE_MASKS[file]
         
         if (attacking_piece == 0)
             # attacking piece is not on this file, abort
@@ -623,21 +634,10 @@ class Bitboard
     
     # generate a bv for this piece on the given rank
     def calculate_rank_attack(clr, piece, rank)
-        rank_masks = [
-            0x00_00_00_00_00_00_00_FF,
-            0x00_00_00_00_00_00_FF_00,
-            0x00_00_00_00_00_FF_00_00,
-            0x00_00_00_00_FF_00_00_00,
-            0x00_00_00_FF_00_00_00_00,
-            0x00_00_FF_00_00_00_00_00,
-            0x00_FF_00_00_00_00_00_00,
-            0xFF_00_00_00_00_00_00_00
-        ]
-
-        piece_bv = piece.name == "Rook" ? @r : @q 
+        piece_bv = piece.name == Chess::Piece::ROOK ? @r : @q 
 
         bv = 0
-        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & rank_masks[rank]
+        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & RANK_MASKS[rank]
         
         if (attacking_piece == 0)
             # attacking piece is not on this rank, abort
