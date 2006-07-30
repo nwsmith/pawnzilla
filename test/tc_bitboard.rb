@@ -641,4 +641,11 @@ class TestBitboard < Test::Unit::TestCase
         assert_equal(Bitboard::FILE_MASKS[7], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(7, 7))))
         assert_equal(Bitboard::FILE_MASKS[3], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(3, 4))))
     end
+    
+    def test_on_board
+        assert(Bitboard.on_board?(Bitboard.get_bv(Coord.new(7, 7))))
+        assert(Bitboard.on_board?(Bitboard.get_bv(Coord.new(0, 0))))
+        assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(7, 8))))
+        assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(8, 7))))
+    end
 end
