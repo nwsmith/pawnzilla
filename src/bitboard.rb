@@ -696,17 +696,33 @@ class Bitboard
         bv
     end
     
-    def Bitboard::get_file(bv) 
-        file = 7;
+    def Bitboard::get_rank(bv) 
+        rank = 7
         while (bv & 0xFF) != bv
-            file -= 1
+            rank -= 1
             bv >>= 8
+        end
+        rank
+    end
+    
+    def Bitboard::get_rank_mask(bv) 
+        return RANK_MASKS[get_rank(bv)]
+    end
+    
+    def Bitboard::get_file(bv)
+        file = 7
+        while (bv & 0xFF) != bv
+            bv >>= 8
+        end
+        while (bv & 0x01) != bv
+            file -= 1
+            bv >>= 1
         end
         file
     end
     
     def Bitboard::get_file_mask(bv) 
-        return FILE_MASKS[get_file(bv)]
+        return FILE_MASKS[get_file(bv)]    
     end
     
     # return the provided 64 bit vector as a formatted binary string

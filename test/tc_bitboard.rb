@@ -622,13 +622,23 @@ class TestBitboard < Test::Unit::TestCase
         assert_equal(Bitboard.get_bv(Coord.new(7, 7)), (0x1 << Bitboard.get_sw(Coord.new(7, 7))))
     end        
     
+    def test_get_rank
+        assert_equal(7, Bitboard.get_rank(Bitboard.get_bv(Coord.new(7, 7))))
+        assert_equal(4, Bitboard.get_rank(Bitboard.get_bv(Coord.new(3, 4))))
+    end
+    
+    def test_get_rank_mask
+        assert_equal(Bitboard::RANK_MASKS[7], Bitboard.get_rank_mask(Bitboard.get_bv(Coord.new(7, 7))))
+        assert_equal(Bitboard::RANK_MASKS[4], Bitboard.get_rank_mask(Bitboard.get_bv(Coord.new(3, 4))))
+    end    
+    
     def test_get_file
         assert_equal(7, Bitboard.get_file(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(4, Bitboard.get_file(Bitboard.get_bv(Coord.new(3, 4))))
+        assert_equal(3, Bitboard.get_file(Bitboard.get_bv(Coord.new(3, 4))))
     end
     
     def test_get_file_mask
         assert_equal(Bitboard::FILE_MASKS[7], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(Bitboard::FILE_MASKS[4], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(3, 4))))
-    end    
+        assert_equal(Bitboard::FILE_MASKS[3], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(3, 4))))
+    end
 end
