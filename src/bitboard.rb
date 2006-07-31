@@ -729,6 +729,12 @@ class Bitboard
         bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
     end
     
+    def Bitboard::find_right_edge(bv) 
+        # formula is
+        # 2^(board_size*(7-rank))
+        0x1 << ((7 - Bitboard.get_rank(bv)) << 3)
+    end
+    
     # return the provided 64 bit vector as a formatted binary string
     def pp_bv(bv) 
         out = ""

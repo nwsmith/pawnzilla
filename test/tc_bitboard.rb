@@ -648,4 +648,11 @@ class TestBitboard < Test::Unit::TestCase
         assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(7, 8))))
         assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(8, 7))))
     end
+    
+    def test_find_right_edge
+        assert_equal(Bitboard.get_bv(Coord.new(7, 7)), 
+                     Bitboard.find_right_edge(Bitboard.get_bv(Coord.new(3, 7))))
+        assert_equal(Bitboard.get_bv(Coord.new(7, 0)),
+                     Bitboard.find_right_edge(Bitboard.get_bv(Coord.new(4, 0))))                     
+    end    
 end
