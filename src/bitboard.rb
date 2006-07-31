@@ -731,8 +731,30 @@ class Bitboard
     
     def Bitboard::find_right_edge(bv) 
         # formula is
-        # 2^(board_size*(7-rank))
+        # x = board_size
+        # y = rank of bit vector
+        # z = right edge
+        # 
+        # z = 2^(x^2 - x - xy)
+        # 
+        # or: 
+        # 
+        # 2^(board_size*(board_size - 1 - rank))
         0x1 << ((7 - Bitboard.get_rank(bv)) << 3)
+    end
+
+    def Bitboard::find_left_edge(bv)
+        # formula is
+        # x = board_size
+        # y = rank of bit vector
+        # z = left edge
+        # 
+        # z = 2^(x^2 - xy - 1)
+        # 
+        # or:
+        # 
+        # 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
+        0x1 << (((7 - Bitboard.get_rank(bv)) << 3) + 7)
     end
     
     # return the provided 64 bit vector as a formatted binary string

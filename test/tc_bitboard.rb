@@ -655,4 +655,11 @@ class TestBitboard < Test::Unit::TestCase
         assert_equal(Bitboard.get_bv(Coord.new(7, 0)),
                      Bitboard.find_right_edge(Bitboard.get_bv(Coord.new(4, 0))))                     
     end    
+    
+    def test_find_left_edge
+        assert_equal(Bitboard.get_bv(Coord.new(0, 7)),
+                     Bitboard.find_left_edge(Bitboard.get_bv(Coord.new(3, 7))))
+        assert_equal(Bitboard.get_bv(Coord.new(0, 0)),
+                     Bitboard.find_left_edge(Bitboard.get_bv(Coord.new(4, 0))))                     
+    end                     
 end
