@@ -387,6 +387,7 @@ class Bitboard
     def calculate_knight_attack(clr)
         bv = 0
         bv_piece = clr.white? ? @wht_pc : @blk_pc
+        bv_knight_piece = bv_piece & @n
         
         # knight attack position legend for below (k == knight)
         #  B C
@@ -394,105 +395,39 @@ class Bitboard
         #   K
         # E   H
         #  F G
-        
-        0.upto(63) do |i|
-            kni_exist = bv_piece & @n & (1 << i) != 0
+    
+        # A
+        bv_board_mask = 0x00_3F_3F_3F_3F_3F_3F_3F
+        bv |= (bv_knight_piece & bv_board_mask) << 10
 
-            if (!kni_exist)
-                next
-            end
-            
-            place_a = true
-            place_b = true
-            place_c = true
-            place_d = true
-            place_e = true
-            place_f = true
-            place_g = true
-            place_h = true
-            
-            # disable marking of squares based off of rows
-            if (i > 47)
-                place_b = false
-                place_c = false
-                
-                if (i > 55)
-                    place_a = false
-                    place_d = false
-                end
-            end
-            
-            if (i < 16)
-                place_f = false
-                place_g = false
-                
-                if (i < 8)
-                    place_e = false
-                    place_h = false
-                end
-            end
+        # B
+        bv_board_mask = 0x00_00_7F_7F_7F_7F_7F_7F
+        bv |= (bv_knight_piece & bv_board_mask) << 17
 
-            # disable marking of squares based off of cols
-            col_index = i % 8
-            if (col_index <= 1)
-                place_a = false
-                place_e = false
-                if (col_index == 0)
-                    place_b = false
-                    place_f = false
-                end
-            end
+        # C
+        bv_board_mask = 0x00_00_FE_FE_FE_FE_FE_FE
+        bv |= (bv_knight_piece & bv_board_mask) << 15
 
-            if (col_index >= 6)
-                place_d = false
-                place_h = false
-                if (col_index == 7)
-                    place_c = false
-                    place_g = false
-                end
-            end
-            
-            # A = K_pos + 6
-            # B = K_pos + 15
-            # C = K_pos + 17
-            # D = K_pos + 10
-            # E = K_pos - 10
-            # F = K_pos - 17
-            # G = K_pos - 15
-            # H = K_pos - 6
-            if (place_a)
-                bv |= 1 << (i + 6)
-            end                
-            
-            if (place_b)
-                bv |= 1 << (i + 15)
-            end                
+        # D
+        bv_board_mask = 0x00_FC_FC_FC_FC_FC_FC_FC
+        bv |= (bv_knight_piece & bv_board_mask) << 6
 
-            if (place_c)
-                bv |= 1 << (i + 17)
-            end                
+        # E
+        bv_board_mask = 0x3F_3F_3F_3F_3F_3F_3F_00
+        bv |= (bv_knight_piece & bv_board_mask) >> 6
 
-            if (place_d)
-                bv |= 1 << (i + 10)
-            end                
+        # F
+        bv_board_mask = 0x7F_7F_7F_7F_7F_7F_00_00
+        bv |= (bv_knight_piece & bv_board_mask) >> 15
 
-            if (place_e)
-                bv |= 1 << (i - 10)
-            end                
+        # G
+        bv_board_mask = 0xFE_FE_FE_FE_FE_FE_00_00
+        bv |= (bv_knight_piece & bv_board_mask) >> 17
 
-            if (place_f)
-                bv |= 1 << (i - 17)
-            end                
+        # H
+        bv_board_mask = 0xFC_FC_FC_FC_FC_FC_FC_00
+        bv |= (bv_knight_piece & bv_board_mask) >> 10
 
-            if (place_g)
-                bv |= 1 << (i - 15)
-            end                
- 
-            if (place_h)
-                bv |= 1 << (i - 6)
-            end                
-        end
-        
         if (clr.white?)
             @wht_n_attk = bv
         else
