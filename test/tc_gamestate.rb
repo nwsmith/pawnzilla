@@ -17,13 +17,13 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"
-require "bitboard"
+require "gamestate"
 require "chess"
 require "geometry"
 
-class TestBitboard < Test::Unit::TestCase
+class TestGameState < Test::Unit::TestCase
     def test_sq_at
-        board = Bitboard.new();
+        board = GameState.new();
         
         square = board.sq_at(Coord.new(0, 0))        
         assert(square.colour.black?)
@@ -44,7 +44,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_move_piece
-        board = Bitboard.new()
+        board = GameState.new()
         src = Coord.new(0, 1)
         dest = Coord.new(0, 2)
         board.move_piece(src, dest)
@@ -56,7 +56,7 @@ class TestBitboard < Test::Unit::TestCase
     
     def test_move_colour
         # Ensure that the peice remains the same colour on move
-        board = Bitboard.new()
+        board = GameState.new()
         src = Coord.new(4, 6);
         dest = Coord.new(4, 4);
         board.move_piece(src, dest);
@@ -70,7 +70,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_place_piece
-        board = Bitboard.new()
+        board = GameState.new()
         coord = Coord.new(0,5)
         piece = Chess::Piece.new(Chess::Colour.new_black(), Chess::Piece::ROOK)
         board.place_piece(coord, piece)
@@ -81,7 +81,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_remove_piece
-        board = Bitboard.new()
+        board = GameState.new()
         coord = Coord.new(0,0)
         board.remove_piece(coord)
         square = board.sq_at(coord)
@@ -95,7 +95,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_blocked
-        b = Bitboard.new()
+        b = GameState.new()
         b.clear()
         
         b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN))        
@@ -131,7 +131,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_calculate_pawn_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the middle board attacks
         b.clear()
@@ -201,7 +201,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_calculate_rook_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the corner
         b.clear()
@@ -275,7 +275,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_calculate_knight_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the middle board attacks
         b.clear()
@@ -314,7 +314,7 @@ class TestBitboard < Test::Unit::TestCase
     end      
     
     def test_calculate_bishop_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the corner
         b.clear()
@@ -385,7 +385,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_calculate_queen_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the corner
         b.clear()
@@ -505,7 +505,7 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_calculate_king_attack()
-        b = Bitboard.new()
+        b = GameState.new()
         
         # Test the middle board attacks
         b.clear()
@@ -550,11 +550,11 @@ class TestBitboard < Test::Unit::TestCase
     end      
     
     def test_on_file? 
-        b = Bitboard.new;
+        b = GameState.new;
         
-        bv0_7 = 0x01 << Bitboard.get_sw(Coord.new(0, 7))
-        bv0_4 = 0x01 << Bitboard.get_sw(Coord.new(0, 4))
-        bv4_7 = 0x01 << Bitboard.get_sw(Coord.new(4, 7))
+        bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
+        bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))
+        bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
         
         assert(b.on_file?(bv0_7, bv0_4))
         assert(b.on_file?(bv0_4, bv0_7))
@@ -566,13 +566,13 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_on_rank?
-        b = Bitboard.new;
+        b = GameState.new;
         
-        bv0_0 = 0x01 << Bitboard.get_sw(Coord.new(0, 0))        
-        bv0_4 = 0x01 << Bitboard.get_sw(Coord.new(0, 4))        
-        bv0_7 = 0x01 << Bitboard.get_sw(Coord.new(0, 7))
-        bv4_7 = 0x01 << Bitboard.get_sw(Coord.new(4, 7))
-        bv7_0 = 0x01 << Bitboard.get_sw(Coord.new(7, 0))        
+        bv0_0 = 0x01 << GameState.get_sw(Coord.new(0, 0))        
+        bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))        
+        bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
+        bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
+        bv7_0 = 0x01 << GameState.get_sw(Coord.new(7, 0))        
         
         assert(b.on_rank?(bv0_7, bv4_7))
         assert(b.on_rank?(bv4_7, bv0_7))
@@ -586,11 +586,11 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_on_diagonal_sw_ne
-        b = Bitboard.new
+        b = GameState.new
         
-        bv1_3 = 0x1 << Bitboard.get_sw(Coord.new(1, 3))
-        bv2_4 = 0x1 << Bitboard.get_sw(Coord.new(2, 4))
-        bv3_5 = 0x1 << Bitboard.get_sw(Coord.new(3, 5))
+        bv1_3 = 0x1 << GameState.get_sw(Coord.new(1, 3))
+        bv2_4 = 0x1 << GameState.get_sw(Coord.new(2, 4))
+        bv3_5 = 0x1 << GameState.get_sw(Coord.new(3, 5))
         
         assert(b.on_diagonal?(bv1_3, bv2_4))
         assert(b.on_diagonal?(bv1_3, bv3_5))
@@ -602,11 +602,11 @@ class TestBitboard < Test::Unit::TestCase
     end
     
     def test_on_diagonal_nw_se
-        b = Bitboard.new
+        b = GameState.new
         
-        bv1_6 = 0x1 << Bitboard.get_sw(Coord.new(1, 6))
-        bv2_5 = 0x1 << Bitboard.get_sw(Coord.new(2, 5))
-        bv5_2 = 0x1 << Bitboard.get_sw(Coord.new(5, 2))
+        bv1_6 = 0x1 << GameState.get_sw(Coord.new(1, 6))
+        bv2_5 = 0x1 << GameState.get_sw(Coord.new(2, 5))
+        bv5_2 = 0x1 << GameState.get_sw(Coord.new(5, 2))
         
         assert(b.on_diagonal?(bv1_6, bv2_5))
         assert(b.on_diagonal?(bv2_5, bv5_2))
@@ -618,47 +618,47 @@ class TestBitboard < Test::Unit::TestCase
     end
 
     def test_get_bv
-        assert_equal(Bitboard.get_bv(Coord.new(7, 7)), (0x1 << Bitboard.get_sw(Coord.new(7, 7))))
+        assert_equal(GameState.get_bv(Coord.new(7, 7)), (0x1 << GameState.get_sw(Coord.new(7, 7))))
     end        
     
     def test_get_rank
-        assert_equal(7, Bitboard.get_rank(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(4, Bitboard.get_rank(Bitboard.get_bv(Coord.new(3, 4))))
+        assert_equal(7, GameState.get_rank(GameState.get_bv(Coord.new(7, 7))))
+        assert_equal(4, GameState.get_rank(GameState.get_bv(Coord.new(3, 4))))
     end
     
     def test_get_rank_mask
-        assert_equal(Bitboard::RANK_MASKS[7], Bitboard.get_rank_mask(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(Bitboard::RANK_MASKS[4], Bitboard.get_rank_mask(Bitboard.get_bv(Coord.new(3, 4))))
+        assert_equal(GameState::RANK_MASKS[7], GameState.get_rank_mask(GameState.get_bv(Coord.new(7, 7))))
+        assert_equal(GameState::RANK_MASKS[4], GameState.get_rank_mask(GameState.get_bv(Coord.new(3, 4))))
     end    
     
     def test_get_file
-        assert_equal(7, Bitboard.get_file(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(3, Bitboard.get_file(Bitboard.get_bv(Coord.new(3, 4))))
+        assert_equal(7, GameState.get_file(GameState.get_bv(Coord.new(7, 7))))
+        assert_equal(3, GameState.get_file(GameState.get_bv(Coord.new(3, 4))))
     end
     
     def test_get_file_mask
-        assert_equal(Bitboard::FILE_MASKS[7], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(7, 7))))
-        assert_equal(Bitboard::FILE_MASKS[3], Bitboard.get_file_mask(Bitboard.get_bv(Coord.new(3, 4))))
+        assert_equal(GameState::FILE_MASKS[7], GameState.get_file_mask(GameState.get_bv(Coord.new(7, 7))))
+        assert_equal(GameState::FILE_MASKS[3], GameState.get_file_mask(GameState.get_bv(Coord.new(3, 4))))
     end
     
     def test_on_board
-        assert(Bitboard.on_board?(Bitboard.get_bv(Coord.new(7, 7))))
-        assert(Bitboard.on_board?(Bitboard.get_bv(Coord.new(0, 0))))
-        assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(7, 8))))
-        assert(!Bitboard.on_board?(Bitboard.get_bv(Coord.new(8, 7))))
+        assert(GameState.on_board?(GameState.get_bv(Coord.new(7, 7))))
+        assert(GameState.on_board?(GameState.get_bv(Coord.new(0, 0))))
+        assert(!GameState.on_board?(GameState.get_bv(Coord.new(7, 8))))
+        assert(!GameState.on_board?(GameState.get_bv(Coord.new(8, 7))))
     end
     
     def test_find_east_edge
-        assert_equal(Bitboard.get_bv(Coord.new(7, 7)), 
-                     Bitboard.find_east_edge(Bitboard.get_bv(Coord.new(3, 7))))
-        assert_equal(Bitboard.get_bv(Coord.new(7, 0)),
-                     Bitboard.find_east_edge(Bitboard.get_bv(Coord.new(4, 0))))                     
+        assert_equal(GameState.get_bv(Coord.new(7, 7)), 
+                     GameState.find_east_edge(GameState.get_bv(Coord.new(3, 7))))
+        assert_equal(GameState.get_bv(Coord.new(7, 0)),
+                     GameState.find_east_edge(GameState.get_bv(Coord.new(4, 0))))                     
     end    
     
     def test_find_west_edge
-        assert_equal(Bitboard.get_bv(Coord.new(0, 7)),
-                     Bitboard.find_west_edge(Bitboard.get_bv(Coord.new(3, 7))))
-        assert_equal(Bitboard.get_bv(Coord.new(0, 0)),
-                     Bitboard.find_west_edge(Bitboard.get_bv(Coord.new(4, 0))))                     
+        assert_equal(GameState.get_bv(Coord.new(0, 7)),
+                     GameState.find_west_edge(GameState.get_bv(Coord.new(3, 7))))
+        assert_equal(GameState.get_bv(Coord.new(0, 0)),
+                     GameState.find_west_edge(GameState.get_bv(Coord.new(4, 0))))                     
     end                     
 end

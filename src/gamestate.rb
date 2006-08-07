@@ -17,7 +17,7 @@
 #
 require "chess"
 
-class Bitboard
+class GameState
 	RANK_MASKS = [
 		0xFF_00_00_00_00_00_00_00,
 		0x00_FF_00_00_00_00_00_00,
@@ -40,7 +40,7 @@ class Bitboard
 		0x01_01_01_01_01_01_01_01		 
 	]
 			
-	# Each property it an individual bitboard 
+	# Each property it an individual GameState 
 	:blk_pc  # All black pieces
 	:wht_pc  # All white pieces
 	:p		 # All pawns
@@ -123,14 +123,14 @@ class Bitboard
 	# This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes to 
 	# get to the proper rank, then by bits to get to the proper file
 	def get_sw(coord) 
-		Bitboard.get_sw(coord)
+		GameState.get_sw(coord)
 	end
 	
-	def Bitboard.get_sw(coord)
+	def GameState.get_sw(coord)
 		63 - (8 * coord.y) - coord.x
 	end
 	
-	def Bitboard.get_bv(coord)
+	def GameState.get_bv(coord)
 		0x1 << get_sw(coord)
 	end
 	
@@ -268,7 +268,7 @@ class Bitboard
 	end
 	
 	#
-	# Modify the bitboards so that the piece on the src square is moved to the dest square
+	# Modify the GameStates so that the piece on the src square is moved to the dest square
 	#
 	def move_piece(src, dest)
 		# bit vector representing the source square
@@ -371,7 +371,7 @@ class Bitboard
 			bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
 		end
 		
-		bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), Bitboard.get_rank(bv_piece))
+		bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), GameState.get_rank(bv_piece))
 		
 		
 		if (clr.white?)
@@ -465,7 +465,7 @@ class Bitboard
 		  bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
 	  end
 	  
-      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), Bitboard.get_rank(bv_piece))
+      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), GameState.get_rank(bv_piece))
 
 	  
 
@@ -579,8 +579,8 @@ class Bitboard
 			return 0						
 		end
 		
-		left_edge = Bitboard.find_west_edge(attacking_piece)
-		right_edge = Bitboard.find_east_edge(attacking_piece)
+		left_edge = GameState.find_west_edge(attacking_piece)
+		right_edge = GameState.find_east_edge(attacking_piece)
 		
         chk_cell = attacking_piece
         loop do
@@ -641,7 +641,7 @@ class Bitboard
 		bv
 	end
 	
-	def Bitboard::get_rank(bv) 
+	def GameState::get_rank(bv) 
 		rank = 7
 		while (bv & 0xFF) != bv
 			rank -= 1
@@ -650,11 +650,11 @@ class Bitboard
 		rank
 	end
 	
-	def Bitboard::get_rank_mask(bv) 
+	def GameState::get_rank_mask(bv) 
 		return RANK_MASKS[get_rank(bv)]
 	end
 	
-	def Bitboard::get_file(bv)
+	def GameState::get_file(bv)
 		file = 7
 		while (bv & 0xFF) != bv
 			bv >>= 8
@@ -666,15 +666,15 @@ class Bitboard
 		file
 	end
 	
-	def Bitboard::get_file_mask(bv) 
+	def GameState::get_file_mask(bv) 
 		return FILE_MASKS[get_file(bv)]    
 	end
 	
-	def Bitboard::on_board?(bv)
+	def GameState::on_board?(bv)
 		bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
 	end
 	
-	def Bitboard::find_east_edge(bv) 
+	def GameState::find_east_edge(bv) 
 		# formula is
 		# x = board_size
 		# y = rank of bit vector
@@ -685,10 +685,10 @@ class Bitboard
 		# or: 
 		# 
 		# 2^(board_size*(board_size - 1 - rank))
-		0x1 << ((7 - Bitboard.get_rank(bv)) << 3)
+		0x1 << ((7 - GameState.get_rank(bv)) << 3)
 	end
 
-	def Bitboard::find_west_edge(bv)
+	def GameState::find_west_edge(bv)
 		# formula is
 		# x = board_size
 		# y = rank of bit vector
@@ -699,7 +699,7 @@ class Bitboard
 		# or:
 		# 
 		# 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
-		0x1 << (((7 - Bitboard.get_rank(bv)) << 3) + 7)
+		0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
 	end
 	
 	# return the provided 64 bit vector as a formatted binary string

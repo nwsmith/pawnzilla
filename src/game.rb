@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-require "bitboard"
+require "gamestate"
 require "chess"
 require "geometry"
 require "tr"
@@ -27,7 +27,7 @@ module Game
         attr_accessor :board
     
         def initialize(b_sz) 
-            @board = Bitboard.new()
+            @board = GameState.new()
         end
      
         def place_piece(coord, piece) 
