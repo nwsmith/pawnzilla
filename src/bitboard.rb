@@ -579,8 +579,8 @@ class Bitboard
 			return 0						
 		end
 		
-		left_edge = Bitboard.find_left_edge(attacking_piece)
-		right_edge = Bitboard.find_right_edge(attacking_piece)
+		left_edge = Bitboard.find_west_edge(attacking_piece)
+		right_edge = Bitboard.find_east_edge(attacking_piece)
 		
         chk_cell = attacking_piece
         loop do
@@ -674,7 +674,7 @@ class Bitboard
 		bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
 	end
 	
-	def Bitboard::find_right_edge(bv) 
+	def Bitboard::find_east_edge(bv) 
 		# formula is
 		# x = board_size
 		# y = rank of bit vector
@@ -688,7 +688,7 @@ class Bitboard
 		0x1 << ((7 - Bitboard.get_rank(bv)) << 3)
 	end
 
-	def Bitboard::find_left_edge(bv)
+	def Bitboard::find_west_edge(bv)
 		# formula is
 		# x = board_size
 		# y = rank of bit vector
