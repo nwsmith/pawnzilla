@@ -68,4 +68,15 @@ class BitboardTest < Test::Unit::TestCase
         bitboard ^= 0x1
         assert_equal(0x1 ^ 0x1, bitboard)
     end
+    
+    def test_bitwise_and
+        bitboard = Bitboard.new(0x1) & 0x1
+        assert_equal(0x1 & 0x1, bitboard)        
+    end
+    
+    def test_bitwise_and_equals
+        bitboard = Bitboard.new(0x1)
+        bitboard &= 0x1
+        assert_equal(0x1 & 0x1, bitboard)
+    end
 end
