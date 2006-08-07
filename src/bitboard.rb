@@ -465,7 +465,7 @@ class Bitboard
 		  bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
 	  end
 	  
-      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
+      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), Bitboard.get_rank(bv_piece))
 
 	  
 
