@@ -16,6 +16,7 @@
 #	limitations under the License.
 #
 require "chess"
+require "bitboard"
 
 class GameState
 	RANK_MASKS = [
@@ -67,29 +68,29 @@ class GameState
 	:wht_attk # All white attacks	 
 	
 	def initialize()		 
-		@blk_pc = 0x00_00_00_00_00_00_FF_FF
-		@wht_pc = 0xFF_FF_00_00_00_00_00_00
+		@blk_pc = Bitboard.new(0x00_00_00_00_00_00_FF_FF)
+		@wht_pc = Bitboard.new(0xFF_FF_00_00_00_00_00_00)
 		
-		@p = 0x00_FF_00_00_00_00_FF_00
-		@r = 0x81_00_00_00_00_00_00_81
-		@n = 0x42_00_00_00_00_00_00_42
-		@b = 0x24_00_00_00_00_00_00_24
-		@q = 0x10_00_00_00_00_00_00_10
-		@k = 0x08_00_00_00_00_00_00_08
+		@p = Bitboard.new(0x00_FF_00_00_00_00_FF_00)
+		@r = Bitboard.new(0x81_00_00_00_00_00_00_81)
+		@n = Bitboard.new(0x42_00_00_00_00_00_00_42)
+		@b = Bitboard.new(0x24_00_00_00_00_00_00_24)
+		@q = Bitboard.new(0x10_00_00_00_00_00_00_10)
+		@k = Bitboard.new(0x08_00_00_00_00_00_00_08)
 		
-		@blk_p_attk = 0x00_00_00_00_00_FF_00_00
-		@blk_r_attk = 0x00_00_00_00_00_00_00_00
-		@blk_n_attk = 0x00_00_00_00_00_A5_18_00
-		@blk_b_attk = 0x00_00_00_00_00_00_00_00
-		@blk_q_attk = 0x00_00_00_00_00_00_00_00
-		@blk_k_attk = 0x00_00_00_00_00_00_1C_14
+		@blk_p_attk = Bitboard.new(0x00_00_00_00_00_FF_00_00)
+		@blk_r_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@blk_n_attk = Bitboard.new(0x00_00_00_00_00_A5_18_00)
+		@blk_b_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@blk_q_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@blk_k_attk = Bitboard.new(0x00_00_00_00_00_00_1C_14)
 
-		@wht_p_attk = 0x00_00_FF_00_00_00_00_00
-		@wht_r_attk = 0x00_00_00_00_00_00_00_00
-		@wht_n_attk = 0x00_18_A5_00_00_00_00_00
-		@wht_b_attk = 0x00_00_00_00_00_00_00_00
-		@wht_q_attk = 0x00_00_00_00_00_00_00_00
-		@wht_k_attk = 0x14_1C_00_00_00_00_00_00
+		@wht_p_attk = Bitboard.new(0x00_00_FF_00_00_00_00_00)
+		@wht_r_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@wht_n_attk = Bitboard.new(0x00_18_A5_00_00_00_00_00)
+		@wht_b_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@wht_q_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
+		@wht_k_attk = Bitboard.new(0x14_1C_00_00_00_00_00_00)
 	end
 	
 	def clear()    

@@ -19,7 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 require "test/unit"
 require "bitboard"
 
-class BitboardTest < Test::Unit::TestCase
+class TestBitboard < Test::Unit::TestCase
     def test_to_i
         bitboard = Bitboard.new(0x1)
         assert_equal(0x1, bitboard.to_i)
