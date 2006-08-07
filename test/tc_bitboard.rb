@@ -57,4 +57,15 @@ class BitboardTest < Test::Unit::TestCase
         assert_equal(0, bitboard[0])
         assert_equal(1, bitboard[1])
     end
+    
+    def test_xor
+        bitboard = Bitboard.new(0x1) ^ 0x1
+        assert_equal(0x1 ^ 0x1, bitboard) 
+    end
+    
+    def test_xor_equals
+        bitboard = Bitboard.new(0x1)
+        bitboard ^= 0x1
+        assert_equal(0x1 ^ 0x1, bitboard)
+    end
 end

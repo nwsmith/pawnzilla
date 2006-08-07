@@ -38,6 +38,10 @@ class Bitboard
         return @bv[index]
     end
     
+    def ^(bv) 
+        return @bv ^ bv
+    end
+    
     def to_s
 		out = ""
 		63.downto(0) do |i|
