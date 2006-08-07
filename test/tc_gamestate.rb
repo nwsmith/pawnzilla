@@ -125,8 +125,7 @@ class TestGameState < Test::Unit::TestCase
         assert(!b.blocked?(c0, c1))
         
         # Unit test for a bug condition -> Rook can hop a pawn
-        e = Rule_Std::Engine.new()
-        b = e.state.board
+        b = GameState.new()
         assert(b.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
     end
     
