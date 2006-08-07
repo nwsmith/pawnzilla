@@ -26,6 +26,10 @@ class Bitboard
         return @bv
     end
     
+    def >>(sw) 
+        return @bv >> sw
+    end
+    
     def <<(sw)
         return @bv << sw
     end
