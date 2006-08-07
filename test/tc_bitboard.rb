@@ -24,4 +24,9 @@ class BitboardTest < Test::Unit::TestCase
         bitboard = Bitboard.new(0x1)
         assert_equal(0x1, bitboard.to_i)
     end
+    
+    def test_right_shift
+        bitboard = Bitboard.new(0x1) << 8;
+        assert_equal(0x1 << 8, bitboard.to_i)
+    end        
 end

@@ -25,4 +25,8 @@ class Bitboard
     def to_i
         return @bv
     end
+    
+    def <<(sw)
+        return @bv << sw
+    end
 end
