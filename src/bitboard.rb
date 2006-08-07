@@ -33,4 +33,13 @@ class Bitboard
     def <<(sw)
         return @bv << sw
     end
+    
+    def to_s
+		out = ""
+		63.downto(0) do |i|
+			out += @bv[i].to_s
+			out += " " if (i % 8 == 0)						 
+		end
+		out.chop    
+    end
 end

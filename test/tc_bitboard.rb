@@ -46,4 +46,9 @@ class BitboardTest < Test::Unit::TestCase
         bitboard <<= 8
         assert_equal(0x1 << 8, bitboard.to_i)
     end
+    
+    def test_to_s
+        bitboard = Bitboard.new(0x1 << 8) 
+        assert_equal("00000000 00000000 00000000 00000000 00000000 00000000 00000001 00000000", bitboard.to_s)
+    end
 end
