@@ -20,7 +20,6 @@ require "test/unit"
 require "bitboard"
 require "chess"
 require "geometry"
-require "rule_std"
 
 class TestBitboard < Test::Unit::TestCase
     def test_sq_at
@@ -225,12 +224,12 @@ class TestBitboard < Test::Unit::TestCase
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 0)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 0)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 0)))
-        
+
         # Test the middle
         b.clear()
         b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::ROOK))
         b.calculate_rook_attack(Chess::Colour.new_white)
-        
+
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(4, 0)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(4, 1)))
@@ -247,7 +246,7 @@ class TestBitboard < Test::Unit::TestCase
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(5, 4)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(6, 4)))
         assert(b.attacked?(Chess::Colour.new_white, Coord.new(7, 4)))
-        
+
         # Test the blocked peice
         b.clear()
         b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::ROOK))
@@ -256,7 +255,7 @@ class TestBitboard < Test::Unit::TestCase
         b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
         b.place_piece(Coord.new(4, 6), Chess::Piece.new(Chess::Colour.new_black, Chess::Piece::ROOK))
         b.calculate_rook_attack(Chess::Colour.new_white)
-        
+      
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 4)))
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 0)))
         assert(!b.attacked?(Chess::Colour.new_white, Coord.new(4, 1)))

@@ -19,14 +19,14 @@ require "chess"
 
 class Bitboard
 	RANK_MASKS = [
-		0x00_00_00_00_00_00_00_FF,
-		0x00_00_00_00_00_00_FF_00,
-		0x00_00_00_00_00_FF_00_00,
-		0x00_00_00_00_FF_00_00_00,
-		0x00_00_00_FF_00_00_00_00,
-		0x00_00_FF_00_00_00_00_00,
+		0xFF_00_00_00_00_00_00_00,
 		0x00_FF_00_00_00_00_00_00,
-		0xFF_00_00_00_00_00_00_00
+		0x00_00_FF_00_00_00_00_00,
+		0x00_00_00_FF_00_00_00_00,
+		0x00_00_00_00_FF_00_00_00,
+		0x00_00_00_00_00_FF_00_00,											
+		0x00_00_00_00_00_00_FF_00,		
+		0x00_00_00_00_00_00_00_FF
 	]
 	
 	FILE_MASKS = [
@@ -371,9 +371,7 @@ class Bitboard
 			bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
 		end
 		
-		0.upto(7) do |i|
-			bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
-		end
+		bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), Bitboard.get_rank(bv_piece))
 		
 		
 		if (clr.white?)
@@ -572,32 +570,37 @@ class Bitboard
 	def calculate_rank_attack(clr, piece, rank)
 		piece_bv = piece.name == Chess::Piece::ROOK ? @r : @q 
 
-		bv = 0
-		attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & RANK_MASKS[rank]
-		
+        attack_bitbrd = 0
+        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & RANK_MASKS[rank]
+        opp_pieces = clr.white? ? @blk_pc : @wht_pc
+        all_pieces = @blk_pc | @wht_pc
+        
 		if (attacking_piece == 0)
-			# attacking piece is not on this rank, abort
-			return 0
+			# attacking piece is not on this file, abort
+			return 0						
 		end
 		
-		cell = 0x1 << (8 * rank)
-		0.upto(7) do |i|
-			if (attacking_piece & cell != 0)
-				(i-1).downto(0) do |j|
-				  chk_cell = cell >> (i - j)
-				  bv |= chk_cell
-				  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
-				end
-
-				(i+1).upto(7) do |j|
-				  chk_cell = cell << (j - i)
-				  bv |= chk_cell
-				  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
-				end
-			end
-			cell <<= 1
-		end
-		bv
+		left_edge = Bitboard.find_left_edge(attacking_piece)
+		right_edge = Bitboard.find_right_edge(attacking_piece)
+        
+        chk_cell = attacking_piece << 0x1
+        while ((chk_cell & all_pieces) == 0) && (chk_cell < left_edge)
+            attack_bitbrd |= chk_cell
+            chk_cell <<= 0x1
+        end            
+        if (chk_cell & opp_pieces) 
+            attack_bitbrd |= chk_cell
+        end
+        
+        chk_cell = attacking_piece >> 0x1     
+        while ((chk_cell & all_pieces) == 0) && (chk_cell > right_edge)
+            attack_bitbrd |= chk_cell
+            chk_cell >>= 0x1
+        end
+        if (chk_cell & opp_pieces)
+            attack_bitbrd |= chk_cell
+        end
+		attack_bitbrd
 	end
 	
 	# generates a bv for a diagonal attack given a square
@@ -694,7 +697,8 @@ class Bitboard
 		out = ""
 		63.downto(0) do |i|
 			out += bv[i].to_s
-			out += " " if (i % 8 == 0)						 
+#			out += " " if (i % 8 == 0)						 
+			out += "\n" if (i % 8) == 0
 		end
 		out
 	end		   
