@@ -16,7 +16,7 @@
 #   limitations under the License.
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
-require "src/rule_std"
+require "rule_std"
 require "test/unit"
 
 class TestRule_Std < Test::Unit::TestCase    
