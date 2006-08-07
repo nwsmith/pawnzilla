@@ -465,9 +465,8 @@ class Bitboard
 		  bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
 	  end
 	  
-	  0.upto(7) do |i|
-		  bv = bv | calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
-	  end
+      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
+
 	  
 
 	  if (clr.white?)
@@ -582,24 +581,35 @@ class Bitboard
 		
 		left_edge = Bitboard.find_left_edge(attacking_piece)
 		right_edge = Bitboard.find_right_edge(attacking_piece)
-        
-        chk_cell = attacking_piece << 0x1
-        while ((chk_cell & all_pieces) == 0) && (chk_cell < left_edge)
-            attack_bitbrd |= chk_cell
+		
+        chk_cell = attacking_piece
+        loop do
             chk_cell <<= 0x1
-        end            
-        if (chk_cell & opp_pieces) 
-            attack_bitbrd |= chk_cell
-        end
-        
-        chk_cell = attacking_piece >> 0x1     
-        while ((chk_cell & all_pieces) == 0) && (chk_cell > right_edge)
-            attack_bitbrd |= chk_cell
+            break if chk_cell > left_edge
+            if (chk_cell & all_pieces) == 0
+                attack_bitbrd |= chk_cell
+            else
+                if (chk_cell & opp_pieces) > 0
+                    attack_bitbrd |= chk_cell
+                end
+                break
+            end
+        end		
+
+        chk_cell = attacking_piece
+        loop do
             chk_cell >>= 0x1
-        end
-        if (chk_cell & opp_pieces)
-            attack_bitbrd |= chk_cell
-        end
+            break if chk_cell < right_edge
+            if (chk_cell & all_pieces) == 0
+                attack_bitbrd |= chk_cell
+            else
+                if (chk_cell & opp_pieces) > 0
+                    attack_bitbrd |= chk_cell
+                end
+                break;
+            end
+        end 
+        
 		attack_bitbrd
 	end
 	
