@@ -701,16 +701,5 @@ class GameState
 		# 
 		# 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
 		0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
-	end
-	
-	# return the provided 64 bit vector as a formatted binary string
-	def pp_bv(bv) 
-		out = ""
-		63.downto(0) do |i|
-			out += bv[i].to_s
-#			out += " " if (i % 8 == 0)						 
-			out += "\n" if (i % 8) == 0
-		end
-		out
-	end		   
+	end	
 end
