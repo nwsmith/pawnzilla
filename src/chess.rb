@@ -66,7 +66,7 @@ module Chess
         end
         
         def ==(cmp)
-            @colour == cmp.colour
+            cmp.class == String ? @colour == cmp : @colour == cmp.colour
         end
     end
     

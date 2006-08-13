@@ -50,7 +50,10 @@ class TestColour < Test::Unit::TestCase
     end
     
     def test_equalsequals
-        assert(Chess::Colour.new_white == Chess::Colour.new_white)
+        assert_equal(Chess::Colour.new_white, Chess::Colour.new_white)
+        assert_equal(Chess::Colour.new_white, Chess::Colour::WHITE)
+        assert_equal(Chess::Colour.new_black, Chess::Colour.new_black)
+        assert_equal(Chess::Colour.new_black, Chess::Colour::BLACK)
     end
 end
 
