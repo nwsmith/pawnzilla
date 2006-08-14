@@ -21,7 +21,7 @@ module Chess
     class Colour
         WHITE = "white"
         BLACK = "black"
-        
+
         attr_reader :colour
         
         # Initialize using the provided colour.
@@ -29,6 +29,9 @@ module Chess
         def initialize(color)
             @colour = color
         end
+
+        WHITE_OBJ = new(WHITE)
+        BLACK_OBJ = new(BLACK)
         
         # Create a new white colour object
         def Colour.new_white
@@ -67,6 +70,10 @@ module Chess
         
         def ==(cmp)
             cmp.class == String ? @colour == cmp : @colour == cmp.colour
+        end
+
+        def hash
+            @colour == WHITE ? 0 : 1
         end
     end
     

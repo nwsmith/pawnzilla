@@ -55,6 +55,11 @@ class TestColour < Test::Unit::TestCase
         assert_equal(Chess::Colour.new_black, Chess::Colour.new_black)
         assert_equal(Chess::Colour.new_black, Chess::Colour::BLACK)
     end
+
+    def test_hash
+        assert_equal(Chess::Colour.new_white.hash, 0)
+        assert_equal(Chess::Colour.new_black.hash, 1)
+    end
 end
 
 class TestBoard < Test::Unit::TestCase    
