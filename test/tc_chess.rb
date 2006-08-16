@@ -21,53 +21,41 @@ require "chess"
 
 class TestColour < Test::Unit::TestCase
     def test_black?
-        assert(Chess::Colour.new_black.black?)
-        assert(!Chess::Colour.new_white.black?)
+        assert(Chess::Colour::BLACK.black?)
+        assert(!Chess::Colour::WHITE.black?)
     end
     
     def test_white?
-        assert(Chess::Colour.new_white.white?)
-        assert(!Chess::Colour.new_white.black?)
+        assert(Chess::Colour::WHITE.white?)
+        assert(!Chess::Colour::WHITE.black?)
     end
     
     def test_opposite?
-        assert(Chess::Colour.new_white.opposite?(Chess::Colour.new_black))
-        assert(!Chess::Colour.new_white.opposite?(Chess::Colour.new_white))
-        assert(Chess::Colour.new_black.opposite?(Chess::Colour.new_white))
-        assert(!Chess::Colour.new_black.opposite?(Chess::Colour.new_black))        
-    end
-    
-    def test_flip!
-        w = Chess::Colour.new_white
-        
-        w.flip!
-        assert(w.black?)
-        assert(!w.white?)
-        
-        w.flip!
-        assert(w.white?)
-        assert(!w.black?)
+        assert(Chess::Colour::WHITE.opposite?(Chess::Colour::BLACK))
+        assert(!Chess::Colour::WHITE.opposite?(Chess::Colour::WHITE))
+        assert(Chess::Colour::BLACK.opposite?(Chess::Colour::WHITE))
+        assert(!Chess::Colour::BLACK.opposite?(Chess::Colour::BLACK))        
     end
     
     def test_equalsequals
-        assert_equal(Chess::Colour.new_white, Chess::Colour.new_white)
-        assert_equal(Chess::Colour.new_white, Chess::Colour::WHITE)
-        assert_equal(Chess::Colour.new_black, Chess::Colour.new_black)
-        assert_equal(Chess::Colour.new_black, Chess::Colour::BLACK)
+        assert_equal(Chess::Colour::WHITE, Chess::Colour::WHITE)
+        assert_equal(Chess::Colour::WHITE, Chess::Colour::WHITE)
+        assert_equal(Chess::Colour::BLACK, Chess::Colour::BLACK)
+        assert_equal(Chess::Colour::BLACK, Chess::Colour::BLACK)
     end
 
     def test_hash
-        assert_equal(Chess::Colour.new_white.hash, 0)
-        assert_equal(Chess::Colour.new_black.hash, 1)
+        assert_equal(Chess::Colour::WHITE.hash, 0)
+        assert_equal(Chess::Colour::BLACK.hash, 1)
     end
 end
 
 class TestBoard < Test::Unit::TestCase    
     def test_get_colour
-        assert_equal(Chess::Board.get_colour(Coord.new(0,0)), Chess::Colour.new_black)
-        assert_equal(Chess::Board.get_colour(Coord.new(1,0)), Chess::Colour.new_white)        
-        assert_equal(Chess::Board.get_colour(Coord.new(0,1)), Chess::Colour.new_white)
-        assert_equal(Chess::Board.get_colour(Coord.new(1,1)), Chess::Colour.new_black)                
+        assert_equal(Chess::Board.get_colour(Coord.new(0,0)), Chess::Colour::BLACK)
+        assert_equal(Chess::Board.get_colour(Coord.new(1,0)), Chess::Colour::WHITE)        
+        assert_equal(Chess::Board.get_colour(Coord.new(0,1)), Chess::Colour::WHITE)
+        assert_equal(Chess::Board.get_colour(Coord.new(1,1)), Chess::Colour::BLACK)                
     end
     
     def test_init
@@ -82,18 +70,18 @@ class TestBoard < Test::Unit::TestCase
     def test_blocked
         b = Chess::Board.new(8)
         
-        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
-        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
         
-        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
         
-        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
@@ -102,8 +90,8 @@ class TestBoard < Test::Unit::TestCase
         c0 = Coord.new(2, 3)
         c1 = Coord.new(5, 6)
         
-        b.sq_at(c0).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
-        b.sq_at(c1).piece = Chess::Piece.new(Chess::Colour.new_white, Chess::Piece::PAWN)
+        b.sq_at(c0).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(c1).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(c0, Coord.new(6, 7)))
         assert(!b.blocked?(c0, Coord.new(4, 5)))
         assert(!b.blocked?(c0, c1))        

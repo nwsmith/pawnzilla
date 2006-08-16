@@ -42,7 +42,7 @@ module Rule_Std
         
             @state = Game::State.new(B_SZ)
             
-            clr = Chess::Colour.new_white
+            clr = Chess::Colour::WHITE
 
             # Pawn Rows
             [1, 6].each do |y|

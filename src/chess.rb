@@ -19,30 +19,22 @@ require "geometry"
 
 module Chess
     class Colour
-        WHITE = "white"
-        BLACK = "black"
-
         attr_reader :colour
+
+        private
+        STR_WHITE = "white"
+        STR_BLACK = "black"
         
         # Initialize using the provided colour.
-        # This method should not be used - use new_white and new_black instead.
+        # This method should not be used - use WHITE and BLACK instead.
         def initialize(color)
             @colour = color
         end
 
-        WHITE_OBJ = new(WHITE)
-        BLACK_OBJ = new(BLACK)
-        
-        # Create a new white colour object
-        def Colour.new_white
-            new(WHITE)
-        end
-        
-        # Create a new black colour object
-        def Colour.new_black
-            new(BLACK)
-        end
-        
+        WHITE = new(STR_WHITE)
+        BLACK = new(STR_BLACK)
+
+        public
         # Returns true if this colour is black
         def black?
             BLACK == @colour
@@ -58,14 +50,9 @@ module Chess
             self != cmp
         end
         
-        # Change the colour of this object - black becomes white;white becomes black
-        def flip!
-            @colour = (@colour == WHITE) ? BLACK : WHITE
-        end        
-        
         # Return a colour object with the opposite colour of this one
         def flip
-            (@colour == WHITE) ? Chess::Colour.new_black : Chess::Colour.new_white
+            (@colour == STR_WHITE) ? BLACK : WHITE
         end
         
         def ==(cmp)
@@ -73,7 +60,7 @@ module Chess
         end
 
         def hash
-            @colour == WHITE ? 0 : 1
+            @colour == STR_WHITE ? 0 : 1
         end
     end
     
@@ -116,7 +103,7 @@ module Chess
         end
                   
         def Board.get_colour(coord) 
-            ((coord.x + coord.y) & 1 == 0) ? Chess::Colour.new_black : Chess::Colour.new_white
+            ((coord.x + coord.y) & 1 == 0) ? Chess::Colour::BLACK : Chess::Colour::WHITE
         end
         
         def blocked?(src, dest) 

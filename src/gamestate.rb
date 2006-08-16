@@ -140,7 +140,7 @@ class GameState
         
         # Look for a piece of either colour in that square
         piece = nil
-        color = @blk_pc[pos] == 1 ? Chess::Colour.new_black : @wht_pc[pos] ? Chess::Colour.new_white : nil
+        color = @blk_pc[pos] == 1 ? Chess::Colour::BLACK : @wht_pc[pos] ? Chess::Colour::WHITE : nil
 
         # Determine piece type
         if !color.nil?                

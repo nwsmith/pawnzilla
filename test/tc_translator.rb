@@ -23,8 +23,8 @@ require "tr"
 class TestTranslator < Test::Unit::TestCase
     def test_to_txt
         tr = Translator::PieceTranslator.new()
-        white = Chess::Colour::new_white
-        black = Chess::Colour::new_black
+        white = Chess::Colour::WHITE
+        black = Chess::Colour::BLACK
         
         piece = Chess::Piece.new(white, Chess::Piece::PAWN)   
         assert(tr.to_txt(piece) == "p")
