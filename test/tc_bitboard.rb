@@ -24,26 +24,30 @@ class TestBitboard < Test::Unit::TestCase
         bitboard = Bitboard.new(0x1)
         assert_equal(0x1, bitboard.to_i)
     end
-    
-    def test_right_shift
+
+    def test_should_right_shift
         bitboard = Bitboard.new(0x1) >> 8
+        assert_kind_of(Bitboard, bitboard)
         assert_equal(0x1 >> 8, bitboard.to_i)
     end        
-    
+
     def test_right_shift_equals
         bitboard = Bitboard.new(0x1);
         bitboard >>= 8
+        assert_kind_of(Bitboard, bitboard)
         assert_equal(0x1 >> 8, bitboard.to_i)
     end
     
-    def test_left_shift
+    def test_should_left_shift
         bitboard = Bitboard.new(0x1) << 8
+        assert_kind_of(Bitboard, bitboard)
         assert_equal(0x1 << 8, bitboard.to_i)
     end
     
     def test_left_shift_equals
         bitboard = Bitboard.new(0x1);
         bitboard <<= 8
+        assert_kind_of(Bitboard, bitboard)
         assert_equal(0x1 << 8, bitboard.to_i)
     end
     
@@ -54,40 +58,86 @@ class TestBitboard < Test::Unit::TestCase
     
     def test_indexer
         bitboard = Bitboard.new(0x1 << 1)
+        assert_kind_of(Bitboard, bitboard)
         assert_equal(0, bitboard[0])
         assert_equal(1, bitboard[1])
     end
     
-    def test_xor
+    def test_should_xor_with_number
         bitboard = Bitboard.new(0x1) ^ 0x1
-        assert_equal(0x1 ^ 0x1, bitboard) 
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 ^ 0x1, bitboard.to_i) 
+    end
+
+    def test_should_xor_with_bitboard
+        bitboard = Bitboard.new(0x1) ^ Bitboard.new(0x1)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 ^ 0x1, bitboard.to_i)
     end
     
-    def test_xor_equals
+    def test_should_xor_equals_with_number
         bitboard = Bitboard.new(0x1)
         bitboard ^= 0x1
-        assert_equal(0x1 ^ 0x1, bitboard)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 ^ 0x1, bitboard.to_i)
+    end
+
+    def test_should_xor_equals_with_bitboard
+        bitboard = Bitboard.new(0x1)
+        bitboard ^= Bitboard.new(0x1)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 ^ 0x1, bitboard.to_i)
     end
     
-    def test_bitwise_and
+    def test_should_bitwise_and_with_number
         bitboard = Bitboard.new(0x1) & 0x1
-        assert_equal(0x1 & 0x1, bitboard)        
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 & 0x1, bitboard.to_i)        
+    end
+
+    def test_should_bitwise_and_with_bitboard
+        bitboard = Bitboard.new(0x1) & Bitboard.new(0x1);
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 & 0x1, bitboard.to_i)
     end
     
-    def test_bitwise_and_equals
+    def test_should_bitwise_and_equals_with_number
         bitboard = Bitboard.new(0x1)
         bitboard &= 0x1
-        assert_equal(0x1 & 0x1, bitboard)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 & 0x1, bitboard.to_i)
+    end
+
+    def test_should_bitwise_and_equals_with_bitboard
+        bitboard = Bitboard.new(0x1)
+        bitboard &= Bitboard.new(0x1)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 & 0x1, bitboard.to_i)
     end
     
-    def test_bitwise_or
+    def test_should_bitwise_or_with_number
         bitboard = Bitboard.new(0x1) | 0x1
-        assert_equal(0x1 | 0x1, bitboard)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 | 0x1, bitboard.to_i)
+    end
+
+    def test_should_bitwise_or_with_bitboard
+        bitboard = Bitboard.new(0x1) | Bitboard.new(0x1)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 | 0x1, bitboard.to_i)
     end
     
-    def test_bitwise_or_equals
+    def test_should_bitwise_or_equals_with_number
         bitboard = Bitboard.new(0x1)
         bitboard |= 0x1
-        assert_equal(0x1 | 0x1, bitboard)
+        assert_kind_of(Bitboard, bitboard)
+        assert_equal(0x1 | 0x1, bitboard.to_i)
+    end
+
+    def test_should_be_equal
+        lhs = Bitboard.new(0x1)
+        rhs = Bitboard.new(0x1) 
+        assert(lhs == rhs)
+        assert(rhs == lhs)
     end
 end

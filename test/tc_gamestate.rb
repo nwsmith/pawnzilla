@@ -22,27 +22,35 @@ require "chess"
 require "geometry"
 
 class TestGameState < Test::Unit::TestCase
-    def test_sq_at
-        board = GameState.new();
-        
-        square = board.sq_at(Coord.new(0, 0))        
-        assert(square.colour.black?)
-        assert(square.piece.colour.white?)
-        assert(square.piece.name == Chess::Piece::ROOK)
-        
-        square = board.sq_at(Coord.new(0, 2))
-        assert(square.colour.black?)
-        assert(square.piece.nil?)
-        
-        square = board.sq_at(Coord.new(2, 7))
-        assert(square.colour.white?)
-        assert(square.piece.colour.black?)
-        assert(square.piece.name == Chess::Piece::BISHOP)
-        
-        square = board.sq_at(Coord.new(0, 5))
-        assert(square.piece.nil?)
+    def setup 
+        @board = GameState.new
     end
-    
+
+    def test_should_get_white_piece_on_black_square_from_initial_setup
+        square = @board.sq_at(Coord.new(0, 0))
+        assert_not_nil(square)
+        assert(square.colour.black?)
+        assert_not_nil(square.piece)
+        assert(square.piece.colour.white?)
+        assert_equal(Chess::Piece::ROOK, square.piece.name)
+    end
+
+    def test_should_get_empty_square_from_initial_setup
+        square = @board.sq_at(Coord.new(0, 2))
+        assert_not_nil(square)
+        assert(square.colour.black?)
+        assert_nil(square.piece)
+    end
+
+    def test_should_get_black_piece_on_white_square_from_initial_setup
+        square = @board.sq_at(Coord.new(2, 7))
+        assert_not_nil(square)
+        assert(square.colour.white?)
+        assert_not_nil(square.piece)
+        assert(square.piece.colour.black?)
+        assert_equal(Chess::Piece::BISHOP, square.piece.name)
+    end
+
     def test_move_piece
         board = GameState.new()
         src = Coord.new(0, 1)
@@ -78,6 +86,18 @@ class TestGameState < Test::Unit::TestCase
         assert(!square.piece.nil?)
         assert(square.piece.colour.black?) 
         assert(square.piece.name == Chess::Piece::ROOK)
+    end
+
+    def test_should_place_piece_over_existing_piece
+        board = GameState.new()
+        coord = Coord.new(0, 5)
+        piece = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
+        board.place_piece(coord, Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
+        board.place_piece(coord, piece)
+        square = board.sq_at(coord)
+        assert_not_nil(square.piece)
+        assert(square.piece.colour.black?)
+        assert_equal(piece.name, square.piece.name)
     end
     
     def test_remove_piece
@@ -311,7 +331,7 @@ class TestGameState < Test::Unit::TestCase
         assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 6)))
         assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
     end      
-    
+
     def test_calculate_bishop_attack()
         b = GameState.new()
         

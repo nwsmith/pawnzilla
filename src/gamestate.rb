@@ -42,8 +42,7 @@ class GameState
     ]
             
     # Each property it an individual GameState 
-    :blk_pc  # All black pieces
-    :wht_pc  # All white pieces
+    :clr_pos # positions by colour
     
     :pos     # All positions
     :p       # All pawns
@@ -70,9 +69,11 @@ class GameState
     :wht_attk # All white attacks    
     
     def initialize()         
-        @blk_pc = Bitboard.new(0x00_00_00_00_00_00_FF_FF)
-        @wht_pc = Bitboard.new(0xFF_FF_00_00_00_00_00_00)
-        
+        @clr_pos = {
+            Chess::Colour::BLACK => Bitboard.new(0x00_00_00_00_00_00_FF_FF),
+            Chess::Colour::WHITE => Bitboard.new(0xFF_FF_00_00_00_00_00_00)
+        }
+
         @pos = {
             Chess::Piece::PAWN => Bitboard.new(0x00_FF_00_00_00_00_FF_00),  
             Chess::Piece::ROOK => Bitboard.new(0x81_00_00_00_00_00_00_81),
@@ -98,9 +99,7 @@ class GameState
     end
     
     def clear()    
-        @blk_pc = 0
-        @wht_pc = 0
-        
+        @clr_pos.each_key {|key| @clr_pos[key] = 0}
         @pos.each_key {|key| @pos[key] = 0}
 
         @blk_p_attk = 0
@@ -140,7 +139,7 @@ class GameState
         
         # Look for a piece of either colour in that square
         piece = nil
-        color = @blk_pc[pos] == 1 ? Chess::Colour::BLACK : @wht_pc[pos] ? Chess::Colour::WHITE : nil
+        color = @clr_pos[Chess::Colour::BLACK][pos] == 1 ? Chess::Colour::BLACK : @clr_pos[Chess::Colour::WHITE][pos] ? Chess::Colour::WHITE : nil
 
         # Determine piece type
         if !color.nil?                
@@ -211,12 +210,8 @@ class GameState
         #remove any existing piece at the coord
         remove_piece(coord)
                 
-        if piece.colour.black?
-            @blk_pc |= pc_bv
-        else 
-            @wht_pc |= pc_bv
-        end
-                
+        
+        @clr_pos[piece.colour] |= pc_bv        
         @pos[piece.name] |= pc_bv
     end
     
@@ -228,12 +223,7 @@ class GameState
         
         return unless !piece.nil?
         
-        if piece.colour.black?
-            @blk_pc ^= pc_bv
-        else
-            @wht_pc ^= pc_bv
-        end
-        
+        @clr_pos[piece.colour] ^= pc_bv
         @pos[piece.name] ^= pc_bv
     end
     
@@ -249,13 +239,9 @@ class GameState
         
         # bit vector representing the change required for the move
         ch_bv = (src_bv | dest_bv)
-        
-        if (@wht_pc & src_bv) == src_bv
-            @wht_pc ^= ch_bv
-        end
-        
-        if (@blk_pc & src_bv) == src_bv
-            @blk_pc ^= ch_bv
+       
+        @clr_pos.each_key do |key|
+            @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
         end
 
         @pos.each_key do |key|
@@ -290,15 +276,15 @@ class GameState
         mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
         mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-        bv_piece = clr.white? ? @wht_pc : @blk_pc
-        bv_p = bv_piece & @pos[Chess::Piece::PAWN]
+        bv_piece = @clr_pos[clr]
+        bv_p = (bv_piece & @pos[Chess::Piece::PAWN]).to_i
 
         # right attack
         bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
 
         # left attack
         bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
-        
+       
         if (clr.white?)
             @wht_p_attk = bv
         else
@@ -308,7 +294,7 @@ class GameState
     
     def calculate_rook_attack(clr)
         bv = 0
-        bv_piece = clr.white? ? @wht_pc : @blk_pc
+        bv_piece = @clr_pos[clr].to_i
         
         if (bv_piece & @pos[Chess::Piece::ROOK] == 0)
             return
@@ -331,8 +317,8 @@ class GameState
     
     def calculate_knight_attack(clr)
         bv = 0
-        bv_piece = clr.white? ? @wht_pc : @blk_pc
-        bv_knight_piece = bv_piece & @pos[Chess::Piece::KNIGHT]
+        bv_piece = @clr_pos[clr]
+        bv_knight_piece = (bv_piece & @pos[Chess::Piece::KNIGHT]).to_i
         
         # knight attack position legend for below (k == knight)
         #  B C
@@ -382,7 +368,7 @@ class GameState
     
     def calculate_bishop_attack(clr)
         bv = 0
-        bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @pos[Chess::Piece::BISHOP]
+        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::BISHOP]).to_i
         
         0.upto(63) do |i|
             if (1 << i & bv_piece != 0)
@@ -399,38 +385,38 @@ class GameState
     end
     
     def calculate_queen_attack(clr)
-      bv = 0
-      bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @pos[Chess::Piece::QUEEN]
+        bv = 0
 
-      0.upto(63) do |i|
-          if (1 << i & bv_piece != 0)
-            bv |= calculate_diagonal_attack(i)
-          end
-      end
-      
-      0.upto(7) do |i|
-          bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
-      end
-      
-      bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), GameState.get_rank(bv_piece))
+        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::QUEEN]).to_i
 
+        0.upto(63) do |i|
+            if (1 << i & bv_piece != 0)
+                bv |= calculate_diagonal_attack(i)
+            end
+        end
+      
+        0.upto(7) do |i|
+            bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
+        end
+      
+        bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), GameState.get_rank(bv_piece))
       
 
-      if (clr.white?)
-          @wht_q_attk = bv
-      else
-          @blk_q_attk = bv
-      end
+        if (clr.white?)
+            @wht_q_attk = bv
+        else
+            @blk_q_attk = bv
+         end
     end
 
     def calculate_king_attack(clr)
         bv = 0
-        bv_piece = (clr.white? ? @wht_pc : @blk_pc) & @pos[Chess::Piece::KING]
+        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::KING]).to_i
 
-    # Move list. k == king.
-    # ABC
-    # DkE
-    # FGH
+        # Move list. k == king.
+        # ABC
+        # DkE
+        # FGH
 
         # A
         bv_board_mask = 0x00_7F_7F_7F_7F_7F_7F_7F
@@ -484,8 +470,9 @@ class GameState
         piece_bv = @pos[piece.name];
 
         bv = 0
-        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & FILE_MASKS[file]
-        
+        attacking_piece = (@clr_pos[clr] & piece_bv & FILE_MASKS[file]).to_i
+        all_pieces = @clr_pos.values.inject(Bitboard.new(0)) {|mask,val| mask | val}        
+
         if (attacking_piece == 0)
             # attacking piece is not on this file, abort
             return 0
@@ -497,13 +484,13 @@ class GameState
                 (i-1).downto(0) do |j|
                   chk_cell = cell >> (8 * (i - j))
                   bv |= chk_cell
-                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                  break if (chk_cell & all_pieces.to_i) != 0
                 end
 
                 (i+1).upto(7) do |j|
                   chk_cell = cell << (8 * (j - i))
                   bv |= chk_cell
-                  break if (chk_cell & (@blk_pc | @wht_pc)) != 0
+                  break if (chk_cell & all_pieces.to_i) != 0
                 end
             end
             cell <<= 8
@@ -517,10 +504,10 @@ class GameState
         piece_bv = @pos[piece.name]
 
         attack_bitbrd = 0
-        attacking_piece = (clr.white? ? @wht_pc : @blk_pc) & piece_bv & RANK_MASKS[rank]
-        opp_pieces = clr.white? ? @blk_pc : @wht_pc
-        all_pieces = @blk_pc | @wht_pc
-        
+        attacking_piece = (@clr_pos[clr] & piece_bv & RANK_MASKS[rank]).to_i
+        opp_pieces = @clr_pos[clr.flip]
+        all_pieces = @clr_pos.values.inject(Bitboard.new(0)) {|mask, val| mask | val}
+
         if (attacking_piece == 0)
             # attacking piece is not on this file, abort
             return 0                        
@@ -533,10 +520,10 @@ class GameState
         loop do
             chk_cell <<= 0x1
             break if chk_cell > left_edge
-            if (chk_cell & all_pieces) == 0
+            if (all_pieces & chk_cell) == 0
                 attack_bitbrd |= chk_cell
             else
-                if (chk_cell & opp_pieces) > 0
+                if (opp_pieces & chk_cell) > 0
                     attack_bitbrd |= chk_cell
                 end
                 break
@@ -547,10 +534,10 @@ class GameState
         loop do
             chk_cell >>= 0x1
             break if chk_cell < right_edge
-            if (chk_cell & all_pieces) == 0
+            if (chk_cell & all_pieces.to_i) == 0
                 attack_bitbrd |= chk_cell
             else
-                if (chk_cell & opp_pieces) > 0
+                if (chk_cell & opp_pieces.to_i) > 0
                     attack_bitbrd |= chk_cell
                 end
                 break;
@@ -565,6 +552,7 @@ class GameState
         mask_left  = 0x80_80_80_80_80_80_80_80
         mask_right = 0x01_01_01_01_01_01_01_01
         bv = 0
+        all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val.to_i}
 
         operations = [
             [mask_right, -9], # btm right
@@ -580,7 +568,7 @@ class GameState
                 bv |= 1 << chk_sq
 
                 # do not continue to the next peice if this square contains a peice or we're off the edge
-                break if ((@blk_pc | @wht_pc) & (1 << chk_sq) != 0 || ((1 << chk_sq) & params[0]) != 0)
+                break if ((all_pieces) & (1 << chk_sq) != 0 || ((1 << chk_sq) & params[0]) != 0)
                 chk_sq += params[1]
             end
         end

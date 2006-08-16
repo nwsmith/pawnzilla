@@ -27,11 +27,11 @@ class Bitboard
     end
     
     def >>(sw) 
-        return @bv >> sw
+        return Bitboard.new(@bv >> sw)
     end
     
     def <<(sw)
-        return @bv << sw
+        return Bitboard.new(@bv << sw)
     end
     
     def [](index)
@@ -39,15 +39,19 @@ class Bitboard
     end
     
     def ^(bv) 
-        return @bv ^ bv
+        return Bitboard.new(@bv ^ (bv.class == Bitboard ? bv.to_i : bv))
     end
     
     def &(bv) 
-        return @bv & bv
+        return Bitboard.new(@bv & (bv.class == Bitboard ? bv.to_i : bv))
     end
     
     def |(bv) 
-        return @bv | bv
+        return Bitboard.new(@bv | (bv.class == Bitboard ? bv.to_i : bv))
+    end
+
+    def ==(bitboard)
+        return @bv == bitboard.to_i
     end
     
     def to_s
