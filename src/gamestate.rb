@@ -42,14 +42,7 @@ class GameState
             
     # Each property it an individual GameState 
     :clr_pos # positions by colour
-    
     :pos     # All positions
-    :p       # All pawns
-    :r       # All rooks
-    :n       # All knights
-    :b       # All bishops
-    :q       # All queens
-    :k       # All kings
     
     :blk_p_attk # Black Pawn Attacks
     :blk_r_attk # Black Roow Attacks
