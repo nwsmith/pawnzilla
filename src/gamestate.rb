@@ -108,28 +108,25 @@ class GameState
     end
     
     def sq_at(coord) 
-        pos = get_sw(coord)
+        square = Chess::Square.new(coord, Chess::Board.get_colour(coord))
+        mask = GameState.get_bv(coord)
         
         # Look for a piece of either colour in that square
         piece = nil
-        color = @clr_pos[Chess::Colour::BLACK][pos] == 1 \
+        color = (@clr_pos[Chess::Colour::BLACK] & mask) == mask \
             ? Chess::Colour::BLACK \
-            : @clr_pos[Chess::Colour::WHITE][pos] \
+            : (@clr_pos[Chess::Colour::WHITE] & mask) == mask \
                 ? Chess::Colour::WHITE \
                 : nil
 
         # Determine piece type
         if !color.nil?                
             @pos.each_key do |key|
-                if @pos[key][pos] == 1
-                    piece = Chess::Piece.new(color, key)
+                if (@pos[key] & mask) == mask
+                    square.piece = Chess::Piece.new(color, key)
                 end
             end
         end
-
-        square = Chess::Square.new(coord, Chess::Board.get_colour(coord))
-        
-        square.piece = piece if ! piece.nil?
         
         square
     end
