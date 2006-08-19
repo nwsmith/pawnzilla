@@ -16,7 +16,6 @@
 #   limitations under the License.
 #
 require "chess"
-require "bitboard"
 
 class GameState
     RANK_MASKS = [
@@ -70,32 +69,32 @@ class GameState
     
     def initialize()         
         @clr_pos = {
-            Chess::Colour::BLACK => Bitboard.new(0x00_00_00_00_00_00_FF_FF),
-            Chess::Colour::WHITE => Bitboard.new(0xFF_FF_00_00_00_00_00_00)
+            Chess::Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
+            Chess::Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
         }
 
         @pos = {
-            Chess::Piece::PAWN => Bitboard.new(0x00_FF_00_00_00_00_FF_00),  
-            Chess::Piece::ROOK => Bitboard.new(0x81_00_00_00_00_00_00_81),
-            Chess::Piece::KNIGHT => Bitboard.new(0x42_00_00_00_00_00_00_42),
-            Chess::Piece::BISHOP => Bitboard.new(0x24_00_00_00_00_00_00_24),
-            Chess::Piece::QUEEN => Bitboard.new(0x10_00_00_00_00_00_00_10),
-            Chess::Piece::KING => Bitboard.new(0x08_00_00_00_00_00_00_08) 
+            Chess::Piece::PAWN => 0x00_FF_00_00_00_00_FF_00,  
+            Chess::Piece::ROOK => 0x81_00_00_00_00_00_00_81,
+            Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
+            Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
+            Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
+            Chess::Piece::KING => 0x08_00_00_00_00_00_00_08 
         }
         
-        @blk_p_attk = Bitboard.new(0x00_00_00_00_00_FF_00_00)
-        @blk_r_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @blk_n_attk = Bitboard.new(0x00_00_00_00_00_A5_18_00)
-        @blk_b_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @blk_q_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @blk_k_attk = Bitboard.new(0x00_00_00_00_00_00_1C_14)
+        @blk_p_attk = 0x00_00_00_00_00_FF_00_00
+        @blk_r_attk = 0x00_00_00_00_00_00_00_00
+        @blk_n_attk = 0x00_00_00_00_00_A5_18_00
+        @blk_b_attk = 0x00_00_00_00_00_00_00_00
+        @blk_q_attk = 0x00_00_00_00_00_00_00_00
+        @blk_k_attk = 0x00_00_00_00_00_00_1C_14
 
-        @wht_p_attk = Bitboard.new(0x00_00_FF_00_00_00_00_00)
-        @wht_r_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @wht_n_attk = Bitboard.new(0x00_18_A5_00_00_00_00_00)
-        @wht_b_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @wht_q_attk = Bitboard.new(0x00_00_00_00_00_00_00_00)
-        @wht_k_attk = Bitboard.new(0x14_1C_00_00_00_00_00_00)
+        @wht_p_attk = 0x00_00_FF_00_00_00_00_00
+        @wht_r_attk = 0x00_00_00_00_00_00_00_00
+        @wht_n_attk = 0x00_18_A5_00_00_00_00_00
+        @wht_b_attk = 0x00_00_00_00_00_00_00_00
+        @wht_q_attk = 0x00_00_00_00_00_00_00_00
+        @wht_k_attk = 0x14_1C_00_00_00_00_00_00
     end
     
     def clear()    
@@ -471,7 +470,7 @@ class GameState
 
         bv = 0
         attacking_piece = (@clr_pos[clr] & piece_bv & FILE_MASKS[file]).to_i
-        all_pieces = @clr_pos.values.inject(Bitboard.new(0)) {|mask,val| mask | val}        
+        all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val}        
 
         if (attacking_piece == 0)
             # attacking piece is not on this file, abort
@@ -506,7 +505,7 @@ class GameState
         attack_bitbrd = 0
         attacking_piece = (@clr_pos[clr] & piece_bv & RANK_MASKS[rank]).to_i
         opp_pieces = @clr_pos[clr.flip]
-        all_pieces = @clr_pos.values.inject(Bitboard.new(0)) {|mask, val| mask | val}
+        all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
 
         if (attacking_piece == 0)
             # attacking piece is not on this file, abort
@@ -636,4 +635,14 @@ class GameState
         # 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
         0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
     end 
+
+    def GameState.pp_bv
+        out = ""
+        63.downto(0) do |i|
+            out += @bv[i].to_s
+            out += " " if (i % 8 == 0)
+        end
+        out.chop
+    end
+
 end

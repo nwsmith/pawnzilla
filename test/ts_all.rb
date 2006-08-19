@@ -16,7 +16,6 @@
 #   limitations under the License.
 #
 require 'test/unit'
-require 'tc_bitboard'
 require 'tc_gamestate'
 require 'tc_chess'
 require 'tc_geometry'
