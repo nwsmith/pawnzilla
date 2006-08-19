@@ -138,7 +138,11 @@ class GameState
         
         # Look for a piece of either colour in that square
         piece = nil
-        color = @clr_pos[Chess::Colour::BLACK][pos] == 1 ? Chess::Colour::BLACK : @clr_pos[Chess::Colour::WHITE][pos] ? Chess::Colour::WHITE : nil
+        color = @clr_pos[Chess::Colour::BLACK][pos] == 1 \
+            ? Chess::Colour::BLACK \
+            : @clr_pos[Chess::Colour::WHITE][pos] \
+                ? Chess::Colour::WHITE \
+                : nil
 
         # Determine piece type
         if !color.nil?                
@@ -155,7 +159,6 @@ class GameState
         
         square
     end
-
 
     def on_file?(src, dest) 
         src, dest = dest, src if dest < src
@@ -276,7 +279,7 @@ class GameState
         mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
         bv_piece = @clr_pos[clr]
-        bv_p = (bv_piece & @pos[Chess::Piece::PAWN]).to_i
+        bv_p = bv_piece & @pos[Chess::Piece::PAWN]
 
         # right attack
         bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
@@ -293,7 +296,7 @@ class GameState
     
     def calculate_rook_attack(clr)
         bv = 0
-        bv_piece = @clr_pos[clr].to_i
+        bv_piece = @clr_pos[clr]
         
         if (bv_piece & @pos[Chess::Piece::ROOK] == 0)
             return
@@ -303,8 +306,8 @@ class GameState
             bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
         end
         
-        bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), GameState.get_rank(bv_piece))
-        
+        bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), \
+                                    GameState.get_rank(bv_piece))
         
         if (clr.white?)
             @wht_r_attk = bv
@@ -317,7 +320,7 @@ class GameState
     def calculate_knight_attack(clr)
         bv = 0
         bv_piece = @clr_pos[clr]
-        bv_knight_piece = (bv_piece & @pos[Chess::Piece::KNIGHT]).to_i
+        bv_knight_piece = bv_piece & @pos[Chess::Piece::KNIGHT]
         
         # knight attack position legend for below (k == knight)
         #  B C
@@ -367,7 +370,7 @@ class GameState
     
     def calculate_bishop_attack(clr)
         bv = 0
-        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::BISHOP]).to_i
+        bv_piece = @clr_pos[clr] & @pos[Chess::Piece::BISHOP]
         
         0.upto(63) do |i|
             if (1 << i & bv_piece != 0)
@@ -386,7 +389,7 @@ class GameState
     def calculate_queen_attack(clr)
         bv = 0
 
-        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::QUEEN]).to_i
+        bv_piece = @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
 
         0.upto(63) do |i|
             if (1 << i & bv_piece != 0)
@@ -398,7 +401,8 @@ class GameState
             bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
         end
       
-        bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), GameState.get_rank(bv_piece))
+        bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), \
+                                    GameState.get_rank(bv_piece))
       
 
         if (clr.white?)
@@ -410,7 +414,7 @@ class GameState
 
     def calculate_king_attack(clr)
         bv = 0
-        bv_piece = (@clr_pos[clr] & @pos[Chess::Piece::KING]).to_i
+        bv_piece = @clr_pos[clr] & @pos[Chess::Piece::KING]
 
         # Move list. k == king.
         # ABC
@@ -469,7 +473,7 @@ class GameState
         piece_bv = @pos[piece.name];
 
         bv = 0
-        attacking_piece = (@clr_pos[clr] & piece_bv & FILE_MASKS[file]).to_i
+        attacking_piece = @clr_pos[clr] & piece_bv & FILE_MASKS[file]
         all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val}        
 
         if (attacking_piece == 0)
@@ -483,13 +487,13 @@ class GameState
                 (i-1).downto(0) do |j|
                   chk_cell = cell >> (8 * (i - j))
                   bv |= chk_cell
-                  break if (chk_cell & all_pieces.to_i) != 0
+                  break if (chk_cell & all_pieces) != 0
                 end
 
                 (i+1).upto(7) do |j|
                   chk_cell = cell << (8 * (j - i))
                   bv |= chk_cell
-                  break if (chk_cell & all_pieces.to_i) != 0
+                  break if (chk_cell & all_pieces) != 0
                 end
             end
             cell <<= 8
@@ -503,7 +507,7 @@ class GameState
         piece_bv = @pos[piece.name]
 
         attack_bitbrd = 0
-        attacking_piece = (@clr_pos[clr] & piece_bv & RANK_MASKS[rank]).to_i
+        attacking_piece = @clr_pos[clr] & piece_bv & RANK_MASKS[rank]
         opp_pieces = @clr_pos[clr.flip]
         all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
 
@@ -533,10 +537,10 @@ class GameState
         loop do
             chk_cell >>= 0x1
             break if chk_cell < right_edge
-            if (chk_cell & all_pieces.to_i) == 0
+            if (chk_cell & all_pieces) == 0
                 attack_bitbrd |= chk_cell
             else
-                if (chk_cell & opp_pieces.to_i) > 0
+                if (chk_cell & opp_pieces) > 0
                     attack_bitbrd |= chk_cell
                 end
                 break;
@@ -551,7 +555,7 @@ class GameState
         mask_left  = 0x80_80_80_80_80_80_80_80
         mask_right = 0x01_01_01_01_01_01_01_01
         bv = 0
-        all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val.to_i}
+        all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
 
         operations = [
             [mask_right, -9], # btm right
@@ -566,7 +570,8 @@ class GameState
             while (chk_sq >= 0 && chk_sq < 64)
                 bv |= 1 << chk_sq
 
-                # do not continue to the next peice if this square contains a peice or we're off the edge
+                # do not continue to the next peice if this square contains a peice or we're 
+                # off the edge
                 break if ((all_pieces) & (1 << chk_sq) != 0 || ((1 << chk_sq) & params[0]) != 0)
                 chk_sq += params[1]
             end
