@@ -43,23 +43,8 @@ class GameState
     # Each property it an individual GameState 
     :clr_pos # positions by colour
     :pos     # All positions
-    
-    :blk_p_attk # Black Pawn Attacks
-    :blk_r_attk # Black Roow Attacks
-    :blk_n_attk # Black Knight Attacks
-    :blk_b_attk # Black Bishop Attacks
-    :blk_q_attk # Black Queen Attacks
-    :blk_k_attk # Black King Attacks
-    :blk_attk # All black attacks
-    
-    :wht_p_attk # White Pawn Attacks
-    :wht_r_attk # White Rook Attacks
-    :wht_n_attk # White Knight Attacks
-    :wht_b_attk # White Bishop Attacks
-    :wht_q_attk # White Queen Attacks
-    :wht_k_attk # While King Attacks
-    :wht_attk # All white attacks    
-    
+    :attack  # Attack bitboards
+
     def initialize()         
         @clr_pos = {
             Chess::Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
@@ -74,39 +59,35 @@ class GameState
             Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
             Chess::Piece::KING => 0x08_00_00_00_00_00_00_08 
         }
-        
-        @blk_p_attk = 0x00_00_00_00_00_FF_00_00
-        @blk_r_attk = 0x00_00_00_00_00_00_00_00
-        @blk_n_attk = 0x00_00_00_00_00_A5_18_00
-        @blk_b_attk = 0x00_00_00_00_00_00_00_00
-        @blk_q_attk = 0x00_00_00_00_00_00_00_00
-        @blk_k_attk = 0x00_00_00_00_00_00_1C_14
 
-        @wht_p_attk = 0x00_00_FF_00_00_00_00_00
-        @wht_r_attk = 0x00_00_00_00_00_00_00_00
-        @wht_n_attk = 0x00_18_A5_00_00_00_00_00
-        @wht_b_attk = 0x00_00_00_00_00_00_00_00
-        @wht_q_attk = 0x00_00_00_00_00_00_00_00
-        @wht_k_attk = 0x14_1C_00_00_00_00_00_00
+        @attack = {
+            Chess::Colour::BLACK => {
+                Chess::Piece::PAWN => 0x00_00_00_00_00_FF_00_00,
+                Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::KNIGHT => 0x00_00_00_00_00_A5_18_00,
+                Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::KING => 0x00_00_00_00_00_00_1C_14
+            },
+            Chess::Colour::WHITE => {
+                Chess::Piece::PAWN => 0x00_00_FF_00_00_00_00_00,
+                Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::KNIGHT => 0x00_18_A5_00_00_00_00_00,
+                Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
+                Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
+            }
+        }
     end
     
     def clear()    
         @clr_pos.each_key {|key| @clr_pos[key] = 0}
         @pos.each_key {|key| @pos[key] = 0}
-
-        @blk_p_attk = 0
-        @blk_r_attk = 0
-        @blk_n_attk = 0
-        @blk_b_attk = 0
-        @blk_q_attk = 0
-        @blk_k_attk = 0
-
-        @wht_p_attk = 0
-        @wht_r_attk = 0
-        @wht_n_attk = 0
-        @wht_b_attk = 0
-        @wht_q_attk = 0
-        @wht_k_attk = 0
+        @attack.each_key do |clr|
+            @attack[clr].each_key do |pc|
+                @attack[clr][pc] = 0
+            end
+        end    
     end
     
     # get the shift width required to get the square specified by the provided 
@@ -280,11 +261,7 @@ class GameState
         # left attack
         bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
        
-        if (clr.white?)
-            @wht_p_attk = bv
-        else
-            @blk_p_attk = bv
-        end
+        @attack[clr][Chess::Piece::PAWN] = bv
     end
     
     def calculate_rook_attack(clr)
@@ -302,12 +279,7 @@ class GameState
         bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), \
                                     GameState.get_rank(bv_piece))
         
-        if (clr.white?)
-            @wht_r_attk = bv
-        else
-            @blk_r_attk = bv
-        end
-        
+        @attack[clr][Chess::Piece::ROOK] = bv
     end
     
     def calculate_knight_attack(clr)
@@ -354,11 +326,7 @@ class GameState
         bv_board_mask = 0xFC_FC_FC_FC_FC_FC_FC_00
         bv |= (bv_knight_piece & bv_board_mask) >> 10
 
-        if (clr.white?)
-            @wht_n_attk = bv
-        else
-            @blk_n_attk = bv
-        end
+        @attack[clr][Chess::Piece::KNIGHT] = bv
     end
     
     def calculate_bishop_attack(clr)
@@ -371,12 +339,7 @@ class GameState
             end
         end
         
-        if (clr.white?)
-            @wht_k_attk = bv
-        else
-            @blk_k_attk = bv
-        end
-        
+        @attack[clr][Chess::Piece::BISHOP] = bv
     end
     
     def calculate_queen_attack(clr)
@@ -397,12 +360,7 @@ class GameState
         bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), \
                                     GameState.get_rank(bv_piece))
       
-
-        if (clr.white?)
-            @wht_q_attk = bv
-        else
-            @blk_q_attk = bv
-         end
+        @attack[clr][Chess::Piece::QUEEN] = bv
     end
 
     def calculate_king_attack(clr)
@@ -445,20 +403,12 @@ class GameState
         # H
         bv_board_mask = 0xFE_FE_FE_FE_FE_FE_FE_00
         bv |= (bv_piece & bv_board_mask) >> 9
-        
-        if (clr.white?)
-            @wht_k_attk = bv
-        else
-            @blk_k_attk = bv
-        end
+       
+        @attack[clr][Chess::Piece::KING] = bv  
     end
     
     def calculate_colour_attack(clr)
-        if (clr.white?)
-            @wht_p_attk | @wht_r_attk | @wht_n_attk | @wht_b_attk | @wht_q_attk | @wht_k_attk
-        else
-            @blk_p_attk | @blk_r_attk | @blk_n_attk | @blk_b_attk | @blk_q_attk | @blk_k_attk
-        end
+        @attack[clr].values.inject(0) {|bv, val| bv | val}
     end
     
     # generate a bv for this piece on the given file
@@ -642,5 +592,4 @@ class GameState
         end
         out.chop
     end
-
 end
