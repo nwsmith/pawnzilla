@@ -17,7 +17,7 @@
 #
 require "chess"
 require "geometry"
-require "game"
+require "gamestate"
 
 module Rule_Std
     B_SZ = 8
@@ -40,7 +40,7 @@ module Rule_Std
                 Chess::Piece::ROOK => PieceInfo.new(5, method(:chk_mv_rook))
             }
         
-            @state = Game::State.new(B_SZ)
+            @state = GameState.new()
             
             clr = Chess::Colour::WHITE
 
@@ -77,7 +77,7 @@ module Rule_Std
         end
         
         def chk_mv(src, dest) 
-            pc = @state.board.sq_at(src).piece
+            pc = @state.sq_at(src).piece
             
             if pc.nil?
                 return false
@@ -88,8 +88,8 @@ module Rule_Std
         end
         
         def chk_mv_pawn(src, dest, state)
-            pc_src = state.board.sq_at(src).piece
-            pc_dest = state.board.sq_at(dest).piece        
+            pc_src = state.sq_at(src).piece
+            pc_dest = state.sq_at(dest).piece        
         
             # no matter what, the pawn has to move forward
             dst = dest.y - src.y
@@ -125,8 +125,8 @@ module Rule_Std
             return false unless src.on_diag?(dest) && !state.blocked?(src, dest)    
             
             # If a piece is on the dest square, make sure it's a capture.
-            pc_dest = state.board.sq_at(dest).piece
-            pc_src = state.board.sq_at(src).piece
+            pc_dest = state.sq_at(dest).piece
+            pc_src = state.sq_at(src).piece
             
             (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true
         end
@@ -135,8 +135,8 @@ module Rule_Std
             return false unless (src.on_rank?(dest) || src.on_file?(dest)) && !state.blocked?(src, dest)
             
             # If a piece is on the dest square, make sure it's a capture.
-            pc_dest = state.board.sq_at(dest).piece
-            pc_src = state.board.sq_at(src).piece
+            pc_dest = state.sq_at(dest).piece
+            pc_src = state.sq_at(src).piece
             
             (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true            
         end
@@ -152,8 +152,8 @@ module Rule_Std
             return false unless l.len == 1
             
             # Can only capture opposite coloured pieces
-            king = state.board.sq_at(src).piece
-            dest_pc = state.board.sq_at(dest).piece
+            king = state.sq_at(src).piece
+            dest_pc = state.sq_at(dest).piece
             
             (!dest_pc.nil? && !king.color.opposite?(dest_pc.color)) || true
         end
@@ -163,8 +163,8 @@ module Rule_Std
             return false unless ((src.x - dest.x).abs + (src.y - dest.y).abs) == 3
 
             # Can only capture opposite coloured pieces
-            knight = state.board.sq_at(src).piece
-            dest_pc = state.board.sq_at(dest).piece
+            knight = state.sq_at(src).piece
+            dest_pc = state.sq_at(dest).piece
             
             (!dest_pc.nil? && !knight.color.opposite?(dest_pc.color)) || true
         end

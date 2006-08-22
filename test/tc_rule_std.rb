@@ -93,7 +93,7 @@ class TestRule_Std < Test::Unit::TestCase
     def test_rook_cannot_hop_pawn
         # Unit test for a bug condition -> Rook can hop a pawn
         e = Rule_Std::Engine.new()
-        b = e.state.board
+        b = e.state
         assert(b.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
     end
 end
