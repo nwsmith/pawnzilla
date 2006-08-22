@@ -16,21 +16,21 @@
 #   limitations under the License.
 #
 require "geometry"
-require "rule_std"
+require "gamestate"
 
 puts "Pawnzilla game."
 puts
 puts "Copyright 2005 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
 puts
 
-e = Rule_Std::Engine.new();
+e = GameState.new
 
 # Main Game Loop
 num_mv = 1
 
 loop do
 
-    puts e.state.to_txt
+    puts e.to_txt
     puts
     clr = (num_mv & 1 == 1) ? "White" : "Black" 
     print "Enter move #{num_mv} for #{clr}: "
@@ -42,10 +42,10 @@ loop do
    
     puts
     src = Coord.from_alg(mv[0].chr + mv[1].chr)
-    dest = Coord.from_alg(mv[2].chr, mv[3].chr)
+    dest = Coord.from_alg(mv[2].chr + mv[3].chr)
     
     if (e.move?(src, dest)) 
-        e.move(src, dest)
+        e.move_piece(src, dest)
         num_mv += 1
         puts
         puts        

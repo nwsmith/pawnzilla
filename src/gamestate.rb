@@ -16,8 +16,11 @@
 #   limitations under the License.
 #
 require "chess"
+require "tr"
 
 class GameState
+    DEFAULT_SEPARATOR = ' '
+
     RANK_MASKS = [
         0xFF_00_00_00_00_00_00_00,
         0x00_FF_00_00_00_00_00_00,
@@ -46,6 +49,15 @@ class GameState
     :attack  # Attack bitboards
 
     def initialize()         
+        @chk_lookup = {
+            Chess::Piece::BISHOP => method(:chk_mv_bishop),
+            Chess::Piece::KING => method(:chk_mv_king),
+            Chess::Piece::KNIGHT => method(:chk_mv_knight),
+            Chess::Piece::PAWN => method(:chk_mv_pawn),
+            Chess::Piece::QUEEN => method(:chk_mv_queen),
+            Chess::Piece::ROOK => method(:chk_mv_rook)
+        }
+
         @clr_pos = {
             Chess::Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
             Chess::Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
@@ -606,7 +618,7 @@ class GameState
             
             # Output the pieces on the rank
             (0...8).each do |x|
-                sq = @board.sq_at(Coord.new(x, y))
+                sq = sq_at(Coord.new(x, y))
                 txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
                 txt += sep
             end
@@ -620,10 +632,100 @@ class GameState
         end
 
         # Output the file letters
-        (COLUMN_A...(COLUMN_A + 8)).each do |col|
+        (97...(97 + 8)).each do |col|
             txt += col.chr + sep
         end 
 
         txt += "\n"
+    end
+    def move?(src, dest)
+        chk_mv(src, dest)
+    end
+            
+    def chk_mv(src, dest) 
+        pc = sq_at(src).piece
+        pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
+    end
+    
+    def chk_mv_pawn(src, dest)
+        pc_src = sq_at(src).piece
+        pc_dest = sq_at(dest).piece        
+    
+        # no matter what, the pawn has to move forward
+        dst = dest.y - src.y
+        
+        # in the coordinate system, a forward move is a reduction in y for black
+        dst = -dst if pc_src.colour.black?
+       
+        return false unless dst > 0           
+
+        # no matter what, the pawn can only stay on the same rank or ONE either way            
+        return false unless ((src.x - 1)..(src.x + 1)) === dest.x
+        
+        # pawns can move one square forward except for first move
+        # I'm not a fan of this, but it works for now:
+        at_strt = (pc_src.colour.white? ? src.y == 1 : src.y == 6)
+        if at_strt && ![1,2].include?(dst) || !at_strt && dst != 1
+            return false
+        end
+       
+        if dst == 1 && [src.x + 1, src.x - 1].include?(dest.x)
+            # it's a diagonal move, ensure it's a capture
+            return false unless !pc_dest.nil? && pc_dest.colour.opposite?(pc_src.colour)
+        else 
+            # it's a straight move, ensure it's not blocked                                
+            return false if !pc_dest.nil? || blocked?(src, dest)
+        end
+        
+        true
+    end        
+    
+    def chk_mv_bishop(src, dest) 
+        # Bishops can only move diagonally and cannot jump pieces
+        return false unless src.on_diag?(dest) && !blocked?(src, dest)    
+        
+        # If a piece is on the dest square, make sure it's a capture.
+        pc_dest = sq_at(dest).piece
+        pc_src = sq_at(src).piece
+        
+        (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true
+    end
+    
+    def chk_mv_rook(src, dest) 
+        return false unless (src.on_rank?(dest) || src.on_file?(dest)) && !blocked?(src, dest)
+        
+        # If a piece is on the dest square, make sure it's a capture.
+        pc_dest = sq_at(dest).piece
+        pc_src = sq_at(src).piece
+        
+        (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true            
+    end
+    
+    def chk_mv_queen(src, dest)
+        chk_mv_bishop(src, dest) || chk_mv_rook(src, dest)
+    end
+    
+    def chk_mv_king(src, dest) 
+        l = Line.new(src, dest)
+        
+        # Kings can only move one square
+        return false unless l.len == 1
+        
+        # Can only capture opposite coloured pieces
+        king = sq_at(src).piece
+        dest_pc = sq_at(dest).piece
+        
+        (!dest_pc.nil? && !king.color.opposite?(dest_pc.color)) || true
+    end
+    
+    def chk_mv_knight(src, dest) 
+        # Knights move in an "L" shape
+        return false unless ((src.x - dest.x).abs + (src.y - dest.y).abs) == 3
+
+        # Can only capture opposite coloured pieces
+        knight = sq_at(src).piece
+        dest_pc = sq_at(dest).piece
+        
+        (!dest_pc.nil? && !knight.color.opposite?(dest_pc.color)) || true
     end
 end

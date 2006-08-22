@@ -28,7 +28,7 @@ module Network
         @move_cnt
 
         def initialize()
-            @engine = Rule_Std::Engine.new()
+            @engine = GameState.new
             @move_cnt = 0
         end
 
@@ -37,7 +37,7 @@ module Network
             dest = Coord.from_alg(move[2].chr, move[3].chr)
 
             if (@engine.move?(src, dest))
-                @engine.move(src, dest)
+                @engine.move_piece(src, dest)
                 true
             else
                 false
@@ -71,9 +71,10 @@ module Network
 
             compMove = moves[@move_cnt]
             @move_cnt = @move_cnt + 1
-            src  = Rule_Std::AlgCoord.new(compMove[0].chr, compMove[1].chr.to_i)
-            dest = Rule_Std::AlgCoord.new(compMove[2].chr, compMove[3].chr.to_i)
-            @engine.move(src, dest)
+            
+            src  = Coord.from_alg(compMove[0].chr + compMove[1].chr)
+            dest = Coord.from_alg(compMove[2].chr + compMove[3].chr)
+            @engine.move_piece(src, dest)
             return compMove
         end
     end

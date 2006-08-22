@@ -680,4 +680,52 @@ class TestGameState < Test::Unit::TestCase
         assert_equal(GameState.get_bv(Coord.new(0, 0)),
                      GameState.find_west_edge(GameState.get_bv(Coord.new(4, 0))))                     
     end                     
+
+    def test_chk_mv_pawn
+        e = GameState.new
+        
+        # cannot move a "pawn" from an empty square
+        assert_equal(e.chk_mv(Coord.from_alg('e3'), Coord.from_alg('e4')), false)
+        
+        # can move one square forward
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), true)
+                                
+        # cannot move one square forward if blocked
+        e.place_piece(Coord.from_alg('e3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), false)
+                                
+        # cannot move two squares forward if blocked
+        assert(!e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e4')))
+                                
+        # cannot move diagonally if not a capture
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
+                                
+        # can move diagonally if a capture
+        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), true)
+                                
+        # cannot capture the same colored piece
+        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
+                                
+        # make sure it works both ways
+        e.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)                       
+    end
+    
+    def test_check_mv_bishop
+        e = GameState.new
+        
+        # cannot move a blocked bishop
+        assert(!e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
+        e.remove_piece(Coord.from_alg('d2'))
+        assert(e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
+
+    end
+    
+    def test_rook_cannot_hop_pawn
+        # Unit test for a bug condition -> Rook can hop a pawn
+        e = GameState.new
+        assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
+    end
 end
