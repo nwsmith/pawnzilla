@@ -72,10 +72,6 @@ module Rule_Std
             chk_mv(src.to_coord, dest.to_coord)
         end
                 
-        def Engine.coord_to_alg(coord)
-            Rule_Std::AlgCoord.new((97 + coord.x).chr, (coord.y + 1))
-        end
-        
         def chk_mv(src, dest) 
             pc = @state.sq_at(src).piece
             
@@ -167,31 +163,6 @@ module Rule_Std
             dest_pc = state.sq_at(dest).piece
             
             (!dest_pc.nil? && !knight.color.opposite?(dest_pc.color)) || true
-        end
-    end
-    
-    class AlgCoord
-        attr_accessor :file
-        attr_accessor :rank
-        
-        def initialize(file, rank)
-            unless (MIN_FILE..MAX_FILE) === file
-                raise ArgumentException, "Illegal Alpha"
-            end
-            @file = file
- 
-            unless (MIN_RANK..MAX_RANK) === rank           
-                raise ArgumentException, "Illegal Numeric"
-            end            
-            @rank = rank
-        end
-        
-        def ==(c)
-            (@file == c.file && @rank == c.rank)
-        end
-        
-        def to_coord
-            Coord.new(@file[0] - 97, @rank - 1)            
         end
     end
     

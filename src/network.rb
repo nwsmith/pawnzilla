@@ -19,6 +19,7 @@
 # xboard interface
 
 require "rule_std"
+require "geometry"
 
 module Network
 
@@ -32,8 +33,8 @@ module Network
         end
 
         def send_move(move) 
-            src  = Rule_Std::AlgCoord.new(move[0].chr, move[1].chr.to_i)
-            dest = Rule_Std::AlgCoord.new(move[2].chr, move[3].chr.to_i)
+            src  = Coord.from_alg(move[0].chr, move[1].chr)
+            dest = Coord.from_alg(move[2].chr, move[3].chr)
 
             if (@engine.move?(src, dest))
                 @engine.move(src, dest)

@@ -62,6 +62,12 @@ class Coord
     def Coord.same_rank?(c0, c1) 
         c0.y == c1.y
     end
+
+    def Coord.from_alg(alg) 
+        return nil unless alg[0].chr.between?('a', 'h')
+        return nil unless alg[1].chr.to_i.between?(1, 8)
+        alg.length == 2 ? Coord.new(alg[0] - 97, alg[1].chr.to_i - 1) : nil
+    end
 end
 
 class Line

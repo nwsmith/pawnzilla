@@ -20,61 +20,36 @@ require "rule_std"
 require "test/unit"
 
 class TestRule_Std < Test::Unit::TestCase    
-    def test_coord_to_alg
-        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(0, 0)), Rule_Std::AlgCoord.new("a", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(0, 7)), Rule_Std::AlgCoord.new("a", 8))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(7, 0)), Rule_Std::AlgCoord.new("h", 1))
-        assert_equal(Rule_Std::Engine.coord_to_alg(Coord.new(7, 7)), Rule_Std::AlgCoord.new("h", 8))
-    end
-    
-    def test_alg_to_coord
-        assert_equal(Rule_Std::AlgCoord.new("a", 1).to_coord, Coord.new(0, 0))
-        assert_equal(Rule_Std::AlgCoord.new("a", 8).to_coord, Coord.new(0, 7))
-        assert_equal(Rule_Std::AlgCoord.new("h", 1).to_coord, Coord.new(7, 0))
-        assert_equal(Rule_Std::AlgCoord.new("h", 8).to_coord, Coord.new(7, 7))                        
-    end
-    
     def test_chk_mv_pawn
         e = Rule_Std::Engine.new
         
         # cannot move a "pawn" from an empty square
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 3).to_coord, 
-                                Rule_Std::AlgCoord.new('e', 4).to_coord), false)
+        assert_equal(e.chk_mv(Coord.from_alg('e3'), Coord.from_alg('e4')), false)
         
         # can move one square forward
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
-                                Rule_Std::AlgCoord.new('e', 3).to_coord), true)
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), true)
                                 
         # cannot move one square forward if blocked
-        e.state.place_piece(Rule_Std::AlgCoord.new('e', 3).to_coord, 
-                            Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
-                                Rule_Std::AlgCoord.new('e', 3).to_coord), false)
+        e.state.place_piece(Coord.from_alg('e3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), false)
                                 
         # cannot move two squares forward if blocked
-        assert(!e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, Rule_Std::AlgCoord.new('e', 4).to_coord))
+        assert(!e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e4')))
                                 
         # cannot move diagonally if not a capture
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
-                                Rule_Std::AlgCoord.new('d', 3).to_coord), false)
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
                                 
         # can move diagonally if a capture
-        e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
-                            Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
-                                Rule_Std::AlgCoord.new('d', 3).to_coord), true)
+        e.state.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), true)
                                 
         # cannot capture the same colored piece
-        e.state.place_piece(Rule_Std::AlgCoord.new('d', 3).to_coord, 
-                            Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 2).to_coord, 
-                                Rule_Std::AlgCoord.new('d', 3).to_coord), false)
+        e.state.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
                                 
         # make sure it works both ways
-        e.state.place_piece(Rule_Std::AlgCoord.new('d', 6).to_coord,
-                            Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
-        assert_equal(e.chk_mv(Rule_Std::AlgCoord.new('e', 7).to_coord,
-                                Rule_Std::AlgCoord.new('f',6).to_coord), false)                       
+        e.state.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)                       
                                 
     end
     
@@ -82,11 +57,11 @@ class TestRule_Std < Test::Unit::TestCase
         e = Rule_Std::Engine.new()
         
         # cannot move a blocked bishop
-        assert(!e.chk_mv(Rule_Std::AlgCoord.new('c', 1).to_coord, 
-                        Rule_Std::AlgCoord.new('e', 3).to_coord))
-        e.state.remove_piece(Rule_Std::AlgCoord.new('d', 2).to_coord)
-        assert(e.chk_mv(Rule_Std::AlgCoord.new('c', 1).to_coord, 
-                        Rule_Std::AlgCoord.new('e', 3).to_coord))
+        assert(!e.chk_mv(Coord.from_alg('c1'), 
+                        Coord.from_alg('e3')))
+        e.state.remove_piece(Coord.from_alg('d2'))
+        assert(e.chk_mv(Coord.from_alg('c1'), 
+                        Coord.from_alg('e3')))
 
     end
     

@@ -79,4 +79,35 @@ class TestCoord < Test::Unit::TestCase
         assert(Coord.new(0, 4).on_file?(Coord.new(0, 0)))            
     end
     
+    def test_should_create_coord_from_algebraic_at_origin
+        assert_equal(Coord.new(0, 0), Coord.from_alg('a1'))
+    end
+    
+    def test_should_create_coord_from_algebraic_at_ne_corner
+        assert_equal(Coord.new(7, 7), Coord.from_alg('h8'))
+    end
+
+    def test_should_create_coord_from_algebraic_at_nw_corner
+        assert_equal(Coord.new(0, 7), Coord.from_alg('a8'))
+    end
+
+    def test_should_return_nil_coord_for_too_long_algebraic_string
+        assert_nil(Coord.from_alg('a10'))
+    end
+
+    def test_should_return_nil_coord_for_rank_out_of_range
+        assert_nil(Coord.from_alg('i8'))
+    end
+
+    def test_should_return_nil_unless_rank_is_alphabetic_character
+        assert_nil(Coord.from_alg('!8'))
+    end
+
+    def test_should_return_nil_for_file_out_of_range
+        assert_nil(Coord.from_alg('a9'))
+    end
+
+    def test_should_return_nil_unless_rank_is_numeric_character
+        assert_nil(Coord.from_alg('aa'))
+    end
 end

@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+require "geometry"
 require "rule_std"
 
 puts "Pawnzilla game."
@@ -40,8 +41,8 @@ loop do
     break if !(mv[/^q$/i].nil?)
    
     puts
-    src = Rule_Std::AlgCoord.new(mv[0].chr, mv[1].chr.to_i)
-    dest = Rule_Std::AlgCoord.new(mv[2].chr, mv[3].chr.to_i)
+    src = Coord.from_alg(mv[0].chr + mv[1].chr)
+    dest = Coord.from_alg(mv[2].chr, mv[3].chr)
     
     if (e.move?(src, dest)) 
         e.move(src, dest)
