@@ -68,12 +68,6 @@ module Rule_Std
             end
         end
         
-        def move(src, dest)
-            if chk_mv(src.to_coord, dest.to_coord)  
-                @state.move_piece(src.to_coord, dest.to_coord)
-            end
-        end
-        
         def move?(src, dest)
             chk_mv(src.to_coord, dest.to_coord)
         end

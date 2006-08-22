@@ -35,7 +35,7 @@ module Game
         end
     
         def remove_piece(coord)
-            @board.remove_piece(coord, piece)
+            @board.remove_piece(coord)
         end
     
         def move_piece(from_coord, to_coord)

@@ -84,7 +84,7 @@ class TestRule_Std < Test::Unit::TestCase
         # cannot move a blocked bishop
         assert(!e.chk_mv(Rule_Std::AlgCoord.new('c', 1).to_coord, 
                         Rule_Std::AlgCoord.new('e', 3).to_coord))
-        e.move(Rule_Std::AlgCoord.new('d', 2), Rule_Std::AlgCoord.new('d', 4))
+        e.state.remove_piece(Rule_Std::AlgCoord.new('d', 2).to_coord)
         assert(e.chk_mv(Rule_Std::AlgCoord.new('c', 1).to_coord, 
                         Rule_Std::AlgCoord.new('e', 3).to_coord))
 
