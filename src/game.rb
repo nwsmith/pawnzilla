@@ -45,43 +45,6 @@ module Game
         def blocked?(src, dest) 
             @board.blocked?(src, dest)
         end
-    
-        # Output a text representation of the current board state using the specified separator
-        # If no separator is defined, the default separator is used.
-        def to_txt(sep = DEFAULT_SEPARATOR)
-            tr = Translator::PieceTranslator.new()
-            txt, row = '', 8;
-
-            # Because we store the board in a standard orientation, in order to make the board
-            # look "right side up" in a textual representation, we have to do the y-axis in
-            # reverse.            
-            (7).downto(0) do |y|
-                # Output the rank number (for alg coord)
-                txt += "#{row}" + sep
-                row -= 1
-                
-                # Output the pieces on the rank
-                (0...8).each do |x|
-                    sq = @board.sq_at(Coord.new(x, y))
-                    txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
-                    txt += sep
-                end
-                
-                txt += "\n"
-            end
-    
-            # Offset to compensate for rank numbers in layout
-            (sep.length + 1).times do 
-                txt += DEFAULT_SEPARATOR 
-            end
-    
-            # Output the file letters
-            (COLUMN_A...(COLUMN_A + 8)).each do |col|
-                txt += col.chr + sep
-            end 
-    
-            txt += "\n"
-        end
     end
 end
 
