@@ -79,6 +79,11 @@ module Chess
             @colour = colour
             @name = name
         end
+
+        def ==(piece)
+            @colour == piece.colour && @name == piece.name
+        end
+
     end    
     
     class Board

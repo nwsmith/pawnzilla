@@ -36,10 +36,39 @@ module Translator
             end
         end
 
+        def from_txt(chr) 
+            case chr
+                when 'p'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+                when 'P'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::PAWN)
+                when 'n'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT)
+                when 'N'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KNIGHT)
+                when 'b'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP)
+                when 'B'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP)
+                when 'r'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK)
+                when 'R'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
+                when 'q'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN)
+                when 'Q'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::QUEEN)
+                when 'k'
+                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING)
+                when 'K'
+                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KING)
+            end
+        end
+
         private
 
         def parseFen(col, w, b) 
-            col.white? ? w : b;    
+            col.white? ? w : b    
         end
     end
 end

@@ -96,4 +96,28 @@ class TestBoard < Test::Unit::TestCase
         assert(!b.blocked?(c0, Coord.new(4, 5)))
         assert(!b.blocked?(c0, c1))        
     end    
+
+    def test_same_piece_same_colour_should_be_equal
+        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        assert_equal(p1, p2)
+    end
+
+    def test_same_piece_diff_colour_should_not_be_equal
+        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::PAWN)
+        assert_not_equal(p1, p2)
+    end
+
+    def test_diff_piece_same_colour_should_not_be_equal
+        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING)
+        assert_not_equal(p1, p2)
+    end
+
+    def test_diff_piece_diff_colour_should_not_be_equal
+        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KING)
+        assert_not_equal(p1, p2)
+    end
 end
