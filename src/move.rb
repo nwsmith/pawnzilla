@@ -15,30 +15,46 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-module Move
-    class MoveNode
-        attr_accessor :white_ply
-        attr_accessor :black_ply
-        attr_accessor :next
-
-        :children
-
-        def initialize
-            @children = Array.new()
-        end
-
-        def add_child(node)
-            @children.append(node)
-        end
+class Move
+    def initialize(src, dest)
+        @src = src
+        @dest = dest
     end
 
-    class Ply
-        attr_reader :source
-        attr_reader :destination
+    def Move.execute(src, dest, pc, state) 
+        state.move_piece(src, dest)
+        new(src, dest)
+    end
 
-        def initialize(source, destination)
-            @source = source
-            @destination = destination
-        end
+    def undo(state) 
+        state.move_piece(@dest, @src)
     end
 end
+#
+#module Move
+#    class MoveNode
+#        attr_accessor :white_ply
+#        attr_accessor :black_ply
+#        attr_accessor :next
+#
+#        :children
+#
+#        def initialize
+#            @children = Array.new()
+#        end
+#
+#        def add_child(node)
+#            @children.append(node)
+#        end
+#    end
+#
+#    class Ply
+#        attr_reader :source
+#        attr_reader :destination
+#
+#        def initialize(source, destination)
+#            @source = source
+#            @destination = destination
+#        end
+#    end
+#end

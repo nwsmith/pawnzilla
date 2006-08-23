@@ -16,7 +16,8 @@
 #   limitations under the License.
 #
 require 'test/unit'
-require 'tc_gamestate'
-require 'tc_chess'
 require 'tc_geometry'
+require 'tc_chess'
+require 'tc_gamestate'
+require 'tc_move'
 require 'tc_translator'
