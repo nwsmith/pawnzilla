@@ -949,11 +949,6 @@ class TestGameState < Test::Unit::TestCase
         x = i % 8;
         y = 8 - ((i - x) / 8)
 
-        coord_notation = 'a';
-        0.upto(x - 1) do |j|
-            coord_notation.succ!
-        end
-        coord_notation + y.to_s
+        (97 + x).chr + y.to_s
     end
-    
 end
