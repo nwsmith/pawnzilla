@@ -17,6 +17,7 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"
+require "test/pawnzilla_test_case"
 require "gamestate"
 require "chess"
 require "geometry"
@@ -152,8 +153,6 @@ class TestGameState < Test::Unit::TestCase
     
     def test_white_pawn_in_centre_should_attack_upwards()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -163,10 +162,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::WHITE)
 
-        expected = check_attack_bv(b, Chess::Colour::WHITE, "
+        expected = "
             --------
             --------
             --------
@@ -175,12 +174,13 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
     def test_black_pawn_in_centre_should_attack_downwards()
         b = GameState.new()
-        b.clear()
         place_pieces(b, "
             --------
             --------
@@ -190,10 +190,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::BLACK)
 
-        expected = check_attack_bv(b, Chess::Colour::BLACK, "
+        expected = "
             --------
             --------
             --------
@@ -202,13 +202,13 @@ class TestGameState < Test::Unit::TestCase
             -*-*----
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::BLACK)
     end
 
     def test_white_pawn_on_left_edge_should_attack_upwards()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -218,10 +218,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::WHITE)
 
-        expected = check_attack_bv(b, Chess::Colour::WHITE, "
+        expected = "
             --------
             --------
             --------
@@ -230,13 +230,13 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
-    def test_black_pawn_on_left_edge_should_attack_upwards()
+    def test_black_pawn_on_left_edge_should_attack_downwards()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -246,10 +246,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::BLACK)
 
-        expected = check_attack_bv(b, Chess::Colour::BLACK, "
+        expected = "
             --------
             --------
             --------
@@ -258,13 +258,13 @@ class TestGameState < Test::Unit::TestCase
             -*------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::BLACK)
     end
 
     def test_white_pawn_on_right_edge_should_attack_upwards()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -274,10 +274,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::WHITE)
 
-        expected = check_attack_bv(b, Chess::Colour::WHITE, "
+        expected = "
             --------
             --------
             --------
@@ -286,13 +286,13 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
-    def test_black_pawn_on_left_edge_should_attack_upwards()
+    def test_black_pawn_on_right_edge_should_attack_downwards()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -302,10 +302,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::BLACK)
 
-        expected = check_attack_bv(b, Chess::Colour::BLACK, "
+        expected = "
             --------
             --------
             --------
@@ -314,13 +314,13 @@ class TestGameState < Test::Unit::TestCase
             ------*-
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::BLACK)
     end
 
     def test_white_pawn_on_top_edge_should_not_attack()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             ----p---
             --------
@@ -330,10 +330,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::WHITE)
 
-        expected = check_attack_bv(b, Chess::Colour::WHITE, "
+        expected = "
             --------
             --------
             --------
@@ -342,13 +342,13 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
     def test_black_pawn_on_bottem_edge_should_not_attack()
         b = GameState.new()
-        b.clear()
-
         place_pieces(b, "
             --------
             --------
@@ -358,10 +358,10 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             ---P----
-        ");
+        ")
         b.calculate_pawn_attack(Chess::Colour::BLACK)
 
-        expected = check_attack_bv(b, Chess::Colour::BLACK, "
+        expected = "
             --------
             --------
             --------
@@ -370,7 +370,9 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
             --------
-        ");
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::BLACK)
     end
         
     def test_calculate_rook_attack()
@@ -895,31 +897,6 @@ class TestGameState < Test::Unit::TestCase
     # --------
     # --------
     #
-    # Replace a dash with the fen character you wish to place
-    def place_pieces(gamestate, string_board)
-        pt = Translator::PieceTranslator.new()
-        string_board.gsub!(/\s+/, "")
-        puts "Error: given board malformed!" if string_board.length != 64;
-
-        0.upto(63) do |i|
-            next if string_board[i].chr == '-';
-
-            coord_notation = get_alg_coord_notation(i)
-            coord = Coord.from_alg(coord_notation)
-            gamestate.place_piece(coord, pt.from_txt(string_board[i].chr))
-        end
-    end
-
-    # A string representation of a board will look like this:
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    #
     # A - represents a square not under attack.
     # A * represents a square under attack
     # All whitespace is ignored.
@@ -942,13 +919,5 @@ class TestGameState < Test::Unit::TestCase
                 "Attack Board: #{raw_string_board}")
         end
         bv
-    end
-
-    # Creates a alg coord notation for an index in a bv
-    def get_alg_coord_notation(i)
-        x = i % 8;
-        y = 8 - ((i - x) / 8)
-
-        (97 + x).chr + y.to_s
     end
 end
