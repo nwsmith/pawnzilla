@@ -15,9 +15,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
+$:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
-require "test/pawnzilla_test_case"
+require "pawnzilla_test_case"
 require "gamestate"
 require "chess"
 require "geometry"
@@ -29,7 +30,7 @@ class TestGameState < Test::Unit::TestCase
     end
 
     def test_should_get_white_piece_on_black_square_from_initial_setup
-        square = @board.sq_at(Coord.new(0, 0))
+        square = @board.sq_at(A1)
         assert_not_nil(square)
         assert(square.colour.black?)
         assert_not_nil(square.piece)
@@ -38,14 +39,14 @@ class TestGameState < Test::Unit::TestCase
     end
 
     def test_should_get_empty_square_from_initial_setup
-        square = @board.sq_at(Coord.new(0, 2))
+        square = @board.sq_at(A3)
         assert_not_nil(square)
         assert(square.colour.black?)
         assert_nil(square.piece)
     end
 
     def test_should_get_black_piece_on_white_square_from_initial_setup
-        square = @board.sq_at(Coord.new(2, 7))
+        square = @board.sq_at(C8)
         assert_not_nil(square)
         assert(square.colour.white?)
         assert_not_nil(square.piece)
@@ -53,10 +54,10 @@ class TestGameState < Test::Unit::TestCase
         assert_equal(Chess::Piece::BISHOP, square.piece.name)
     end
 
-    def test_move_piece
+    def test_move_should_not_change_peice_properties
         board = GameState.new()
-        src = Coord.new(0, 1)
-        dest = Coord.new(0, 2)
+        src = A2
+        dest = A3
         board.move_piece(src, dest)
         assert(board.sq_at(src).piece.nil?)
         assert(!board.sq_at(dest).piece.nil?)
@@ -64,24 +65,23 @@ class TestGameState < Test::Unit::TestCase
         assert(board.sq_at(dest).piece.name == Chess::Piece::PAWN)
     end
     
-    def test_move_colour
-        # Ensure that the peice remains the same colour on move
+    def test_move_should_not_chance_peice_colour
         board = GameState.new()
-        src = Coord.new(4, 6);
-        dest = Coord.new(4, 4);
+        src = D7
+        dest = D5
         board.move_piece(src, dest);
         assert(board.sq_at(dest).piece.colour.black?);
         
-        src = Coord.new(4, 1);
-        dest = Coord.new(4, 3);
+        src = D2
+        dest = D3
         board.move_piece(src, dest);
         assert(board.sq_at(dest).piece.colour.white?);
         
     end
     
-    def test_place_piece
+    def test_place_piece_should_place_proper_peice_and_colour
         board = GameState.new()
-        coord = Coord.new(0,5)
+        coord = A6
         piece = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
         board.place_piece(coord, piece)
         square = board.sq_at(coord)
@@ -92,7 +92,7 @@ class TestGameState < Test::Unit::TestCase
 
     def test_should_place_piece_over_existing_piece
         board = GameState.new()
-        coord = Coord.new(0, 5)
+        coord = A6
         piece = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
         board.place_piece(coord, Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
         board.place_piece(coord, piece)
@@ -104,13 +104,13 @@ class TestGameState < Test::Unit::TestCase
     
     def test_remove_piece
         board = GameState.new()
-        coord = Coord.new(0,0)
+        coord = A1
         board.remove_piece(coord)
         square = board.sq_at(coord)
         assert(square.piece.nil?)
         
         # Make sure an empty square stays that way
-        coord = Coord.new(0, 5)
+        coord = A6
         board.remove_piece(coord)
         square = board.sq_at(coord)
         assert(square.piece.nil?)
@@ -118,37 +118,112 @@ class TestGameState < Test::Unit::TestCase
     
     def test_blocked
         b = GameState.new()
-        b.clear()
-        
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))        
-        b.place_piece(Coord.new(3, 3), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))
-        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
-        
-        b.place_piece(Coord.new(0, 3), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))
-        assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
-        
-        b.place_piece(Coord.new(3, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))
-        assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
-        assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
-        
-        # Make sure it works for squares other than the origin
-        c0 = Coord.new(2, 3)
-        c1 = Coord.new(5, 6)
-        
-        b.place_piece(c0, Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))
-        b.place_piece(c1, Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN))
-        assert(b.blocked?(c0, Coord.new(6, 7)))
-        assert(!b.blocked?(c0, Coord.new(4, 5)))
-        assert(!b.blocked?(c0, c1))
-        
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            ---p----
+            --------
+            --------
+            p-------
+        ")
+
+        expected = "
+            -------*
+            ------*-
+            -----*--
+            ----*---
+            --------
+            --------
+            --------
+            --------
+        "
+        #assert_blocked_state(expected, b, A1)
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            p--p----
+            --------
+            --------
+            p-------
+        ")
+
+        expected = "
+            *------*
+            *-----*-
+            *----*--
+            *---*---
+            --------
+            --------
+            --------
+            --------
+        "
+        #assert_blocked_state(expected, b, A1)
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            p--p----
+            --------
+            --------
+            p--p----
+        ")
+
+        expected = "
+            *------*
+            *-----*-
+            *----*--
+            *---*---
+            --------
+            --------
+            --------
+            ----****
+        "
+        #assert_blocked_state(expected, b, A1)
+
+        place_pieces(b, "
+            --------
+            -----p--
+            --------
+            --------
+            p-pp----
+            --------
+            --------
+            p--p----
+        ")
+
+        expected = "
+            ------*-
+            --------
+            --------
+            --------
+            ----****
+            --------
+            --------
+            --------
+        "
+        assert_blocked_state(expected, b, C4)
+
         # Unit test for a bug condition -> Rook can hop a pawn
         b = GameState.new()
-        assert(b.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
+        expected = "
+            ******--
+            --------
+            -------*
+            -------*
+            -------*
+            -------*
+            -------*
+            -------*
+        "
+        
+        #assert_blocked_state(expected, b, H8)
     end
     
     def test_white_pawn_in_centre_should_attack_upwards()

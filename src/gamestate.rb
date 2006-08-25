@@ -247,7 +247,7 @@ class GameState
             # a piece on the destination square isn't a block
             break if c == dest
                 
-            return true unless sq_at(c).piece.nil?
+            return true unless sq_at(c).piece.nil? || c == src
         end
         
         false

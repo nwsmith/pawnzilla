@@ -16,6 +16,7 @@
 #
 require 'test/unit'
 
+require "geometry"
 require "tr"
 
 # Redtag: I did try extending this, but test case does some mojo
@@ -37,17 +38,76 @@ require "tr"
 # All non-whitespace characters must be - for a square not under attack,
 # and a * for one that is.
 
-class Test::Unit::TestCase
+# Useful constants
+A1 = Coord.from_alg("a1")
+A2 = Coord.from_alg("a2")
+A3 = Coord.from_alg("a3")
+A4 = Coord.from_alg("a4")
+A5 = Coord.from_alg("a5")
+A6 = Coord.from_alg("a6")
+A7 = Coord.from_alg("a7")
+A8 = Coord.from_alg("a8")
+B1 = Coord.from_alg("b1")
+B2 = Coord.from_alg("b2")
+B3 = Coord.from_alg("b3")
+B4 = Coord.from_alg("b4")
+B5 = Coord.from_alg("b5")
+B6 = Coord.from_alg("b6")
+B7 = Coord.from_alg("b7")
+B8 = Coord.from_alg("b8")
+C1 = Coord.from_alg("c1")
+C2 = Coord.from_alg("c2")
+C3 = Coord.from_alg("c3")
+C4 = Coord.from_alg("c4")
+C5 = Coord.from_alg("c5")
+C6 = Coord.from_alg("c6")
+C7 = Coord.from_alg("c7")
+C8 = Coord.from_alg("c8")
+D1 = Coord.from_alg("d1")
+D2 = Coord.from_alg("d2")
+D3 = Coord.from_alg("d3")
+D4 = Coord.from_alg("d4")
+D5 = Coord.from_alg("d5")
+D6 = Coord.from_alg("d6")
+D7 = Coord.from_alg("d7")
+D8 = Coord.from_alg("d8")
+E1 = Coord.from_alg("e1")
+E2 = Coord.from_alg("e2")
+E3 = Coord.from_alg("e3")
+E4 = Coord.from_alg("e4")
+E5 = Coord.from_alg("e5")
+E6 = Coord.from_alg("e6")
+E7 = Coord.from_alg("e7")
+E8 = Coord.from_alg("e8")
+F1 = Coord.from_alg("f1")
+F2 = Coord.from_alg("f2")
+F3 = Coord.from_alg("f3")
+F4 = Coord.from_alg("f4")
+F5 = Coord.from_alg("f5")
+F6 = Coord.from_alg("f6")
+F7 = Coord.from_alg("f7")
+F8 = Coord.from_alg("f8")
+G1 = Coord.from_alg("g1")
+G2 = Coord.from_alg("g2")
+G3 = Coord.from_alg("g3")
+G4 = Coord.from_alg("g4")
+G5 = Coord.from_alg("g5")
+G6 = Coord.from_alg("g6")
+G7 = Coord.from_alg("g7")
+G8 = Coord.from_alg("g8")
+H1 = Coord.from_alg("h1")
+H2 = Coord.from_alg("h2")
+H3 = Coord.from_alg("h3")
+H4 = Coord.from_alg("h4")
+H5 = Coord.from_alg("h5")
+H6 = Coord.from_alg("h6")
+H7 = Coord.from_alg("h7")
+H8 = Coord.from_alg("h8")
 
+class Test::Unit::TestCase
     def assert_attack_state(expected, gamestate, clr, message = nil)
         processed_expected = expected.gsub(/\s+/, "")
  
-        # Create a nicely formatted message
-        full_message = message == nil ? "" : message
-        full_message += "Given board malformed!\n" if processed_expected.length != 64
-        full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
-        full_message += "Board:\n#{gamestate.to_txt}\n"
-        full_message += "Expected:\n#{format_board(processed_expected)}\n"
  
         # Generate the gamestates attack board into our format
         gamestate_attack_board = ""
@@ -55,9 +115,33 @@ class Test::Unit::TestCase
             coord = Coord.from_alg(get_alg_coord_notation(i))
             gamestate_attack_board += gamestate.attacked?(clr, coord) ? "*" : "-"
         end
-        full_message += "Actual:\n#{format_board(gamestate_attack_board)}\n"
+
+        # Create a nicely formatted message
+        full_message = create_pretty_message(message, expected, gamestate_attack_board, gamestate)
  
         assert_block(full_message) { processed_expected == gamestate_attack_board }
+    end
+
+    def assert_blocked_state(expected, gamestate, coord, message = nil)
+        processed_expected = expected.gsub(/\s+/, "")
+ 
+ 
+        # Generate the gamestates attack board into our format
+        gamestate_block_board = ""
+        0.upto(63) do |i|
+            chk_coord = Coord.from_alg(get_alg_coord_notation(i))
+
+            same_line = Coord.same_diag?(coord, chk_coord) || Coord.same_rank?(coord, chk_coord) ||
+                    Coord.same_file?(coord, chk_coord)
+
+            gamestate_block_board += (same_line && gamestate.blocked?(coord, chk_coord)) ? "*" : "-"
+        end
+
+        # Create a nicely formatted message
+        full_message = create_pretty_message(message, expected, gamestate_block_board, gamestate)
+
+        assert_block(full_message) { processed_expected == gamestate_block_board }
+
     end
 
     def place_pieces(gamestate, board_string)
@@ -88,7 +172,8 @@ class Test::Unit::TestCase
         board_string.gsub(/\s+/, "")
     end
 
-    # TAkes a processed board and renders it in a more readable form
+    private
+    # Takes a processed board and renders it in a more readable form
     def format_board(board_string)
         board_string[0..7]   + "\n" +
         board_string[8..15]  + "\n" +
@@ -99,5 +184,25 @@ class Test::Unit::TestCase
         board_string[48..55] + "\n" +
         board_string[56..63] + "\n" +
         ""
+    end
+
+    def format_board_message(message)
+        # Create a nicely formatted message
+        full_message = message == nil ? "" : message
+        full_message += "Given board malformed!\n" if processed_expected.length != 64
+        full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
+        full_message += "Board:\n#{gamestate.to_txt}\n"
+        full_message += "Expected:\n#{format_board(processed_expected)}\n"
+        full_message
+    end
+
+    def create_pretty_message(message, expected, actual, gamestate)
+        # Create a nicely formatted message
+        full_message = message == nil ? "" : message
+        full_message += "Given board malformed!\n" if expected.length != 64
+        full_message += "Given board has illegal characters\n" if expected.match(/[^-*]/)
+        full_message += "Board:\n#{gamestate.to_txt}\n"
+        full_message += "Expected:\n#{format_board(expected)}\n"
+        full_message += "Actual:\n#{format_board(actual)}\n"
     end
 end

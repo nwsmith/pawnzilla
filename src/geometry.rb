@@ -83,7 +83,7 @@ class Line
         c0, c1 = @c0, @c1
         
         # First, normalize the coords (i.e. make sure they go W-E)
-        c0, c1 = c0, c1 if (c0.x > c1.x) 
+        c0, c1 = c1, c0 if (c0.x > c1.x) 
             
         # Then make sure we know if we're going N->S or S->N
         y_inc = c0.y < c1.y ? 1 : -1
