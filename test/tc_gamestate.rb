@@ -374,81 +374,91 @@ class TestGameState < Test::Unit::TestCase
 
         assert_attack_state(expected, b, Chess::Colour::BLACK)
     end
-        
-    def test_calculate_rook_attack()
+
+    def test_corner_rook_should_attack_sides
         b = GameState.new()
-        
-        # Test the corner
-        b.clear()
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK))
-        b.calculate_rook_attack(Chess::Colour::WHITE)
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(0, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 7)))
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 0)))
-
-        # Test the middle
-        b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK))
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            r-------
+        ")
         b.calculate_rook_attack(Chess::Colour::WHITE)
 
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 7)))
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 4)))
+        expected = "
+            *-------
+            *-------
+            *-------
+            *-------
+            *-------
+            *-------
+            *-------
+            -*******
+        "
 
-        # Test the blocked peice
-        b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(2, 4), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(6, 4), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(4, 6), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.calculate_rook_attack(Chess::Colour::WHITE)
-      
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 7)))
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(1, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(7, 4)))
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
-    
+
+    def test_center_rook_should_attack_file_and_rank
+        b = GameState.new()
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            ---r----
+            --------
+            --------
+            --------
+            --------
+        ")
+        b.calculate_rook_attack(Chess::Colour::WHITE)
+
+        expected = "
+            ---*----
+            ---*----
+            ---*----
+            ***-****
+            ---*----
+            ---*----
+            ---*----
+            ---*----
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_pieces_should_block_rook_attack
+        b = GameState.new()
+        place_pieces(b, "
+            --------
+            ---P----
+            --------
+            --Pr--P-
+            --------
+            --------
+            ---P----
+            --------
+        ")
+        b.calculate_rook_attack(Chess::Colour::WHITE)
+
+        expected = "
+            --------
+            ---*----
+            ---*----
+            --*-***-
+            ---*----
+            ---*----
+            ---*----
+            --------
+        "
+
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+        
     def test_calculate_knight_attack()
         b = GameState.new()
         

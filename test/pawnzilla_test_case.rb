@@ -47,7 +47,7 @@ class Test::Unit::TestCase
         full_message += "Given board malformed!\n" if processed_expected.length != 64
         full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
         full_message += "Board:\n#{gamestate.to_txt}\n"
-        full_message += "Expected:\n#{format_board(processed_expected)} DBA\n"
+        full_message += "Expected:\n#{format_board(processed_expected)}\n"
  
         # Generate the gamestates attack board into our format
         gamestate_attack_board = ""
