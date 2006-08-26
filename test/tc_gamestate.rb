@@ -533,45 +533,62 @@ class TestGameState < Test::Unit::TestCase
 
         assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
-        
-    def test_calculate_knight_attack()
+
+    def test_corner_knights_should_attack_middle()
         b = GameState.new()
-        
-        # Test the middle board attacks
-        b.clear()
-        
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT))
-        b.place_piece(Coord.new(0, 7), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT))
-        b.place_piece(Coord.new(7, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT))
-        b.place_piece(Coord.new(7, 7), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT))
+
+        place_pieces(b, "
+            n------n
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            n------n
+        ")
         b.calculate_knight_attack(Chess::Colour::WHITE)
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 1)))
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 6)))
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 1)))
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 6)))
-        
-        b.clear()
-        
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT))
+
+        expected = "
+            --------
+            --*--*--
+            -*----*-
+            --------
+            --------
+            -*----*-
+            --*--*--
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_centre_knight_should_attack_outwards()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            ---n----
+            --------
+            --------
+            --------
+        ")
         b.calculate_knight_attack(Chess::Colour::WHITE)
-        
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
-    end      
+
+        expected = "
+            --------
+            --------
+            --*-*---
+            -*---*--
+            --------
+            -*---*--
+            --*-*---
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
 
     def test_calculate_bishop_attack()
         b = GameState.new()
