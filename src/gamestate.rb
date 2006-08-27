@@ -43,11 +43,6 @@ class GameState
         0x01_01_01_01_01_01_01_01        
     ]
             
-    # Each property it an individual GameState 
-    :clr_pos # positions by colour
-    :pos     # All positions
-    :attack  # Attack bitboards
-
     def initialize()         
         @chk_lookup = {
             Chess::Piece::BISHOP => method(:chk_mv_bishop),
