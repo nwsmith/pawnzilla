@@ -1142,40 +1142,4 @@ class TestGameState < Test::Unit::TestCase
         e = GameState.new
         assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
     end
-
-    private
-
-    # A string representation of a board will look like this:
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    # --------
-    #
-    # A - represents a square not under attack.
-    # A * represents a square under attack
-    # All whitespace is ignored.
-    def check_attack_bv(gamestate, clr, raw_string_board)
-        string_board = raw_string_board.gsub(/\s+/, "")
-        puts "Error: given board malformed!" if string_board.length != 64;
-
-        bv = 0
-        0.upto(63) do |i|
-            coord_notation = get_alg_coord_notation(i)
-            coord = Coord.from_alg(coord_notation)
-
-            expected = string_board[i].chr == '*'
-            actual = gamestate.attacked?(clr, coord);
-
-            
-            assert_equal(expected, actual, 
-                "Checking coord #{coord_notation}\n" +
-                "Board: \n#{gamestate.to_txt}\n" +
-                "Attack Board: #{raw_string_board}")
-        end
-        bv
-    end
 end
