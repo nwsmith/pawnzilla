@@ -814,7 +814,7 @@ class TestGameState < Test::Unit::TestCase
         assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
-    def test_centre_queen_attach_should_be_blockable()
+    def test_centre_queen_attack_should_be_blockable()
         b = GameState.new()
 
         place_pieces(b, "
