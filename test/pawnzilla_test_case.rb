@@ -117,7 +117,7 @@ class Test::Unit::TestCase
         end
 
         # Create a nicely formatted message
-        full_message = create_pretty_message(message, expected, gamestate_attack_board, gamestate)
+        full_message = create_pretty_message(message, processed_expected, gamestate_attack_board, gamestate)
  
         assert_block(full_message) { processed_expected == gamestate_attack_board }
     end

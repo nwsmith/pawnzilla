@@ -510,22 +510,29 @@ class GameState
         all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
 
         operations = [
-            [mask_right, -9], # btm right
-            [mask_left, -7],  # btm left
-            [mask_right, 7],  # up right
-            [mask_left, 9]    # up left
+             [mask_left,  -9], # SW -> NE
+             [mask_right, -7], # SE -> NW
+             [mask_left,   7], # NW -> SE
+             [mask_right,  9]  # NE -> SW
         ]
         
         operations.each do |params|
-            chk_sq = sq + params[1]
-            
-            while (chk_sq >= 0 && chk_sq < 64)
-                bv |= 1 << chk_sq
+            edge_mask = params[0]
+            shift_width = params[1]
 
-                # do not continue to the next peice if this square contains a peice or we're 
-                # off the edge
-                break if ((all_pieces) & (1 << chk_sq) != 0 || ((1 << chk_sq) & params[0]) != 0)
-                chk_sq += params[1]
+            chk_sq = sq
+            next_sq = chk_sq + shift_width
+
+            next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
+            blocked  = false
+
+            until(next_sq_off_edge || blocked)
+                chk_sq = next_sq
+                next_sq = chk_sq + shift_width
+                bv |= (1 << chk_sq)
+
+                next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
+                blocked  = (1 << chk_sq) & all_pieces != 0
             end
         end
 
