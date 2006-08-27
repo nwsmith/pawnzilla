@@ -758,126 +758,90 @@ class TestGameState < Test::Unit::TestCase
         assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
-    def test_calculate_queen_attack()
+    def test_corner_queen_should_attack()
         b = GameState.new()
-        
-        # Test the corner
-        b.clear()
-        b.place_piece(Coord.new(0, 0), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            q-------
+        ")
         b.calculate_queen_attack(Chess::Colour::WHITE)
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(0, 0)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(1, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 0)))
-        
-        
-        # Test the middle
-        b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
-        b.calculate_queen_attack(Chess::Colour::WHITE)
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(3, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(3, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(5, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(5, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 3)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 5)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 3)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 4)))
-        
-        # Test the blocked peice
-        b.clear()
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
-        b.place_piece(Coord.new(5, 5), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(3, 5), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.place_piece(Coord.new(4, 2), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK))
-        b.calculate_queen_attack(Chess::Colour::WHITE)
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(3, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(3, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(5, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(5, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 3)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 5)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 3)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 0)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 5)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 6)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(7, 7)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(1, 7)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 1)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 0)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 1)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 2)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 6)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 7)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(1, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(2, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(6, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(7, 4)))
+
+        expected = "
+            *------*
+            *-----*-
+            *----*--
+            *---*---
+            *--*----
+            *-*-----
+            **------
+            -*******
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
-    
+
+    def test_centre_queen_should_attack_outwards()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            ---q----
+            --------
+            --------
+            --------
+        ")
+        b.calculate_queen_attack(Chess::Colour::WHITE)
+
+        expected = "
+            ---*---*
+            *--*--*-
+            -*-*-*--
+            --***---
+            ***-****
+            --***---
+            -*-*-*--
+            *--*--*-
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_centre_queen_attach_should_be_blockable()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            ---P-P--
+            --------
+            ---q----
+            --------
+            --------
+            --------
+        ")
+        b.calculate_queen_attack(Chess::Colour::WHITE)
+
+        expected = "
+            --------
+            *-------
+            -*-*-*--
+            --***---
+            ***-****
+            --***---
+            -*-*-*--
+            *--*--*-
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
     def test_calculate_king_attack()
         b = GameState.new()
         
