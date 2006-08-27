@@ -842,51 +842,146 @@ class TestGameState < Test::Unit::TestCase
         assert_attack_state(expected, b, Chess::Colour::WHITE)
     end
 
-    def test_calculate_king_attack()
+    def test_centre_king_should_attack_outwards()
         b = GameState.new()
-        
-        # Test the middle board attacks
-        b.clear()
-        
-        b.place_piece(Coord.new(4, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING))
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            ---k----
+            --------
+            --------
+            --------
+        ")
         b.calculate_king_attack(Chess::Colour::WHITE)
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(3, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(4, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(5, 2)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 2)))
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 3)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 3)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 3)))
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 4)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 4)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 4)))
-        
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(2, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(3, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(4, 5)))
-        assert(b.attacked?(Chess::Colour::WHITE, Coord.new(5, 5)))
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(6, 5)))
-        
-        # Left side
-        b.clear()
-        b.place_piece(Coord.new(0, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING))
+
+        expected = "
+            --------
+            --------
+            --------
+            --***---
+            --*-*---
+            --***---
+            --------
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_left_king_should_attack()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            k-------
+            --------
+            --------
+            --------
+        ")
         b.calculate_king_attack(Chess::Colour::WHITE)
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(7, 4)))
-        
-        #Right side
-        b.clear()
-        b.place_piece(Coord.new(7, 4), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING))
+
+        expected = "
+            --------
+            --------
+            --------
+            **------
+            -*------
+            **------
+            --------
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_right_king_should_attack_outwards()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            -------k
+            --------
+            --------
+            --------
+        ")
         b.calculate_king_attack(Chess::Colour::WHITE)
-        assert(!b.attacked?(Chess::Colour::WHITE, Coord.new(0, 4)))
-    end      
-    
+
+        expected = "
+            --------
+            --------
+            --------
+            ------**
+            ------*-
+            ------**
+            --------
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_top_king_should_attack_outwards()
+        b = GameState.new()
+
+        place_pieces(b, "
+            ---k----
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+        ")
+        b.calculate_king_attack(Chess::Colour::WHITE)
+
+        expected = "
+            --*-*---
+            --***---
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
+    def test_bottom_king_should_attack_outwards()
+        b = GameState.new()
+
+        place_pieces(b, "
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            ---k----
+        ")
+        b.calculate_king_attack(Chess::Colour::WHITE)
+
+        expected = "
+            --------
+            --------
+            --------
+            --------
+            --------
+            --------
+            --***---
+            --*-*---
+        "
+        assert_attack_state(expected, b, Chess::Colour::WHITE)
+    end
+
     def test_on_file? 
         b = GameState.new;
         
