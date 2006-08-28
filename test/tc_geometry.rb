@@ -110,4 +110,20 @@ class TestCoord < Test::Unit::TestCase
     def test_should_return_nil_unless_rank_is_numeric_character
         assert_nil(Coord.from_alg('aa'))
     end
+
+    def test_should_create_algebraic_coord_at_origin
+        assert_equal('a1', Coord.new(0, 0).to_alg)
+    end
+
+    def test_should_create_algebraic_coord_at_northeast_corner
+        assert_equal('h8', Coord.new(7, 7).to_alg)
+    end
+
+    def test_should_create_algebraic_coord_at_northwest_corner
+        assert_equal('a8', Coord.new(0, 7).to_alg)
+    end
+
+    def test_should_create_algebraic_coord_at_southwest_corner
+        assert_equal('h1', Coord.new(7, 0).to_alg)
+    end
 end

@@ -68,6 +68,10 @@ class Coord
         return nil unless alg[1].chr.to_i.between?(1, 8)
         alg.length == 2 ? Coord.new(alg[0] - 97, alg[1].chr.to_i - 1) : nil
     end
+
+    def to_alg
+        return (97 + @x).chr + (@y + 1).to_s
+    end
 end
 
 class Line
