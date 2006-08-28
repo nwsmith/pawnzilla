@@ -31,7 +31,7 @@ class MoveTest < Test::Unit::TestCase
 
     def test_should_move_piece
         @state.place_piece(@a1, @w_p)
-        move = Move.execute(@a1, @a2, @w_p, @state)
+        move = Move.execute(@a1, @a2, @state)
         assert_not_nil(move)
         assert_nil(@state.sq_at(@a1).piece)
         assert_not_nil(@state.sq_at(@a2).piece)
@@ -40,7 +40,7 @@ class MoveTest < Test::Unit::TestCase
 
     def test_should_undo_move
         @state.place_piece(@a1, @w_p)
-        move = Move.execute(@a1, @a2, @w_p, @state)
+        move = Move.execute(@a1, @a2, @state)
         move.undo(@state)
         assert_nil(@state.sq_at(@a2).piece)
         assert_not_nil(@state.sq_at(@a1).piece)

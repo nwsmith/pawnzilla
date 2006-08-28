@@ -21,7 +21,7 @@ class Move
         @dest = dest
     end
 
-    def Move.execute(src, dest, pc, state) 
+    def Move.execute(src, dest, state) 
         state.move_piece(src, dest)
         new(src, dest)
     end
