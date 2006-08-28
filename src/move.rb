@@ -29,4 +29,8 @@ class Move
     def undo(state) 
         state.move_piece(@dest, @src)
     end
+
+    def to_s
+        "#{@src.to_alg}:#{@dest.to_alg}"
+    end
 end
