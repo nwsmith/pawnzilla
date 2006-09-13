@@ -16,6 +16,7 @@
 #   limitations under the License.
 #
 require "chess"
+require "colour"
 require "tr"
 
 class GameState
@@ -54,8 +55,8 @@ class GameState
         }
 
         @clr_pos = {
-            Chess::Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
-            Chess::Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
+            Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
+            Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
         }
 
         @pos = {
@@ -68,7 +69,7 @@ class GameState
         }
 
         @attack = {
-            Chess::Colour::BLACK => {
+            Colour::BLACK => {
                 Chess::Piece::PAWN => 0x00_00_00_00_00_FF_00_00,
                 Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
                 Chess::Piece::KNIGHT => 0x00_00_00_00_00_A5_18_00,
@@ -76,7 +77,7 @@ class GameState
                 Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
                 Chess::Piece::KING => 0x00_00_00_00_00_00_1C_14
             },
-            Chess::Colour::WHITE => {
+            Colour::WHITE => {
                 Chess::Piece::PAWN => 0x00_00_FF_00_00_00_00_00,
                 Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
                 Chess::Piece::KNIGHT => 0x00_18_A5_00_00_00_00_00,
@@ -120,10 +121,10 @@ class GameState
         
         # Look for a piece of either colour in that square
         piece = nil
-        color = (@clr_pos[Chess::Colour::BLACK] & mask) == mask \
-            ? Chess::Colour::BLACK \
-            : (@clr_pos[Chess::Colour::WHITE] & mask) == mask \
-                ? Chess::Colour::WHITE \
+        color = (@clr_pos[Colour::BLACK] & mask) == mask \
+            ? Colour::BLACK \
+            : (@clr_pos[Colour::WHITE] & mask) == mask \
+                ? Colour::WHITE \
                 : nil
 
         # Determine piece type

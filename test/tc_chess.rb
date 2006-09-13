@@ -17,45 +17,15 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"
+require "colour"
 require "chess"
-
-class TestColour < Test::Unit::TestCase
-    def test_black?
-        assert(Chess::Colour::BLACK.black?)
-        assert(!Chess::Colour::WHITE.black?)
-    end
-    
-    def test_white?
-        assert(Chess::Colour::WHITE.white?)
-        assert(!Chess::Colour::WHITE.black?)
-    end
-    
-    def test_opposite?
-        assert(Chess::Colour::WHITE.opposite?(Chess::Colour::BLACK))
-        assert(!Chess::Colour::WHITE.opposite?(Chess::Colour::WHITE))
-        assert(Chess::Colour::BLACK.opposite?(Chess::Colour::WHITE))
-        assert(!Chess::Colour::BLACK.opposite?(Chess::Colour::BLACK))        
-    end
-    
-    def test_equalsequals
-        assert_equal(Chess::Colour::WHITE, Chess::Colour::WHITE)
-        assert_equal(Chess::Colour::WHITE, Chess::Colour::WHITE)
-        assert_equal(Chess::Colour::BLACK, Chess::Colour::BLACK)
-        assert_equal(Chess::Colour::BLACK, Chess::Colour::BLACK)
-    end
-
-    def test_hash
-        assert_equal(Chess::Colour::WHITE.hash, 0)
-        assert_equal(Chess::Colour::BLACK.hash, 1)
-    end
-end
 
 class TestBoard < Test::Unit::TestCase    
     def test_get_colour
-        assert_equal(Chess::Board.get_colour(Coord.new(0,0)), Chess::Colour::BLACK)
-        assert_equal(Chess::Board.get_colour(Coord.new(1,0)), Chess::Colour::WHITE)        
-        assert_equal(Chess::Board.get_colour(Coord.new(0,1)), Chess::Colour::WHITE)
-        assert_equal(Chess::Board.get_colour(Coord.new(1,1)), Chess::Colour::BLACK)                
+        assert_equal(Chess::Board.get_colour(Coord.new(0,0)), Colour::BLACK)
+        assert_equal(Chess::Board.get_colour(Coord.new(1,0)), Colour::WHITE)        
+        assert_equal(Chess::Board.get_colour(Coord.new(0,1)), Colour::WHITE)
+        assert_equal(Chess::Board.get_colour(Coord.new(1,1)), Colour::BLACK)                
     end
     
     def test_init
@@ -70,18 +40,18 @@ class TestBoard < Test::Unit::TestCase
     def test_blocked
         b = Chess::Board.new(8)
         
-        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(0, 0)).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(3, 3)).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 3)))
         
-        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(0, 3)).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(0, 4)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 2)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(0, 3)))
         
-        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(Coord.new(3, 0)).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(Coord.new(0, 0), Coord.new(4, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(2, 0)))
         assert(!b.blocked?(Coord.new(0, 0), Coord.new(3, 0)))
@@ -90,34 +60,34 @@ class TestBoard < Test::Unit::TestCase
         c0 = Coord.new(2, 3)
         c1 = Coord.new(5, 6)
         
-        b.sq_at(c0).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        b.sq_at(c1).piece = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(c0).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        b.sq_at(c1).piece = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
         assert(b.blocked?(c0, Coord.new(6, 7)))
         assert(!b.blocked?(c0, Coord.new(4, 5)))
         assert(!b.blocked?(c0, c1))        
     end    
 
     def test_same_piece_same_colour_should_be_equal
-        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        p2 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        p1 = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
         assert_equal(p1, p2)
     end
 
     def test_same_piece_diff_colour_should_not_be_equal
-        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        p2 = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::PAWN)
+        p1 = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN)
         assert_not_equal(p1, p2)
     end
 
     def test_diff_piece_same_colour_should_not_be_equal
-        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        p2 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING)
+        p1 = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Colour::WHITE, Chess::Piece::KING)
         assert_not_equal(p1, p2)
     end
 
     def test_diff_piece_diff_colour_should_not_be_equal
-        p1 = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
-        p2 = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KING)
+        p1 = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
+        p2 = Chess::Piece.new(Colour::BLACK, Chess::Piece::KING)
         assert_not_equal(p1, p2)
     end
 end

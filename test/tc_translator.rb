@@ -17,14 +17,15 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"
+require "colour"
 require "chess"
 require "tr"
 
 class TestTranslator < Test::Unit::TestCase
     def test_to_txt
         tr = Translator::PieceTranslator.new()
-        white = Chess::Colour::WHITE
-        black = Chess::Colour::BLACK
+        white = Colour::WHITE
+        black = Colour::BLACK
         
         piece = Chess::Piece.new(white, Chess::Piece::PAWN)   
         assert(tr.to_txt(piece) == "p")
@@ -65,61 +66,61 @@ class TestTranslator < Test::Unit::TestCase
 
     def test_p_should_return_white_pawn
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN), tr.from_txt('p'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), tr.from_txt('p'))
     end
 
     def test_P_should_return_black_pawn
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::PAWN), tr.from_txt('P'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN), tr.from_txt('P'))
     end
 
     def test_n_should_return_white_knight
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT), tr.from_txt('n'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT), tr.from_txt('n'))
     end
 
     def test_N_should_return_black_knight
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KNIGHT), tr.from_txt('N'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT), tr.from_txt('N'))
     end
 
     def test_b_should_return_white_bishop
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP), tr.from_txt('b'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), tr.from_txt('b'))
     end
 
     def test_B_should_return_black_bishop
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP), tr.from_txt('B'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP), tr.from_txt('B'))
     end
 
     def test_r_should_return_white_rook
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK), tr.from_txt('r'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK), tr.from_txt('r'))
     end
 
     def test_R_should_return_black_rook
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK), tr.from_txt('R'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK), tr.from_txt('R'))
     end
 
     def test_q_should_return_white_queen
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN), tr.from_txt('q'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN), tr.from_txt('q'))
     end
 
     def test_Q_should_return_black_queen
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::QUEEN), tr.from_txt('Q'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::QUEEN), tr.from_txt('Q'))
     end
 
     def test_k_should_return_white_king
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING), tr.from_txt('k'))
+        assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::KING), tr.from_txt('k'))
     end
 
     def test_K_should_return_black_king
         tr = Translator::PieceTranslator.new()
-        assert_equal(Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KING), tr.from_txt('K'))
+        assert_equal(Chess::Piece.new(Colour::BLACK, Chess::Piece::KING), tr.from_txt('K'))
     end
 end

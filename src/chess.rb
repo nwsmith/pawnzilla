@@ -16,54 +16,9 @@
 #   limitations under the License.
 #
 require "geometry"
+require "colour"
 
 module Chess
-    class Colour
-        attr_reader :colour
-
-        private
-        STR_WHITE = "white"
-        STR_BLACK = "black"
-        
-        # Initialize using the provided colour.
-        # This method should not be used - use WHITE and BLACK instead.
-        def initialize(color)
-            @colour = color
-        end
-
-        WHITE = new(STR_WHITE)
-        BLACK = new(STR_BLACK)
-
-        public
-        # Returns true if this colour is black
-        def black?
-            BLACK == @colour
-        end
-        
-        # Returns true if this colour is white
-        def white?
-            WHITE == @colour
-        end
-        
-        # Returns true if the specified colour is the opposite of the internal colour
-        def opposite?(cmp) 
-            self != cmp
-        end
-        
-        # Return a colour object with the opposite colour of this one
-        def flip
-            (@colour == STR_WHITE) ? BLACK : WHITE
-        end
-        
-        def ==(cmp)
-            cmp.class == String ? @colour == cmp : @colour == cmp.colour
-        end
-
-        def hash
-            @colour == STR_WHITE ? 0 : 1
-        end
-    end
-    
     class Piece
         BISHOP = "Bishop";
         KING = "King";
@@ -108,7 +63,7 @@ module Chess
         end
                   
         def Board.get_colour(coord) 
-            ((coord.x + coord.y) & 1 == 0) ? Chess::Colour::BLACK : Chess::Colour::WHITE
+            ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
         end
         
         def blocked?(src, dest) 

@@ -19,6 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pawnzilla_test_case"
+require "colour"
 require "move"
 require "gamestate"
 
@@ -26,7 +27,7 @@ class MoveTest < Test::Unit::TestCase
     def setup
         @state = GameState.new
         @state.clear
-        @w_p = Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+        @w_p = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
     end
 
     def test_should_move_piece

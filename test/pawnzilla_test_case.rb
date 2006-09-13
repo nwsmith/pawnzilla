@@ -17,6 +17,7 @@
 require 'test/unit'
 
 require "geometry"
+require "colour"
 require "tr"
 
 # Redtag: I did try extending this, but test case does some mojo

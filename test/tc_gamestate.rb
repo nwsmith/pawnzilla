@@ -19,6 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pawnzilla_test_case"
+require "colour"
 require "gamestate"
 require "chess"
 require "geometry"
@@ -82,7 +83,7 @@ class TestGameState < Test::Unit::TestCase
     def test_place_piece_should_place_proper_peice_and_colour
         board = GameState.new()
         coord = A6
-        piece = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
+        piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
         board.place_piece(coord, piece)
         square = board.sq_at(coord)
         assert(!square.piece.nil?)
@@ -93,8 +94,8 @@ class TestGameState < Test::Unit::TestCase
     def test_should_place_piece_over_existing_piece
         board = GameState.new()
         coord = A6
-        piece = Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
-        board.place_piece(coord, Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN))
+        piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
+        board.place_piece(coord, Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN))
         board.place_piece(coord, piece)
         square = board.sq_at(coord)
         assert_not_nil(square.piece)
@@ -238,7 +239,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::WHITE)
+        b.calculate_pawn_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -251,7 +252,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_black_pawn_in_centre_should_attack_downwards()
@@ -266,7 +267,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::BLACK)
+        b.calculate_pawn_attack(Colour::BLACK)
 
         expected = "
             --------
@@ -279,7 +280,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::BLACK)
+        assert_attack_state(expected, b, Colour::BLACK)
     end
 
     def test_white_pawn_on_left_edge_should_attack_upwards()
@@ -294,7 +295,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::WHITE)
+        b.calculate_pawn_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -307,7 +308,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_black_pawn_on_left_edge_should_attack_downwards()
@@ -322,7 +323,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::BLACK)
+        b.calculate_pawn_attack(Colour::BLACK)
 
         expected = "
             --------
@@ -335,7 +336,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::BLACK)
+        assert_attack_state(expected, b, Colour::BLACK)
     end
 
     def test_white_pawn_on_right_edge_should_attack_upwards()
@@ -350,7 +351,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::WHITE)
+        b.calculate_pawn_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -363,7 +364,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_black_pawn_on_right_edge_should_attack_downwards()
@@ -378,7 +379,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::BLACK)
+        b.calculate_pawn_attack(Colour::BLACK)
 
         expected = "
             --------
@@ -391,7 +392,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::BLACK)
+        assert_attack_state(expected, b, Colour::BLACK)
     end
 
     def test_white_pawn_on_top_edge_should_not_attack()
@@ -406,7 +407,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_pawn_attack(Chess::Colour::WHITE)
+        b.calculate_pawn_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -419,7 +420,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_black_pawn_on_bottem_edge_should_not_attack()
@@ -434,7 +435,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             ---P----
         ")
-        b.calculate_pawn_attack(Chess::Colour::BLACK)
+        b.calculate_pawn_attack(Colour::BLACK)
 
         expected = "
             --------
@@ -447,7 +448,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::BLACK)
+        assert_attack_state(expected, b, Colour::BLACK)
     end
 
     def test_corner_rook_should_attack_sides
@@ -462,7 +463,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             r-------
         ")
-        b.calculate_rook_attack(Chess::Colour::WHITE)
+        b.calculate_rook_attack(Colour::WHITE)
 
         expected = "
             *-------
@@ -475,7 +476,7 @@ class TestGameState < Test::Unit::TestCase
             -*******
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_center_rook_should_attack_file_and_rank
@@ -490,7 +491,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_rook_attack(Chess::Colour::WHITE)
+        b.calculate_rook_attack(Colour::WHITE)
 
         expected = "
             ---*----
@@ -503,7 +504,7 @@ class TestGameState < Test::Unit::TestCase
             ---*----
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_pieces_should_block_rook_attack
@@ -518,7 +519,7 @@ class TestGameState < Test::Unit::TestCase
             ---P----
             --------
         ")
-        b.calculate_rook_attack(Chess::Colour::WHITE)
+        b.calculate_rook_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -531,7 +532,7 @@ class TestGameState < Test::Unit::TestCase
             --------
         "
 
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_corner_knights_should_attack_middle()
@@ -547,7 +548,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             n------n
         ")
-        b.calculate_knight_attack(Chess::Colour::WHITE)
+        b.calculate_knight_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -559,7 +560,7 @@ class TestGameState < Test::Unit::TestCase
             --*--*--
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_centre_knight_should_attack_outwards()
@@ -575,7 +576,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_knight_attack(Chess::Colour::WHITE)
+        b.calculate_knight_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -587,7 +588,7 @@ class TestGameState < Test::Unit::TestCase
             --*-*---
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_lower_left_corner_bishop_should_attack_diagonally()
@@ -603,7 +604,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             b-------
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             -------*
@@ -615,7 +616,7 @@ class TestGameState < Test::Unit::TestCase
             -*------
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_lower_rightt_corner_bishop_should_attack_diagonally()
@@ -631,7 +632,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             -------b
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             *-------
@@ -643,7 +644,7 @@ class TestGameState < Test::Unit::TestCase
             ------*-
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_upper_left_corner_bishop_should_attack_diagonally()
@@ -659,7 +660,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -671,7 +672,7 @@ class TestGameState < Test::Unit::TestCase
             ------*-
             -------*
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_upper_right_corner_bishop_should_attack_diagonally()
@@ -687,7 +688,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -699,7 +700,7 @@ class TestGameState < Test::Unit::TestCase
             -*------
             *-------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_centre_bishop_should_attack_outwards()
@@ -715,7 +716,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             -------*
@@ -727,7 +728,7 @@ class TestGameState < Test::Unit::TestCase
             -*---*--
             *-----*-
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
     
     def test_centre_bishop_attacks_should_be_blockable()
@@ -743,7 +744,7 @@ class TestGameState < Test::Unit::TestCase
             -Q---Q--
             --------
         ")
-        b.calculate_bishop_attack(Chess::Colour::WHITE)
+        b.calculate_bishop_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -755,7 +756,7 @@ class TestGameState < Test::Unit::TestCase
             -*---*--
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_corner_queen_should_attack()
@@ -771,7 +772,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             q-------
         ")
-        b.calculate_queen_attack(Chess::Colour::WHITE)
+        b.calculate_queen_attack(Colour::WHITE)
 
         expected = "
             *------*
@@ -783,7 +784,7 @@ class TestGameState < Test::Unit::TestCase
             **------
             -*******
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_centre_queen_should_attack_outwards()
@@ -799,7 +800,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_queen_attack(Chess::Colour::WHITE)
+        b.calculate_queen_attack(Colour::WHITE)
 
         expected = "
             ---*---*
@@ -811,7 +812,7 @@ class TestGameState < Test::Unit::TestCase
             -*-*-*--
             *--*--*-
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_centre_queen_attack_should_be_blockable()
@@ -827,7 +828,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_queen_attack(Chess::Colour::WHITE)
+        b.calculate_queen_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -839,7 +840,7 @@ class TestGameState < Test::Unit::TestCase
             -*-*-*--
             *--*--*-
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_centre_king_should_attack_outwards()
@@ -855,7 +856,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_king_attack(Chess::Colour::WHITE)
+        b.calculate_king_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -867,7 +868,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_left_king_should_attack()
@@ -883,7 +884,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_king_attack(Chess::Colour::WHITE)
+        b.calculate_king_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -895,7 +896,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_right_king_should_attack_outwards()
@@ -911,7 +912,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_king_attack(Chess::Colour::WHITE)
+        b.calculate_king_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -923,7 +924,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_top_king_should_attack_outwards()
@@ -939,7 +940,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         ")
-        b.calculate_king_attack(Chess::Colour::WHITE)
+        b.calculate_king_attack(Colour::WHITE)
 
         expected = "
             --*-*---
@@ -951,7 +952,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             --------
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_bottom_king_should_attack_outwards()
@@ -967,7 +968,7 @@ class TestGameState < Test::Unit::TestCase
             --------
             ---k----
         ")
-        b.calculate_king_attack(Chess::Colour::WHITE)
+        b.calculate_king_attack(Colour::WHITE)
 
         expected = "
             --------
@@ -979,7 +980,7 @@ class TestGameState < Test::Unit::TestCase
             --***---
             --*-*---
         "
-        assert_attack_state(expected, b, Chess::Colour::WHITE)
+        assert_attack_state(expected, b, Colour::WHITE)
     end
 
     def test_on_file? 
@@ -1105,7 +1106,7 @@ class TestGameState < Test::Unit::TestCase
         assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), true)
                                 
         # cannot move one square forward if blocked
-        e.place_piece(Coord.from_alg('e3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        e.place_piece(Coord.from_alg('e3'), Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP))
         assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), false)
                                 
         # cannot move two squares forward if blocked
@@ -1115,15 +1116,15 @@ class TestGameState < Test::Unit::TestCase
         assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
                                 
         # can move diagonally if a capture
-        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP))
         assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), true)
                                 
         # cannot capture the same colored piece
-        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP))
+        e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP))
         assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
                                 
         # make sure it works both ways
-        e.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP))
+        e.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP))
         assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)                       
     end
     

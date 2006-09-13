@@ -15,6 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+require "colour"
+
 module Translator
     class PieceTranslator
         def to_txt(piece) 
@@ -39,29 +41,29 @@ module Translator
         def from_txt(chr) 
             case chr
                 when 'p'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::PAWN)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
                 when 'P'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::PAWN)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN)
                 when 'n'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KNIGHT)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT)
                 when 'N'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KNIGHT)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT)
                 when 'b'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::BISHOP)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP)
                 when 'B'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::BISHOP)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP)
                 when 'r'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::ROOK)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK)
                 when 'R'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::ROOK)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
                 when 'q'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::QUEEN)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN)
                 when 'Q'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::QUEEN)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::QUEEN)
                 when 'k'
-                    Chess::Piece.new(Chess::Colour::WHITE, Chess::Piece::KING)
+                    Chess::Piece.new(Colour::WHITE, Chess::Piece::KING)
                 when 'K'
-                    Chess::Piece.new(Chess::Colour::BLACK, Chess::Piece::KING)
+                    Chess::Piece.new(Colour::BLACK, Chess::Piece::KING)
             end
         end
 
