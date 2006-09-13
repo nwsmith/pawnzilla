@@ -41,45 +41,6 @@ module Chess
 
     end    
     
-    class Board
-        attr_reader :size
-        attr_reader :squares
-
-        def initialize(size) 
-            @size = size
-            @squares = Array.new(size)
-     
-            (0...size).each do |x|
-                @squares[x] = Array.new(size)
-                (0...size).each do |y|
-                    coord = Coord.new(x, y)
-                    @squares[x][y] = Square.new(coord, Board.get_colour(coord))    
-                end
-            end 
-        end
-        
-        def sq_at(coord) 
-            @squares[coord.x][coord.y]
-        end
-                  
-        def Board.get_colour(coord) 
-            ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
-        end
-        
-        def blocked?(src, dest) 
-            l = Line.new(src, dest)
-            
-            l.each_coord do |c|
-                # a piece on the destination square isn't a block
-                break if c == dest
-                
-                return true unless @squares[c.x][c.y].piece.nil?
-            end
-            
-            false
-        end
-    end
-
     class Square 
         attr_reader :coord
         attr_reader :colour
@@ -90,5 +51,4 @@ module Chess
             @colour = colour
         end
     end
-            
 end

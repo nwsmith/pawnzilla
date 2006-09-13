@@ -114,9 +114,13 @@ class GameState
     def GameState.get_bv(coord)
         0x1 << get_sw(coord)
     end
+
+    def GameState.clrfcoord(coord) 
+      ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
+    end
     
     def sq_at(coord) 
-        square = Chess::Square.new(coord, Chess::Board.get_colour(coord))
+        square = Chess::Square.new(coord, GameState.clrfcoord(coord))
         mask = GameState.get_bv(coord)
         
         # Look for a piece of either colour in that square
