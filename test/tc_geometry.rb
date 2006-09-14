@@ -21,65 +21,42 @@ require "pz_unit"
 require "geometry"
 
 class TestCoord < Test::Unit::TestCase
-    def test_same_diag?
-        # SW to NE
-        assert(Coord.same_diag?(Coord.new(0, 0), Coord.new(1, 1)))
-        assert(Coord.same_diag?(Coord.new(0, 0), Coord.new(7, 7)))
-        assert(! Coord.same_diag?(Coord.new(0, 0), Coord.new(1, 0)))
-        
-        # NW to SE
-        assert(Coord.same_diag?(Coord.new(0, 1), Coord.new(1, 0)))
-        assert(Coord.same_diag?(Coord.new(0, 7), Coord.new(7, 0)))
-        
-        # SE to NW
-        assert(Coord.same_diag?(Coord.new(1, 0), Coord.new(0, 1)))
-        assert(Coord.same_diag?(Coord.new(7, 0), Coord.new(0, 7)))
-        
-        # NE to SW
-        assert(Coord.same_diag?(Coord.new(1, 1), Coord.new(0, 0)))
-        assert(Coord.same_diag?(Coord.new(7, 7), Coord.new(1, 1)))
+    def test_should_detect_SW_to_NE_diagonal
+        assert(Coord.same_diag?(A1, B2))
+        assert(Coord.same_diag?(A1, H8))
+    end
+
+    def test_should_detect_NW_to_SE_diagonal
+        assert(Coord.same_diag?(A2, B1))
+        assert(Coord.same_diag?(A8, H1))
+    end
+
+    def test_should_detect_SE_to_NW_diagonal
+        assert(Coord.same_diag?(B1, A2))
+        assert(Coord.same_diag?(H1, A8))
+    end
+
+    def test_should_detect_NE_to_SW_diagonal
+        assert(Coord.same_diag?(B2, A1))
+        assert(Coord.same_diag?(H8, A1))
+    end
+
+    def test_should_detect_N_to_S_rank
+        assert(Coord.same_file?(A8, A1))
+    end
+
+    def test_should_detect_S_to_N_rank
+        assert(Coord.same_file?(A1, A8))
     end
     
-    def test_same_file?
-        # N to S
-        assert(Coord.same_file?(Coord.new(0, 0), Coord.new(0, 4)))
-        assert(!Coord.same_file?(Coord.new(0, 0), Coord.new(4, 4)))
-        assert(!Coord.same_file?(Coord.new(0, 0), Coord.new(4, 0)))
-        
-        # S to N
-        assert(Coord.same_file?(Coord.new(0, 4), Coord.new(0, 0)))
+    def test_should_detect_W_to_E_file
+        assert(Coord.same_rank?(A1, H1))
     end
-    
-    def test_same_rank?
-        # W to E
-        assert(Coord.same_rank?(Coord.new(0, 0), Coord.new(4, 0)))
-        assert(!Coord.same_rank?(Coord.new(0, 0), Coord.new(4, 4)))
-        assert(!Coord.same_rank?(Coord.new(0, 0), Coord.new(0, 4)))
-        
-        # E to W
-        assert(Coord.same_rank?(Coord.new(4, 0), Coord.new(0, 0)))        
+
+    def test_should_detect_W_to_E_file
+        assert(Coord.same_rank?(H1, A1))
     end
-    
-    def test_on_rank?
-        # W to E
-        assert(Coord.new(0, 0).on_rank?(Coord.new(4, 0)))
-        assert(!Coord.new(0, 0).on_rank?(Coord.new(4, 4)))
-        assert(!Coord.new(0, 0).on_rank?(Coord.new(0, 4)))
-        
-        # E to W
-        assert(Coord.new(4, 0).on_rank?(Coord.new(0, 0)))            
-    end
-    
-    def test_on_file?
-        # W to E
-        assert(Coord.new(0, 0).on_file?(Coord.new(0, 4)))
-        assert(!Coord.new(0, 0).on_file?(Coord.new(4, 4)))
-        assert(!Coord.new(0, 0).on_file?(Coord.new(4, 0)))
-        
-        # E to W
-        assert(Coord.new(0, 4).on_file?(Coord.new(0, 0)))            
-    end
-    
+
     def test_should_create_coord_from_algebraic_at_origin
         assert_equal(Coord.new(0, 0), Coord.from_alg('a1'))
     end
