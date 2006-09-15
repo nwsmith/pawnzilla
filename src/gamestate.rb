@@ -17,6 +17,7 @@
 #
 require "chess"
 require "colour"
+require "move"
 require "tr"
 
 class GameState
@@ -43,6 +44,8 @@ class GameState
     0x02_02_02_02_02_02_02_02,
     0x01_01_01_01_01_01_01_01    
   ]
+
+  attr_accessor :moves
       
   def initialize()     
     @chk_lookup = {
@@ -87,7 +90,34 @@ class GameState
       }
     }
   end
-  
+
+  def move_piece(src, dest)
+    # bit vector representing the source square
+    src_bv = 0x1 << get_sw(src)
+    
+    # bit vector representing the destination square
+    dest_bv = 0x1 << get_sw(dest)
+    
+    # bit vector representing the change required for the move
+    ch_bv = (src_bv | dest_bv)
+     
+    @clr_pos.each_key do |key|
+      @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
+    end
+
+    @pos.each_key do |key|
+      if (@pos[key] & src_bv) == src_bv
+        @pos[key] ^= ch_bv
+        return
+      end
+    end
+  end
+
+  def move!(src, dest)
+    require 'move'
+    @moves.push(Move.execute(src, dest, self))
+  end
+
   def clear()    
     @clr_pos.each_key {|key| @clr_pos[key] = 0}
     @pos.each_key {|key| @pos[key] = 0}
@@ -210,31 +240,6 @@ class GameState
     
     @clr_pos[piece.colour] ^= pc_bv
     @pos[piece.name] ^= pc_bv
-  end
-  
-  #
-  # Modify the GameStates so that the piece on the src square is moved to the dest square
-  #
-  def move_piece(src, dest)
-    # bit vector representing the source square
-    src_bv = 0x1 << get_sw(src)
-    
-    # bit vector representing the destination square
-    dest_bv = 0x1 << get_sw(dest)
-    
-    # bit vector representing the change required for the move
-    ch_bv = (src_bv | dest_bv)
-     
-    @clr_pos.each_key do |key|
-      @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
-    end
-
-    @pos.each_key do |key|
-      if (@pos[key] & src_bv) == src_bv
-        @pos[key] ^= ch_bv
-        return
-      end
-    end
   end
   
   #
@@ -675,10 +680,27 @@ class GameState
     if at_strt && ![1,2].include?(dst) || !at_strt && dst != 1
       return false
     end
-     
+    
     if dst == 1 && [src.x + 1, src.x - 1].include?(dest.x)
       # it's a diagonal move, ensure it's a capture
-      return false unless !pc_dest.nil? && pc_dest.colour.opposite?(pc_src.colour)
+
+      if (pc_dest.nil?)
+        # en passant hack
+        if (pc_src.colour.white? && src.y == 4) || src.y == 3
+          [Coord.new(src.x - 1, src.y), Coord.new(src.x + 1, src.y)].each do |ep_coord|
+            ep_pc = sq_at(ep_coord).piece
+            unless ep_pc.nil? || ep_pc.name != Chess::Piece::PAWN
+              last_mv = @moves.last
+              return last_mv.dest == ep_coord && last_mv.src == Coord.new(ep_coord.x, ep_coord.y + (pc_src.colour.white? ? 2 : -2))
+            end
+          end
+          return false
+        else
+          return false
+        end
+      else
+        return pc_dest.colour.opposite?(pc_src.colour)
+      end
     else 
       # it's a straight move, ensure it's not blocked                  
       return false if !pc_dest.nil? || blocked?(src, dest)

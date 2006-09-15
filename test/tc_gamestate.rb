@@ -233,7 +233,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
       --------
-      --------
+      -B-B----
       --p-----
       --------
       --------
@@ -251,7 +251,6 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     "
-
     assert_attack_state(expected, b, Colour::WHITE)
   end
 
@@ -1126,6 +1125,137 @@ class TestGameState < Test::Unit::TestCase
     # make sure it works both ways
     e.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP))
     assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)           
+  end
+
+  def test_white_pawn_should_have_en_passant_available_NW
+    e = GameState.new
+
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - P p - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -
+    ")
+    e.moves = [Move.new(D7, D5)]
+    assert(e.chk_mv(E5, D6)) 
+  end
+
+  def test_white_pawn_should_have_en_passant_available_NE
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - p P - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -
+    ")
+    e.moves = [Move.new(F7, F5)]
+    assert(e.chk_mv(E5, F6)) 
+  end
+
+  def test_white_pawn_should_not_have_en_passant_available_if_not_pawn
+    e = GameState.new
+    
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+      - - - R p - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - - 
+    ")
+    e.moves = [Move.new(D7, D5)]
+    assert(!e.chk_mv(E5, D5))
+  end
+
+  def test_white_pawn_should_not_have_en_passant_available_if_one_square_moved
+    e = GameState.new
+
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - P p - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -
+    ")
+    e.moves = [Move.new(D6, D5)]
+    assert(!e.chk_mv(E5, D6)) 
+  end
+
+  def test_black_pawn_should_have_en_passant_available_SW
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - p P - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.moves = [Move.new(E2, E4)]
+    assert(e.chk_mv(F4, E3)) 
+  end
+
+  def test_black_pawn_should_have_en_passant_available_SE
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - P p - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.moves = [Move.new(G2, G4)]
+    assert(e.chk_mv(F4, G3)) 
+  end
+
+  def test_black_pawn_should_not_have_en_passant_available_if_not_pawn
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - r P - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.moves = [Move.new(E2, E4)]
+    assert(!e.chk_mv(F4, E3)) 
+  end
+
+  def test_black_pawn_should_not_have_en_passant_available_if_one_square_moved 
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - p P - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.moves = [Move.new(E3, E4)]
+    assert(!e.chk_mv(F4, E3)) 
   end
   
   def test_check_mv_bishop
