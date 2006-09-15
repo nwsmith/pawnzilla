@@ -31,16 +31,16 @@ test_is_subdir = File.directory?("test")
 
 # change into the test directory or alert that we were run from an unknown location
 if (!test_dir && test_is_subdir) 
-    FileUtils.cd("test")
+  FileUtils.cd("test")
 elsif (!test_dir && !test_is_subdir)
-    fail("Ran from unexpected directory. Failing")
+  fail("Ran from unexpected directory. Failing")
 end
 
 # Run all tests
 Find.find(FileUtils.pwd()) do |filename|
-    next if filename.match("[\.-]svn") # skip svn directories
-    next unless filename.split(File::SEPARATOR).last().match(/(tc_.*)\.rb/)
-    require $1
+  next if filename.match("[\.-]svn") # skip svn directories
+  next unless filename.split(File::SEPARATOR).last().match(/(tc_.*)\.rb/)
+  require $1
 end
 
 FileUtils.cd(pwd)

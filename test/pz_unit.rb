@@ -1,18 +1,18 @@
-#   $Id$
+# $Id$
 #
-#   Copyright 2005, 2006 Nathan Smith, Sheldon Fuchs, Ron Thomas
+# Copyright 2005, 2006 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 require 'test/unit'
 
@@ -106,104 +106,104 @@ H7 = Coord.from_alg("h7")
 H8 = Coord.from_alg("h8")
 
 class Test::Unit::TestCase
-    def assert_attack_state(expected, gamestate, clr, message = nil)
-        processed_expected = expected.gsub(/\s+/, "")
+  def assert_attack_state(expected, gamestate, clr, message = nil)
+    processed_expected = expected.gsub(/\s+/, "")
  
  
-        # Generate the gamestates attack board into our format
-        gamestate_attack_board = ""
-        0.upto(63) do |i|
-            coord = Coord.from_alg(get_alg_coord_notation(i))
-            gamestate_attack_board += gamestate.attacked?(clr, coord) ? "*" : "-"
-        end
-
-        # Create a nicely formatted message
-        full_message = create_pretty_message(message, processed_expected, gamestate_attack_board, gamestate)
- 
-        assert_block(full_message) { processed_expected == gamestate_attack_board }
+    # Generate the gamestates attack board into our format
+    gamestate_attack_board = ""
+    0.upto(63) do |i|
+      coord = Coord.from_alg(get_alg_coord_notation(i))
+      gamestate_attack_board += gamestate.attacked?(clr, coord) ? "*" : "-"
     end
 
-    def assert_blocked_state(expected, gamestate, coord, message = nil)
-        processed_expected = expected.gsub(/\s+/, "")
+    # Create a nicely formatted message
+    full_message = create_pretty_message(message, processed_expected, gamestate_attack_board, gamestate)
+ 
+    assert_block(full_message) { processed_expected == gamestate_attack_board }
+  end
+
+  def assert_blocked_state(expected, gamestate, coord, message = nil)
+    processed_expected = expected.gsub(/\s+/, "")
  
  
-        # Generate the gamestates attack board into our format
-        gamestate_block_board = ""
-        0.upto(63) do |i|
-            chk_coord = Coord.from_alg(get_alg_coord_notation(i))
+    # Generate the gamestates attack board into our format
+    gamestate_block_board = ""
+    0.upto(63) do |i|
+      chk_coord = Coord.from_alg(get_alg_coord_notation(i))
 
-            same_line = Coord.same_diag?(coord, chk_coord) || Coord.same_rank?(coord, chk_coord) ||
-                    Coord.same_file?(coord, chk_coord)
+      same_line = Coord.same_diag?(coord, chk_coord) || Coord.same_rank?(coord, chk_coord) ||
+          Coord.same_file?(coord, chk_coord)
 
-            gamestate_block_board += (same_line && gamestate.blocked?(coord, chk_coord)) ? "*" : "-"
-        end
-
-        # Create a nicely formatted message
-        full_message = create_pretty_message(message, expected, gamestate_block_board, gamestate)
-
-        assert_block(full_message) { processed_expected == gamestate_block_board }
-
+      gamestate_block_board += (same_line && gamestate.blocked?(coord, chk_coord)) ? "*" : "-"
     end
 
-    def place_pieces(gamestate, board_string)
-        pt = Translator::PieceTranslator.new()
-        board_string = process_board_string(board_string)
-        puts "error: given board malformed!" if board_string.length != 64
-        gamestate.clear()
- 
-        0.upto(63) do |i|
-            next if board_string[i].chr == '-'
- 
-            coord_notation = get_alg_coord_notation(i)
-            coord = Coord.from_alg(coord_notation)
-            gamestate.place_piece(coord, pt.from_txt(board_string[i].chr))
-        end
-    end
- 
- 
-    # creates a alg coord notation for an index in a bv
-    def get_alg_coord_notation(i)
-        x = i % 8
-        y = 8 - ((i - x) / 8)
- 
-        (97 + x).chr + y.to_s
-    end
- 
-    def process_board_string(board_string)
-        board_string.gsub(/\s+/, "")
-    end
+    # Create a nicely formatted message
+    full_message = create_pretty_message(message, expected, gamestate_block_board, gamestate)
 
-    private
-    # Takes a processed board and renders it in a more readable form
-    def format_board(board_string)
-        board_string[0..7]   + "\n" +
-        board_string[8..15]  + "\n" +
-        board_string[16..23] + "\n" +
-        board_string[24..31] + "\n" +
-        board_string[32..39] + "\n" +
-        board_string[40..47] + "\n" +
-        board_string[48..55] + "\n" +
-        board_string[56..63] + "\n" +
-        ""
-    end
+    assert_block(full_message) { processed_expected == gamestate_block_board }
 
-    def format_board_message(message)
-        # Create a nicely formatted message
-        full_message = message == nil ? "" : message
-        full_message += "Given board malformed!\n" if processed_expected.length != 64
-        full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
-        full_message += "Board:\n#{gamestate.to_txt}\n"
-        full_message += "Expected:\n#{format_board(processed_expected)}\n"
-        full_message
-    end
+  end
 
-    def create_pretty_message(message, expected, actual, gamestate)
-        # Create a nicely formatted message
-        full_message = message == nil ? "" : message
-        full_message += "Given board malformed!\n" if expected.length != 64
-        full_message += "Given board has illegal characters\n" if expected.match(/[^-*]/)
-        full_message += "Board:\n#{gamestate.to_txt}\n"
-        full_message += "Expected:\n#{format_board(expected)}\n"
-        full_message += "Actual:\n#{format_board(actual)}\n"
+  def place_pieces(gamestate, board_string)
+    pt = Translator::PieceTranslator.new()
+    board_string = process_board_string(board_string)
+    puts "error: given board malformed!" if board_string.length != 64
+    gamestate.clear()
+ 
+    0.upto(63) do |i|
+      next if board_string[i].chr == '-'
+ 
+      coord_notation = get_alg_coord_notation(i)
+      coord = Coord.from_alg(coord_notation)
+      gamestate.place_piece(coord, pt.from_txt(board_string[i].chr))
     end
+  end
+ 
+ 
+  # creates a alg coord notation for an index in a bv
+  def get_alg_coord_notation(i)
+    x = i % 8
+    y = 8 - ((i - x) / 8)
+ 
+    (97 + x).chr + y.to_s
+  end
+ 
+  def process_board_string(board_string)
+    board_string.gsub(/\s+/, "")
+  end
+
+  private
+  # Takes a processed board and renders it in a more readable form
+  def format_board(board_string)
+    board_string[0..7]   + "\n" +
+    board_string[8..15]  + "\n" +
+    board_string[16..23] + "\n" +
+    board_string[24..31] + "\n" +
+    board_string[32..39] + "\n" +
+    board_string[40..47] + "\n" +
+    board_string[48..55] + "\n" +
+    board_string[56..63] + "\n" +
+    ""
+  end
+
+  def format_board_message(message)
+    # Create a nicely formatted message
+    full_message = message == nil ? "" : message
+    full_message += "Given board malformed!\n" if processed_expected.length != 64
+    full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
+    full_message += "Board:\n#{gamestate.to_txt}\n"
+    full_message += "Expected:\n#{format_board(processed_expected)}\n"
+    full_message
+  end
+
+  def create_pretty_message(message, expected, actual, gamestate)
+    # Create a nicely formatted message
+    full_message = message == nil ? "" : message
+    full_message += "Given board malformed!\n" if expected.length != 64
+    full_message += "Given board has illegal characters\n" if expected.match(/[^-*]/)
+    full_message += "Board:\n#{gamestate.to_txt}\n"
+    full_message += "Expected:\n#{format_board(expected)}\n"
+    full_message += "Actual:\n#{format_board(actual)}\n"
+  end
 end
