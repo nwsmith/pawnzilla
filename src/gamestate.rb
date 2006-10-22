@@ -36,76 +36,10 @@ class PieceInfo
   end
 end
 
-class GameState
-  DEFAULT_SEPARATOR = ' '
+class PieceInfoBag
+  attr_accessor :pieces
 
-  RANK_MASKS = [
-    0xFF_00_00_00_00_00_00_00,
-    0x00_FF_00_00_00_00_00_00,
-    0x00_00_FF_00_00_00_00_00,
-    0x00_00_00_FF_00_00_00_00,
-    0x00_00_00_00_FF_00_00_00,
-    0x00_00_00_00_00_FF_00_00,                      
-    0x00_00_00_00_00_00_FF_00,    
-    0x00_00_00_00_00_00_00_FF
-  ]
-  
-  FILE_MASKS = [
-    0x80_80_80_80_80_80_80_80,
-    0x40_40_40_40_40_40_40_40,
-    0x20_20_20_20_20_20_20_20,
-    0x10_10_10_10_10_10_10_10,
-    0x08_08_08_08_08_08_08_08,
-    0x04_04_04_04_04_04_04_04,
-    0x02_02_02_02_02_02_02_02,
-    0x01_01_01_01_01_01_01_01    
-  ]
-
-  attr_accessor :moves
-      
-  def initialize()     
-    @chk_lookup = {
-      Chess::Piece::BISHOP => method(:chk_mv_bishop),
-      Chess::Piece::KING => method(:chk_mv_king),
-      Chess::Piece::KNIGHT => method(:chk_mv_knight),
-      Chess::Piece::PAWN => method(:chk_mv_pawn),
-      Chess::Piece::QUEEN => method(:chk_mv_queen),
-      Chess::Piece::ROOK => method(:chk_mv_rook)
-    }
-
-    @clr_pos = {
-      Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
-      Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
-    }
-
-    @pos = {
-      Chess::Piece::PAWN => 0x00_FF_00_00_00_00_FF_00,  
-      Chess::Piece::ROOK => 0x81_00_00_00_00_00_00_81,
-      Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
-      Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
-      Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
-      Chess::Piece::KING => 0x08_00_00_00_00_00_00_08 
-    }
-
-    @attack = {
-      Colour::BLACK => {
-        Chess::Piece::PAWN => 0x00_00_00_00_00_FF_00_00,
-        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KNIGHT => 0x00_00_00_00_00_A5_18_00,
-        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KING => 0x00_00_00_00_00_00_1C_14
-      },
-      Colour::WHITE => {
-        Chess::Piece::PAWN => 0x00_00_FF_00_00_00_00_00,
-        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KNIGHT => 0x00_18_A5_00_00_00_00_00,
-        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
-      }
-    }
-
+  def initialize
     @pieces = {
       Colour::WHITE => [
         PieceInfo.new(
@@ -280,6 +214,80 @@ class GameState
         )
       ], 
     }
+  end
+end
+
+class GameState
+  DEFAULT_SEPARATOR = ' '
+
+  RANK_MASKS = [
+    0xFF_00_00_00_00_00_00_00,
+    0x00_FF_00_00_00_00_00_00,
+    0x00_00_FF_00_00_00_00_00,
+    0x00_00_00_FF_00_00_00_00,
+    0x00_00_00_00_FF_00_00_00,
+    0x00_00_00_00_00_FF_00_00,                      
+    0x00_00_00_00_00_00_FF_00,    
+    0x00_00_00_00_00_00_00_FF
+  ]
+  
+  FILE_MASKS = [
+    0x80_80_80_80_80_80_80_80,
+    0x40_40_40_40_40_40_40_40,
+    0x20_20_20_20_20_20_20_20,
+    0x10_10_10_10_10_10_10_10,
+    0x08_08_08_08_08_08_08_08,
+    0x04_04_04_04_04_04_04_04,
+    0x02_02_02_02_02_02_02_02,
+    0x01_01_01_01_01_01_01_01    
+  ]
+
+  attr_accessor :moves
+      
+  def initialize()     
+    @chk_lookup = {
+      Chess::Piece::BISHOP => method(:chk_mv_bishop),
+      Chess::Piece::KING => method(:chk_mv_king),
+      Chess::Piece::KNIGHT => method(:chk_mv_knight),
+      Chess::Piece::PAWN => method(:chk_mv_pawn),
+      Chess::Piece::QUEEN => method(:chk_mv_queen),
+      Chess::Piece::ROOK => method(:chk_mv_rook)
+    }
+
+    @clr_pos = {
+      Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
+      Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
+    }
+
+    @pos = {
+      Chess::Piece::PAWN => 0x00_FF_00_00_00_00_FF_00,  
+      Chess::Piece::ROOK => 0x81_00_00_00_00_00_00_81,
+      Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
+      Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
+      Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
+      Chess::Piece::KING => 0x08_00_00_00_00_00_00_08 
+    }
+
+    @attack = {
+      Colour::BLACK => {
+        Chess::Piece::PAWN => 0x00_00_00_00_00_FF_00_00,
+        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::KNIGHT => 0x00_00_00_00_00_A5_18_00,
+        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::KING => 0x00_00_00_00_00_00_1C_14
+      },
+      Colour::WHITE => {
+        Chess::Piece::PAWN => 0x00_00_FF_00_00_00_00_00,
+        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::KNIGHT => 0x00_18_A5_00_00_00_00_00,
+        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
+        Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
+      }
+    }
+
+    @piece_info_bag = PieceInfoBag.new;
   end
 
   def move_piece(src, dest)
