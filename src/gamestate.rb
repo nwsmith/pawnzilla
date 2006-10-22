@@ -20,6 +20,20 @@ require "colour"
 require "move"
 require "tr"
 
+class PieceInfo
+  attr_reader :piece, :coord
+  attr_accessor :bb_attack, :bb_move
+  
+  def initialize(piece, coord)
+    @piece = piece    
+    @coord = coord
+  end
+
+  def colour
+    return piece.colour
+  end
+end
+
 class GameState
   DEFAULT_SEPARATOR = ' '
 

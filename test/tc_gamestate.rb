@@ -25,6 +25,13 @@ require "chess"
 require "geometry"
 require "tr"
 
+class TestPieceInfo < Test::Unit::TestCase
+  def test_should_get_correct_colour
+    pc_info = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    assert_equal(Colour::WHITE, pc_info.colour)
+  end  
+end
+
 class TestGameState < Test::Unit::TestCase
   def setup 
     @board = GameState.new
