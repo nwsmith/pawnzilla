@@ -142,7 +142,15 @@ class Test::Unit::TestCase
     full_message = create_pretty_message(message, expected, gamestate_block_board, gamestate)
 
     assert_block(full_message) { processed_expected == gamestate_block_board }
+  end
 
+  def assert_bv_equals(expected, bv, message = nil)
+    processed_expected = expected.gsub(/\s+/, "")
+    processed_bv = create_formatted_board(bv);
+ 
+    # Create a nicely formatted message
+    full_message = create_pretty_message(message, processed_expected, processed_bv)
+    assert_block(full_message) { processed_expected == processed_bv }
   end
 
   def place_pieces(gamestate, board_string)
@@ -186,6 +194,16 @@ class Test::Unit::TestCase
     board_string[56..63] + "\n" +
     ""
   end
+  
+  def create_formatted_board(bv)
+    bv_str = "";
+    0.upto(63) do |i|
+      coord = Coord.from_alg(get_alg_coord_notation(i))
+      bv_str += ((0x1 << GameState.get_sw(coord)) & bv != 0) ? "*" : "-"
+    end
+
+    bv_str
+  end
 
   def format_board_message(message)
     # Create a nicely formatted message
@@ -197,12 +215,12 @@ class Test::Unit::TestCase
     full_message
   end
 
-  def create_pretty_message(message, expected, actual, gamestate)
+  def create_pretty_message(message, expected, actual, gamestate=nil)
     # Create a nicely formatted message
     full_message = message == nil ? "" : message
     full_message += "Given board malformed!\n" if expected.length != 64
     full_message += "Given board has illegal characters\n" if expected.match(/[^-*]/)
-    full_message += "Board:\n#{gamestate.to_txt}\n"
+    full_message += "Board:\n#{gamestate.to_txt}\n" if gamestate != nil
     full_message += "Expected:\n#{format_board(expected)}\n"
     full_message += "Actual:\n#{format_board(actual)}\n"
   end
