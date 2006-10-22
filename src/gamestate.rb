@@ -24,9 +24,11 @@ class PieceInfo
   attr_reader :piece, :coord
   attr_accessor :bb_attack, :bb_move
   
-  def initialize(piece, coord)
+  def initialize(piece, coord, bb_attack=0, bb_move=0)
     @piece = piece    
     @coord = coord
+    @bb_attack = bb_attack
+    @bb_move = bb_move
   end
 
   def colour
@@ -102,6 +104,181 @@ class GameState
         Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
         Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
       }
+    }
+
+    @pieces = {
+      Colour::WHITE => [
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK),
+          Coord.from_alg('a1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT),
+          Coord.from_alg('b1'),
+          0x00_00_A0_00_00_00_00_00,
+          0x00_00_A0_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP),
+          Coord.from_alg('c1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN),
+          Coord.from_alg('d1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KING),
+          Coord.from_alg('e1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP),
+          Coord.from_alg('f1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT),
+          Coord.from_alg('g1'),
+          0x00_00_05_00_00_00_00_00,
+          0x00_00_05_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK),
+          Coord.from_alg('h1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('a2'),
+          0x00_00_80_00_00_00_00_00,
+          0x00_00_40_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('b2'),
+          0x00_00_40_00_00_00_00_00,
+          0x00_00_A0_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('c2'),
+          0x00_00_20_00_00_00_00_00,
+          0x00_00_50_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('d2'),
+          0x00_00_10_00_00_00_00_00,
+          0x00_00_28_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('e2'),
+          0x00_00_08_00_00_00_00_00,
+          0x00_00_14_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('f2'),
+          0x00_00_04_00_00_00_00_00,
+          0x00_00_0A_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('g2'),
+          0x00_00_02_00_00_00_00_00,
+          0x00_00_05_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('h2'),
+          0x00_00_01_00_00_00_00_00,
+          0x00_00_01_00_00_00_00_00
+        )
+      ], 
+      Colour::BLACK=> [
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK),
+          Coord.from_alg('a8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT),
+          Coord.from_alg('b8'),
+          0x00_00_00_00_00_A0_00_00,
+          0x00_00_00_00_00_A0_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP),
+          Coord.from_alg('c8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::QUEEN),
+          Coord.from_alg('d8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KING),
+          Coord.from_alg('e8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP),
+          Coord.from_alg('f8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT),
+          Coord.from_alg('g8'),
+          0x00_00_00_00_00_05_00_00,
+          0x00_00_00_00_00_05_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK),
+          Coord.from_alg('h8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('a7'),
+          0x00_00_00_00_00_80_00_00,
+          0x00_00_00_00_00_40_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('b7'),
+          0x00_00_00_00_00_40_00_00,
+          0x00_00_00_00_00_A0_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('c7'),
+          0x00_00_00_00_00_20_00_00,
+          0x00_00_00_00_00_50_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('d7'),
+          0x00_00_00_00_00_10_00_00,
+          0x00_00_00_00_00_28_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('e7'),
+          0x00_00_00_00_00_08_00_00,
+          0x00_00_00_00_00_14_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('f7'),
+          0x00_00_00_00_00_04_00_00,
+          0x00_00_00_00_00_0A_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('g7'),
+          0x00_00_00_00_00_02_00_00,
+          0x00_00_00_00_00_05_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('h7'),
+          0x00_00_00_00_00_01_00_00,
+          0x00_00_00_00_00_01_00_00
+        )
+      ], 
     }
   end
 
