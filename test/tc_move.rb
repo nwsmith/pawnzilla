@@ -1,4 +1,3 @@
-e
 # $Id: test_tmpl.rb 160 2006-08-07 04:39:47Z nwsmith $
 #
 # Copyright 2005, 2006 Nathan Smith, Sheldon Fuchs, Ron Thomas
