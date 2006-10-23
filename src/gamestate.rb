@@ -21,8 +21,8 @@ require "move"
 require "tr"
 
 class PieceInfo
-  attr_reader :piece, :coord
-  attr_accessor :bb_attack, :bb_move
+  attr_reader :piece
+  attr_accessor :coord, :bb_attack, :bb_move
   
   def initialize(piece, coord, bb_attack=0, bb_move=0)
     @piece = piece    
@@ -254,6 +254,7 @@ class GameState
   ]
 
   attr_accessor :moves
+  attr_reader :piece_info_bag
       
   def initialize()     
     @chk_lookup = {
@@ -302,6 +303,8 @@ class GameState
   end
 
   def move_piece(src, dest)
+    @piece_info_bag.pcfcoord(src).coord = dest
+
     # bit vector representing the source square
     src_bv = 0x1 << get_sw(src)
     

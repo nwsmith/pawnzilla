@@ -140,7 +140,13 @@ class TestGameState < Test::Unit::TestCase
     dest = D3
     board.move_piece(src, dest);
     assert(board.sq_at(dest).piece.colour.white?);
-    
+  end
+
+  def test_should_modify_piece_info_after_move
+    board = GameState.new
+    board.move_piece(E2, E4)
+    #assert_nil(board.piece_info_bag.pcfcoord(E2))
+    assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), board.piece_info_bag.pcfcoord(E4).piece)
   end
   
   def test_place_piece_should_place_proper_peice_and_colour
