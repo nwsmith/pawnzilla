@@ -32,7 +32,14 @@ class PieceInfo
   end
 
   def colour
-    return piece.colour
+    piece.colour
+  end
+
+  def ==(pc) 
+    @piece == pc.piece &&
+    @coord == pc.coord &&
+    @bb_attack == pc.bb_attack &&
+    @bb_move == pc.bb_move
   end
 end
 

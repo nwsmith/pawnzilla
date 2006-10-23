@@ -30,6 +30,42 @@ class TestPieceInfo < Test::Unit::TestCase
     pc_info = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
     assert_equal(Colour::WHITE, pc_info.colour)
   end  
+
+  def test_equal_piece_info_should_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    assert_equal(lhs, rhs)
+  end
+
+  def test_piece_info_with_different_colour_should_not_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP), A1)
+    assert_not_equal(lhs, rhs)
+  end
+
+  def test_piece_info_with_different_piece_type_should_not_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN), A1)
+    assert_not_equal(lhs, rhs)
+  end
+
+  def test_piece_info_with_different_coord_should_not_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A2)
+    assert_not_equal(lhs, rhs)
+  end
+
+  def test_piece_info_with_different_attack_should_not_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1)
+    assert_not_equal(lhs, rhs)
+  end
+
+  def test_piece_info_with_different_move_should_not_be_equal
+    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1, 0x2)
+    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1, 0x1)
+    assert_not_equal(lhs, rhs)
+  end
 end
 
 class TestGameState < Test::Unit::TestCase
