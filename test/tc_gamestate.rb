@@ -636,7 +636,6 @@ class TestGameState < Test::Unit::TestCase
 
   def test_corner_knights_should_attack_middle()
     b = GameState.new()
-
     place_pieces(b, "
       n------n
       --------
@@ -647,7 +646,11 @@ class TestGameState < Test::Unit::TestCase
       --------
       n------n
     ")
-    b.calculate_knight_attack(Colour::WHITE)
+
+    bv = b.calculate_knight_attack(Colour::WHITE, A1) \
+       | b.calculate_knight_attack(Colour::WHITE, A8) \
+       | b.calculate_knight_attack(Colour::WHITE, H1) \
+       | b.calculate_knight_attack(Colour::WHITE, H8)
 
     expected = "
       --------
@@ -659,7 +662,8 @@ class TestGameState < Test::Unit::TestCase
       --*--*--
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+
+    assert_bv_equals(expected, bv)
   end
 
   def test_centre_knight_should_attack_outwards()
@@ -675,7 +679,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_knight_attack(Colour::WHITE)
+    bv = b.calculate_knight_attack(Colour::WHITE, D4)
 
     expected = "
       --------
@@ -687,7 +691,7 @@ class TestGameState < Test::Unit::TestCase
       --*-*---
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_bv_equals(expected, bv)
   end
 
   def test_lower_left_corner_bishop_should_attack_diagonally()

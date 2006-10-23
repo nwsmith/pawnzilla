@@ -498,10 +498,9 @@ class GameState
     bv
   end
   
-  def calculate_knight_attack(clr)
+  def calculate_knight_attack(clr, coord)
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::KNIGHT]
     bv = 0
-    bv_piece = @clr_pos[clr]
-    bv_knight_piece = bv_piece & @pos[Chess::Piece::KNIGHT]
     
     # knight attack position legend for below (k == knight)
     #  B C
@@ -512,37 +511,37 @@ class GameState
   
     # A
     bv_board_mask = 0x00_3F_3F_3F_3F_3F_3F_3F
-    bv |= (bv_knight_piece & bv_board_mask) << 10
+    bv |= (bv_piece & bv_board_mask) << 10
 
     # B
     bv_board_mask = 0x00_00_7F_7F_7F_7F_7F_7F
-    bv |= (bv_knight_piece & bv_board_mask) << 17
+    bv |= (bv_piece & bv_board_mask) << 17
 
     # C
     bv_board_mask = 0x00_00_FE_FE_FE_FE_FE_FE
-    bv |= (bv_knight_piece & bv_board_mask) << 15
+    bv |= (bv_piece & bv_board_mask) << 15
 
     # D
     bv_board_mask = 0x00_FC_FC_FC_FC_FC_FC_FC
-    bv |= (bv_knight_piece & bv_board_mask) << 6
+    bv |= (bv_piece & bv_board_mask) << 6
 
     # E
     bv_board_mask = 0x3F_3F_3F_3F_3F_3F_3F_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 6
+    bv |= (bv_piece & bv_board_mask) >> 6
 
     # F
     bv_board_mask = 0x7F_7F_7F_7F_7F_7F_00_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 15
+    bv |= (bv_piece & bv_board_mask) >> 15
 
     # G
     bv_board_mask = 0xFE_FE_FE_FE_FE_FE_00_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 17
+    bv |= (bv_piece & bv_board_mask) >> 17
 
     # H
     bv_board_mask = 0xFC_FC_FC_FC_FC_FC_FC_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 10
+    bv |= (bv_piece & bv_board_mask) >> 10
 
-    @attack[clr][Chess::Piece::KNIGHT] = bv
+    bv
   end
   
   def calculate_bishop_attack(clr)
