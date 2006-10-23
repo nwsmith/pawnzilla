@@ -471,13 +471,12 @@ class GameState
   def attacked?(clr, coord)
     (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
   end    
-  
-  def calculate_pawn_attack(clr)
+
+  def calculate_pawn_attack(clr, coord)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-    bv_piece = @clr_pos[clr]
-    bv_p = bv_piece & @pos[Chess::Piece::PAWN]
+    bv_p = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::PAWN]
 
     # right attack
     bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
@@ -485,25 +484,18 @@ class GameState
     # left attack
     bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
      
-    @attack[clr][Chess::Piece::PAWN] = bv
+    bv
   end
   
-  def calculate_rook_attack(clr)
+  def calculate_rook_attack(clr, coord)
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::ROOK]
+    
     bv = 0
-    bv_piece = @clr_pos[clr]
-    
-    if (bv_piece & @pos[Chess::Piece::ROOK] == 0)
-      return
-    end
-    
-    0.upto(7) do |i|
-      bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
-    end
+    bv = bv | calculate_file_attack(clr, coord)
     
     bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), \
                   GameState.get_rank(bv_piece))
-    
-    @attack[clr][Chess::Piece::ROOK] = bv
+    bv
   end
   
   def calculate_knight_attack(clr)
@@ -577,8 +569,14 @@ class GameState
       end
     end
     
-    0.upto(7) do |i|
-      bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
+    0.upto(7) do |x|
+      0.upto(7) do |y|
+        coord = Coord.new(x, y)
+        sw = get_sw(coord)
+        if (bv_piece & (1 << sw)) != 0
+          bv |= calculate_file_attack(clr, coord)
+        end
+      end
     end
     
     bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), \
@@ -636,35 +634,26 @@ class GameState
   end
   
   # generate a bv for this piece on the given file
-  def calculate_file_attack(clr, piece, file)
-    piece_bv = @pos[piece.name];
-
+  def calculate_file_attack(clr, coord)
     bv = 0
-    attacking_piece = @clr_pos[clr] & piece_bv & FILE_MASKS[file]
+
+    attacking_piece = get_sw(coord)
     all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val}      
 
-    if (attacking_piece == 0)
-      # attacking piece is not on this file, abort
-      return 0
+    chk_cell = attacking_piece - 8
+    while (chk_cell > 0)
+      bv |= 1 << chk_cell
+      break if ((1 << chk_cell) & all_pieces) != 0
+      chk_cell -= 8
     end
-    
-    cell = 0x1 << (7 - file)
-    0.upto(7) do |i|
-      if (attacking_piece & cell != 0)
-        (i-1).downto(0) do |j|
-          chk_cell = cell >> (8 * (i - j))
-          bv |= chk_cell
-          break if (chk_cell & all_pieces) != 0
-        end
 
-        (i+1).upto(7) do |j|
-          chk_cell = cell << (8 * (j - i))
-          bv |= chk_cell
-          break if (chk_cell & all_pieces) != 0
-        end
-      end
-      cell <<= 8
+    chk_cell = attacking_piece + 8
+    while (chk_cell <= 63)
+      bv |= 1 << chk_cell
+      break if ((1 << chk_cell) & all_pieces) != 0
+      chk_cell += 8
     end
+
     bv
   end
   
