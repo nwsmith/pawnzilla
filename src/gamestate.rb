@@ -222,6 +222,10 @@ class PieceInfoBag
       ], 
     }
   end
+
+  def pcfcoord(coord) 
+    @pieces.values.flatten.detect {|info| info.coord == coord} 
+  end
 end
 
 class GameState
@@ -467,22 +471,23 @@ class GameState
   def attacked?(clr, coord)
     (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
   end    
-
-  def GameState.calculate_pawn_attack(clr, coord)
+  
+  def calculate_pawn_attack(clr)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-    bv_piece = (1 << get_sw(coord))
+    bv_piece = @clr_pos[clr]
+    bv_p = bv_piece & @pos[Chess::Piece::PAWN]
 
     # right attack
-    bv = mask_right & (clr.white? ? bv_piece >> 7 : bv_piece << 9)
+    bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
 
     # left attack
-    bv |= mask_left & (clr.white? ? bv_piece >> 9 : bv_piece << 7)
-
-    bv
+    bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
+     
+    @attack[clr][Chess::Piece::PAWN] = bv
   end
-
+  
   def calculate_rook_attack(clr)
     bv = 0
     bv_piece = @clr_pos[clr]
