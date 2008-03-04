@@ -20,6 +20,214 @@ require "colour"
 require "move"
 require "tr"
 
+class PieceInfo
+  attr_reader :piece
+  attr_accessor :coord, :bb_attack, :bb_move
+  
+  def initialize(piece, coord, bb_attack=0, bb_move=0)
+    @piece = piece    
+    @coord = coord
+    @bb_attack = bb_attack
+    @bb_move = bb_move
+  end
+
+  def colour
+    piece.colour
+  end
+
+  def ==(pc) 
+    @piece == pc.piece &&
+    @coord == pc.coord &&
+    @bb_attack == pc.bb_attack &&
+    @bb_move == pc.bb_move
+  end
+end
+
+class PieceInfoBag
+  attr_accessor :pieces
+
+  def initialize
+    @pieces = {
+      Colour::WHITE => [
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK),
+          Coord.from_alg('a1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT),
+          Coord.from_alg('b1'),
+          0x00_00_A0_00_00_00_00_00,
+          0x00_00_A0_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP),
+          Coord.from_alg('c1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN),
+          Coord.from_alg('d1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KING),
+          Coord.from_alg('e1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP),
+          Coord.from_alg('f1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::KNIGHT),
+          Coord.from_alg('g1'),
+          0x00_00_05_00_00_00_00_00,
+          0x00_00_05_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK),
+          Coord.from_alg('h1')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('a2'),
+          0x00_00_80_00_00_00_00_00,
+          0x00_00_40_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('b2'),
+          0x00_00_40_00_00_00_00_00,
+          0x00_00_A0_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('c2'),
+          0x00_00_20_00_00_00_00_00,
+          0x00_00_50_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('d2'),
+          0x00_00_10_00_00_00_00_00,
+          0x00_00_28_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('e2'),
+          0x00_00_08_00_00_00_00_00,
+          0x00_00_14_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('f2'),
+          0x00_00_04_00_00_00_00_00,
+          0x00_00_0A_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('g2'),
+          0x00_00_02_00_00_00_00_00,
+          0x00_00_05_00_00_00_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN),
+          Coord.from_alg('h2'),
+          0x00_00_01_00_00_00_00_00,
+          0x00_00_01_00_00_00_00_00
+        )
+      ], 
+      Colour::BLACK=> [
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK),
+          Coord.from_alg('a8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT),
+          Coord.from_alg('b8'),
+          0x00_00_00_00_00_A0_00_00,
+          0x00_00_00_00_00_A0_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP),
+          Coord.from_alg('c8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::QUEEN),
+          Coord.from_alg('d8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KING),
+          Coord.from_alg('e8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP),
+          Coord.from_alg('f8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::KNIGHT),
+          Coord.from_alg('g8'),
+          0x00_00_00_00_00_05_00_00,
+          0x00_00_00_00_00_05_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK),
+          Coord.from_alg('h8')
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('a7'),
+          0x00_00_00_00_00_80_00_00,
+          0x00_00_00_00_00_40_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('b7'),
+          0x00_00_00_00_00_40_00_00,
+          0x00_00_00_00_00_A0_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('c7'),
+          0x00_00_00_00_00_20_00_00,
+          0x00_00_00_00_00_50_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('d7'),
+          0x00_00_00_00_00_10_00_00,
+          0x00_00_00_00_00_28_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('e7'),
+          0x00_00_00_00_00_08_00_00,
+          0x00_00_00_00_00_14_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('f7'),
+          0x00_00_00_00_00_04_00_00,
+          0x00_00_00_00_00_0A_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('g7'),
+          0x00_00_00_00_00_02_00_00,
+          0x00_00_00_00_00_05_00_00
+        ),
+        PieceInfo.new(
+          Chess::Piece.new(Colour::BLACK, Chess::Piece::PAWN),
+          Coord.from_alg('h7'),
+          0x00_00_00_00_00_01_00_00,
+          0x00_00_00_00_00_01_00_00
+        )
+      ], 
+    }
+  end
+
+  def pcfcoord(coord) 
+    @pieces.values.flatten.detect {|info| info.coord == coord} 
+  end
+end
+
 class GameState
   DEFAULT_SEPARATOR = ' '
 
@@ -46,6 +254,7 @@ class GameState
   ]
 
   attr_accessor :moves
+  attr_reader :piece_info_bag
       
   def initialize()     
     @chk_lookup = {
@@ -89,9 +298,13 @@ class GameState
         Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
       }
     }
+
+    @piece_info_bag = PieceInfoBag.new;
   end
 
   def move_piece(src, dest)
+    @piece_info_bag.pcfcoord(src).coord = dest
+
     # bit vector representing the source square
     src_bv = 0x1 << get_sw(src)
     
@@ -261,13 +474,12 @@ class GameState
   def attacked?(clr, coord)
     (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
   end    
-  
-  def calculate_pawn_attack(clr)
+
+  def calculate_pawn_attack(clr, coord)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-    bv_piece = @clr_pos[clr]
-    bv_p = bv_piece & @pos[Chess::Piece::PAWN]
+    bv_p = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::PAWN]
 
     # right attack
     bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
@@ -275,31 +487,23 @@ class GameState
     # left attack
     bv |= mask_left & (clr.white? ? bv_p >> 9 : bv_p << 7)
      
-    @attack[clr][Chess::Piece::PAWN] = bv
+    bv
   end
   
-  def calculate_rook_attack(clr)
+  def calculate_rook_attack(clr, coord)
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::ROOK]
+    
     bv = 0
-    bv_piece = @clr_pos[clr]
-    
-    if (bv_piece & @pos[Chess::Piece::ROOK] == 0)
-      return
-    end
-    
-    0.upto(7) do |i|
-      bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), i)
-    end
+    bv = bv | calculate_file_attack(clr, coord)
     
     bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), \
                   GameState.get_rank(bv_piece))
-    
-    @attack[clr][Chess::Piece::ROOK] = bv
+    bv
   end
   
-  def calculate_knight_attack(clr)
+  def calculate_knight_attack(clr, coord)
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::KNIGHT]
     bv = 0
-    bv_piece = @clr_pos[clr]
-    bv_knight_piece = bv_piece & @pos[Chess::Piece::KNIGHT]
     
     # knight attack position legend for below (k == knight)
     #  B C
@@ -310,37 +514,37 @@ class GameState
   
     # A
     bv_board_mask = 0x00_3F_3F_3F_3F_3F_3F_3F
-    bv |= (bv_knight_piece & bv_board_mask) << 10
+    bv |= (bv_piece & bv_board_mask) << 10
 
     # B
     bv_board_mask = 0x00_00_7F_7F_7F_7F_7F_7F
-    bv |= (bv_knight_piece & bv_board_mask) << 17
+    bv |= (bv_piece & bv_board_mask) << 17
 
     # C
     bv_board_mask = 0x00_00_FE_FE_FE_FE_FE_FE
-    bv |= (bv_knight_piece & bv_board_mask) << 15
+    bv |= (bv_piece & bv_board_mask) << 15
 
     # D
     bv_board_mask = 0x00_FC_FC_FC_FC_FC_FC_FC
-    bv |= (bv_knight_piece & bv_board_mask) << 6
+    bv |= (bv_piece & bv_board_mask) << 6
 
     # E
     bv_board_mask = 0x3F_3F_3F_3F_3F_3F_3F_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 6
+    bv |= (bv_piece & bv_board_mask) >> 6
 
     # F
     bv_board_mask = 0x7F_7F_7F_7F_7F_7F_00_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 15
+    bv |= (bv_piece & bv_board_mask) >> 15
 
     # G
     bv_board_mask = 0xFE_FE_FE_FE_FE_FE_00_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 17
+    bv |= (bv_piece & bv_board_mask) >> 17
 
     # H
     bv_board_mask = 0xFC_FC_FC_FC_FC_FC_FC_00
-    bv |= (bv_knight_piece & bv_board_mask) >> 10
+    bv |= (bv_piece & bv_board_mask) >> 10
 
-    @attack[clr][Chess::Piece::KNIGHT] = bv
+    bv
   end
   
   def calculate_bishop_attack(clr)
@@ -367,8 +571,14 @@ class GameState
       end
     end
     
-    0.upto(7) do |i|
-      bv = bv | calculate_file_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), i)
+    0.upto(7) do |x|
+      0.upto(7) do |y|
+        coord = Coord.new(x, y)
+        sw = get_sw(coord)
+        if (bv_piece & (1 << sw)) != 0
+          bv |= calculate_file_attack(clr, coord)
+        end
+      end
     end
     
     bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), \
@@ -426,35 +636,26 @@ class GameState
   end
   
   # generate a bv for this piece on the given file
-  def calculate_file_attack(clr, piece, file)
-    piece_bv = @pos[piece.name];
-
+  def calculate_file_attack(clr, coord)
     bv = 0
-    attacking_piece = @clr_pos[clr] & piece_bv & FILE_MASKS[file]
+
+    attacking_piece = get_sw(coord)
     all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val}      
 
-    if (attacking_piece == 0)
-      # attacking piece is not on this file, abort
-      return 0
+    chk_cell = attacking_piece - 8
+    while (chk_cell > 0)
+      bv |= 1 << chk_cell
+      break if ((1 << chk_cell) & all_pieces) != 0
+      chk_cell -= 8
     end
-    
-    cell = 0x1 << (7 - file)
-    0.upto(7) do |i|
-      if (attacking_piece & cell != 0)
-        (i-1).downto(0) do |j|
-          chk_cell = cell >> (8 * (i - j))
-          bv |= chk_cell
-          break if (chk_cell & all_pieces) != 0
-        end
 
-        (i+1).upto(7) do |j|
-          chk_cell = cell << (8 * (j - i))
-          bv |= chk_cell
-          break if (chk_cell & all_pieces) != 0
-        end
-      end
-      cell <<= 8
+    chk_cell = attacking_piece + 8
+    while (chk_cell <= 63)
+      bv |= 1 << chk_cell
+      break if ((1 << chk_cell) & all_pieces) != 0
+      chk_cell += 8
     end
+
     bv
   end
   
