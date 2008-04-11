@@ -33,6 +33,16 @@ class Coord
     "(#{x}, #{y})"
   end
   
+  # Returns the coordinate directly in front of this one
+  def forward
+    return Coord.new(@x, @y+1)
+  end
+  
+  # Modifies the current coordinate to be the one directly in front
+  def forward!
+    @y += 1
+  end
+  
   # Checks if the specified coordinate is on the same diagonal as this object
   def on_diag?(c) 
     Coord.same_diag?(self, c)

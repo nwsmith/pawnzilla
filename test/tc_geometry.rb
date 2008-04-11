@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
+$:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pz_unit"
@@ -103,5 +104,16 @@ class TestCoord < Test::Unit::TestCase
 
   def test_should_create_algebraic_coord_at_southwest_corner
     assert_equal('h1', Coord.new(7, 0).to_alg)
+  end
+  
+  def test_should_move_forward
+    coord = A1
+    assert_equal(A2, coord.forward)
+  end
+  
+  def test_should_move_forward_change_state
+    coord = A1
+    coord.forward!
+    assert_equal(A2, coord)
   end
 end
