@@ -1383,4 +1383,29 @@ class TestGameState < Test::Unit::TestCase
     e = GameState.new
     assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
   end
+  
+  def test_check_calculate_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - p - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D3);
+  end
 end

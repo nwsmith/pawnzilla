@@ -265,6 +265,10 @@ class GameState
       Chess::Piece::QUEEN => method(:chk_mv_queen),
       Chess::Piece::ROOK => method(:chk_mv_rook)
     }
+    
+    @calc_mv_lookup = {
+      Chess::Piece::PAWN => method(:calc_all_mv_pawn)
+    }
 
     @clr_pos = {
       Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
@@ -357,6 +361,10 @@ class GameState
   def GameState.get_bv(coord)
     0x1 << get_sw(coord)
   end
+
+  def get_bv(coord) 
+    GameState.get_bv(coord)
+  end  
 
   def GameState.clrfcoord(coord) 
     ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
@@ -474,7 +482,7 @@ class GameState
   def attacked?(clr, coord)
     (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
   end    
-
+  
   def calculate_pawn_attack(clr, coord)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
@@ -815,6 +823,15 @@ class GameState
     out.chop
   end
   
+  def pp_bv(bv)
+    out = ""
+    63.downto(0) do |i|
+      out += bv[i].to_s
+      out += " " if (i % 8 == 0)
+    end
+    out.chop
+  end
+  
   # Output a text representation of the current board state using the specified separator
   # If no separator is defined, the default separator is used.
   def to_txt(sep = DEFAULT_SEPARATOR)
@@ -851,8 +868,27 @@ class GameState
 
     txt += "\n"
   end
+  
   def move?(src, dest)
     chk_mv(src, dest)
+  end
+  
+  # Note: For now, calculating all possible moves is a just-in-time calculation,
+  # so we will return the bit vector representing all possible moves.  You'd
+  # think it's the same as all possible captures, but then you aren't thinking
+  # about pawns or kings :-D
+  def calculate_all_moves(src) 
+    pc = sq_at(src).piece
+    @calc_mv_lookup[pc.name].call(src)
+  end
+  
+  def calc_all_mv_pawn(src)
+    mv_bv = 0x0
+    
+    mv_bv |= get_bv(src.forward)
+    puts pp_bv(mv_bv)
+    
+    return mv_bv
   end
       
   def chk_mv(src, dest) 
