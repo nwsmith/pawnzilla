@@ -122,6 +122,21 @@ class Test::Unit::TestCase
  
     assert_block(full_message) { processed_expected == gamestate_attack_board }
   end
+  
+  def assert_move_state(gamestate, expected, coord, message = nil) 
+    processed_expected = expected.gsub(/\s+/, "")
+    
+    mv_bv = gamestate.calculate_all_moves(coord)
+    actual = ""
+
+    0.upto(63) do |i|
+      i_bv = GameState.get_bv(Coord.from_alg(get_alg_coord_notation(i)));
+      actual += i_bv & mv_bv == i_bv ? "@" : "-"
+    end
+    
+    full_message = create_pretty_message(message, processed_expected, actual)
+    assert_block(full_message) {processed_expected == actual}
+  end
 
   def assert_blocked_state(expected, gamestate, coord, message = nil)
     processed_expected = expected.gsub(/\s+/, "")
