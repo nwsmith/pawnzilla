@@ -886,7 +886,6 @@ class GameState
     mv_bv = 0x0
     
     mv_bv |= get_bv(src.forward)
-    puts pp_bv(mv_bv)
     
     return mv_bv
   end
