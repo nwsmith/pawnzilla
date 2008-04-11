@@ -1,4 +1,3 @@
-
 $Id: tc_gamestate.rb 214 2006-09-15 06:46:11Z nwsmith $
 
 Copyright 2005, 2006 Nathan Smith, Sheldon Fuchs, Ron Thomas
