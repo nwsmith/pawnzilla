@@ -885,7 +885,7 @@ class GameState
   def calc_all_mv_pawn(src)
     mv_bv = 0x0
     
-    mv_bv |= get_bv(src.forward)
+    mv_bv |= get_bv(src.north)
     
     return mv_bv
   end

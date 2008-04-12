@@ -106,14 +106,14 @@ class TestCoord < Test::Unit::TestCase
     assert_equal('h1', Coord.new(7, 0).to_alg)
   end
   
-  def test_should_move_forward
+  def test_should_return_north
     coord = A1
-    assert_equal(A2, coord.forward)
+    assert_equal(A2, coord.north)
   end
   
-  def test_should_move_forward_change_state
-    coord = A1
-    coord.forward!
+  def test_should_change_state_north
+    coord = Coord.from_alg("a1")
+    coord.north!
     assert_equal(A2, coord)
   end
 end

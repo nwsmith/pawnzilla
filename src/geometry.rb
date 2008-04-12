@@ -34,12 +34,12 @@ class Coord
   end
   
   # Returns the coordinate directly in front of this one
-  def forward
+  def north
     return Coord.new(@x, @y+1)
   end
   
   # Modifies the current coordinate to be the one directly in front
-  def forward!
+  def north!
     @y += 1
   end
   
