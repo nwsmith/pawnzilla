@@ -116,4 +116,74 @@ class TestCoord < Test::Unit::TestCase
     coord.north!
     assert_equal(A2, coord)
   end
+  
+  def test_should_return_south
+    assert_equal(A1, A2.south)
+  end
+  
+  def test_should_change_state_south
+    coord = Coord.from_alg("a2")
+    coord.south!
+    assert_equal(A1, coord)
+  end
+  
+  def test_should_return_west
+    assert_equal(A1, B1.west)
+  end
+  
+  def test_should_change_state_west
+    coord = Coord.from_alg("b1");
+    coord.west!
+    assert_equal(A1, coord)
+  end
+  
+  def test_should_return_east
+    assert_equal(B1, A1.east)
+  end
+  
+  def test_should_change_state_east
+    coord = Coord.from_alg("a1")
+    coord.east!
+    assert_equal(B1, coord)
+  end
+  
+  def test_should_return_northwest
+    assert_equal(A2, B1.northwest)
+  end
+  
+  def test_should_change_state_northwest
+    coord = Coord.from_alg("b1")
+    coord.northwest!
+    assert_equal(A2, coord)
+  end
+  
+  def test_should_return_northeast
+    assert_equal(B2, A1.northeast)
+  end
+  
+  def test_should_change_state_northeast
+    coord = Coord.from_alg("a1")
+    coord.northeast!
+    assert_equal(B2, coord)
+  end
+  
+  def test_should_return_southwest
+    assert_equal(B1, C2.southwest)
+  end
+  
+  def test_should_change_state_southwest
+    coord = Coord.from_alg("c2")
+    coord.southwest!
+    assert_equal(B1, coord)
+  end
+  
+  def test_should_return_southeast
+    assert_equal(B1, A2.southeast)
+  end
+  
+  def test_should_change_state_southeast
+    coord = Coord.from_alg("a2")
+    coord.southeast!
+    assert_equal(B1, coord)
+  end
 end

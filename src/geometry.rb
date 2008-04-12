@@ -33,14 +33,88 @@ class Coord
     "(#{x}, #{y})"
   end
   
-  # Returns the coordinate directly in front of this one
+  # Returns the coordinate directly in north of this one
   def north
     return Coord.new(@x, @y+1)
   end
   
-  # Modifies the current coordinate to be the one directly in front
+  # Modifies the current coordinate to be the one directly north
   def north!
     @y += 1
+  end
+  
+  #Returns the coordinate directly south of this one
+  def south
+    return Coord.new(@x, @y-1)
+  end
+  
+  # Modifies the curent coordinate to be the one directly south
+  def south!
+    @y -= 1
+  end
+  
+  # Returns the coordinate west of this one
+  def west
+    return Coord.new(@x-1, @y)
+  end
+  
+  # Modifies the current coordinate to be the one directly west
+  def west!
+    @x -= 1
+  end
+  
+  # Returns the coordinate east of this one
+  def east
+    return Coord.new(@x+1, @y)
+  end
+  
+  # Modifies the current coordinate to be the one directly east
+  def east!
+    @x += 1
+  end
+  
+  # Returns the coordinate northwest of this one
+  def northwest
+    return Coord.new(@x-1, @y+1)
+  end
+  
+  # Modifies the current coordinate to be the one directly nortwest
+  def northwest!
+    north!
+    west!
+  end
+  
+  # Returns the coordinate northeast of this one
+  def northeast
+    return Coord.new(@x+1, @y+1)
+  end
+  
+  # Modifies the current coordinate to be the one directly northeast
+  def northeast!
+    north!
+    east!
+  end
+  
+  # Returns the coordinate southwest from this one
+  def southwest
+    return Coord.new(@x-1, @y-1)
+  end
+  
+  # Modifies this coordinate to its southwest neighbour
+  def southwest!
+    south!
+    west!
+  end
+  
+  # Returns the coordinate southeast of this one
+  def southeast
+    return Coord.new(@x+1, @y-1)
+  end
+  
+  # Modifies this coordinate to its souteast neighbour
+  def southeast!
+    south!
+    east!
   end
   
   # Checks if the specified coordinate is on the same diagonal as this object
