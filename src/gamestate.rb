@@ -469,10 +469,7 @@ class GameState
   def blocked?(src, dest) 
     l = Line.new(src, dest)
       
-    l.each_coord do |c|
-      # a piece on the destination square isn't a block
-      break if c == dest
-        
+    l.each_coord do |c|        
       return true unless sq_at(c).piece.nil? || c == src
     end
     
@@ -885,7 +882,7 @@ class GameState
   def calc_all_mv_pawn(src)
     mv_bv = 0x0
     
-    mv_bv |= get_bv(src.north)
+    mv_bv |= get_bv(src.north) unless blocked?(src, src.north)
     
     return mv_bv
   end
