@@ -186,4 +186,9 @@ class TestCoord < Test::Unit::TestCase
     coord.southeast!
     assert_equal(B1, coord)
   end
+  
+  def test_should_two_point_line_should_have_len_of_two
+    line = Line.new(C2, C3);
+    assert_equal(2, line.len)
+  end
 end

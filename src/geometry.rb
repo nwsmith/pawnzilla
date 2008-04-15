@@ -177,6 +177,9 @@ class Line
     y_inc = c0.y < c1.y ? 1 : -1
     y = c0.y + y_inc
           
+    # Make sure the src is here
+    yield @c0
+    
     # Now check where we're going
     if c0.on_diag?(c1) 
       ((c0.x + 1)..c1.x).each do |x|
