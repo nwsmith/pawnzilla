@@ -884,6 +884,14 @@ class GameState
     
     mv_bv |= get_bv(src.north) unless blocked?(src, src.north)
     
+    # can move two spaces from start square
+    p_bv = 0x00_FF_00_00_00_00_00_00 | 0x00_00_00_00_00_00_FF_00
+    sq_bv = get_bv(src)
+    
+    if (p_bv & sq_bv == sq_bv) then
+      mv_bv |= get_bv(src.north.north) unless blocked?(src, src.north.north)
+    end
+    
     return mv_bv
   end
       

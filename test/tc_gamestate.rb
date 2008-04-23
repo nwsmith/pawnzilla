@@ -1447,6 +1447,29 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     "
-    assert_move_state(e, expected, C2);
+    assert_move_state(e, expected, C2)
+  end
+  
+  def test_calculate_pawn_move_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - p - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - - 
+      - - - @ - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D2)
   end
 end
