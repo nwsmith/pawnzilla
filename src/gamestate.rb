@@ -882,17 +882,23 @@ class GameState
   def calc_all_mv_pawn(src)
     mv_bv = 0x0
     
-    mv_bv |= get_bv(src.north) unless blocked?(src, src.north)
-    
-    # can move two spaces from start square
-    p_bv = 0x00_FF_00_00_00_00_00_00 | 0x00_00_00_00_00_00_FF_00
-    sq_bv = get_bv(src)
-    
-    if (p_bv & sq_bv == sq_bv) then
-      mv_bv |= get_bv(src.north.north) unless blocked?(src, src.north.north)
+    # This is a lazy way :-D
+    # Note: We can't just bitwise OR the mv_bv with the result of 
+    # calculate pawn attack, because that method calculates all squares 
+    # attacked by pawns, regardless whether or not there is something to attack
+    if sq_at(src).piece.colour == Colour::WHITE then
+      mv_bv |= get_bv(src.north) if chk_mv(src, src.north)
+      mv_bv |= get_bv(src.north.north) if chk_mv(src, src.north.north)
+      mv_bv |= get_bv(src.northwest) if chk_mv(src, src.northwest)
+      mv_bv |= get_bv(src.northeast) if chk_mv(src, src.northeast)
+    else
+      mv_bv |= get_bv(src.south) if chk_mv(src, src.south)
+      mv_bv |= get_bv(src.south.south) if chk_mv(src, src.south.south)      
+      mv_bv |= get_bv(src.southwest) if chk_mv(src, src.southwest)
+      mv_bv |= get_bv(src.southeast) if chk_mv(src, src.southeast)
     end
     
-    return mv_bv
+    mv_bv
   end
       
   def chk_mv(src, dest) 

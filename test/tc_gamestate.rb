@@ -1400,7 +1400,7 @@ class TestGameState < Test::Unit::TestCase
     assert(e.blocked?(C2, C3))
   end
   
-  def test_check_calculate_pawn_move
+  def test_check_calculate_white_pawn_move
     e = GameState.new
     place_pieces(e, "
       - - - - - - - - 
@@ -1424,8 +1424,33 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_move_state(e, expected, D3);
   end
+
+  def test_check_calculate_black_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - P - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - @ - - - -
+      - - - - - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D6);
+  end
   
-  def test_check_calculate_blocked_pawn_move
+  def test_check_calculate_blocked_white_pawn_move
     e = GameState.new
     place_pieces(e, "
       - - - - - - - -
@@ -1434,7 +1459,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - b - - - - - 
-      - - P - - - - - 
+      - - p - - - - - 
       - - - - - - - - 
     ")
     expected = "
@@ -1449,8 +1474,33 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_move_state(e, expected, C2)
   end
+
+  def test_check_calculate_blocked_black_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - P - - - - - 
+      - - b - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, C7)
+  end
   
-  def test_calculate_pawn_move_should_work_for_start_square
+  def test_calculate_white_pawn_move_should_work_for_start_square
     e = GameState.new
     place_pieces(e, "
       - - - - - - - -
@@ -1471,5 +1521,74 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - -"
     assert_move_state(e, expected, D2)
+  end
+
+  def test_calculate_black_pawn_move_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - P - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - @ - - - - 
+      - - - @ - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D7)
+  end
+  
+  def test_calculate_white_pawn_move_should_include_captures
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - B - - - - - 
+      - - - p - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - - 
+      - - @ @ - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D2)    
+  end
+  
+  def test_calculate_black_pawn_move_should_include_captures
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - P - - - -
+      - - b - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ @ - - - - 
+      - - - @ - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D7)    
   end
 end
