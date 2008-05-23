@@ -267,7 +267,8 @@ class GameState
     }
     
     @calc_mv_lookup = {
-      Chess::Piece::PAWN => method(:calc_all_mv_pawn)
+      Chess::Piece::PAWN => method(:calc_all_mv_pawn),
+      Chess::Piece::KNIGHT => method(:calc_all_mv_knight)
     }
 
     @clr_pos = {
@@ -900,8 +901,26 @@ class GameState
     
     mv_bv
   end
+  
+  def calc_all_mv_knight(src) 
+    mv_bv = 0x0
+    
+    mv_bv |= get_bv(src.north.west.west) if chk_mv(src, src.north.west.west)
+    mv_bv |= get_bv(src.north.north.west) if chk_mv(src, src.north.north.west)
+    mv_bv |= get_bv(src.north.north.east) if chk_mv(src, src.north.north.east)
+    mv_bv |= get_bv(src.east.east.north) if chk_mv(src, src.east.east.north)
+    mv_bv |= get_bv(src.east.east.south) if chk_mv(src, src.east.east.south)
+    mv_bv |= get_bv(src.south.south.east) if chk_mv(src, src.south.south.east)
+    mv_bv |= get_bv(src.south.south.west) if chk_mv(src, src.south.south.west)
+    mv_bv |= get_bv(src.west.west.south) if chk_mv(src, src.west.west.south)
+    mv_bv |= get_bv(src.west.west.north) if chk_mv(src, src.west.west.north)
+    
+    mv_bv
+  end
       
   def chk_mv(src, dest) 
+    return false if src.x < 0 || src.y < 0
+    return false if dest.x < 0 || dest.y < 0
     pc = sq_at(src).piece
     pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
   end
@@ -1002,6 +1021,6 @@ class GameState
     knight = sq_at(src).piece
     dest_pc = sq_at(dest).piece
     
-    (!dest_pc.nil? && !knight.color.opposite?(dest_pc.color)) || true
+    (!dest_pc.nil? && !knight.colour.opposite?(dest_pc.colour)) || true
   end
 end

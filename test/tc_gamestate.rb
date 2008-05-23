@@ -1368,6 +1368,21 @@ class TestGameState < Test::Unit::TestCase
     assert(!e.chk_mv(F4, E3)) 
   end
   
+  def test_bug_chk_knight_move_allows_moving_to_h1_from_b1
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - n - - - - - - 
+    ")
+    assert(!e.chk_mv(B1, Coord.new(-1, 1))) 
+  end
+  
   def test_check_mv_bishop
     e = GameState.new
     
@@ -1590,5 +1605,143 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - -"
     assert_move_state(e, expected, D7)    
+  end
+  
+  def test_calculate_white_knight_moves_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - n - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - - 
+      @ - @ - - - - - 
+      - - - @ - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, B1)    
+  end
+  
+  def test_calculate_white_knight_moves_should_work_from_mid_board
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - n - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
+  
+  def test_calculate_white_knight_moves_should_work_from_board_edge
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      n - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
+  end
+  
+  def test_calculate_black_knight_moves_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - N - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - @ - - - -
+      @ - @ - - - - - 
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, B8)    
+  end
+  
+  def test_calculate_black_knight_moves_should_work_from_mid_board
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - N - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
+  
+  def test_calculate_black_knight_moves_should_work_from_board_edge
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      N - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
   end
 end
