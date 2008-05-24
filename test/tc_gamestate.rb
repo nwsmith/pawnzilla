@@ -583,6 +583,35 @@ class TestGameState < Test::Unit::TestCase
 
     assert_bv_equals(expected, bv)
   end
+  
+  def test_rook_should_not_attack_diagonally_bugfix
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      ----R---
+      --------
+      --------
+      R-------
+    ")
+
+    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+
+    expected = "
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      -*******
+    "
+
+    assert_bv_equals(expected, bv)    
+  end
 
   def test_center_rook_should_attack_file_and_rank
     b = GameState.new()
@@ -590,23 +619,23 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
       --------
-      ---r----
+      --------
+      R-------
       --------
       --------
-      --------
-      --------
+      r----r--
     ")
-    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+    bv = b.calculate_rook_attack(Colour::WHITE, A1)
 
     expected = "
-      ---*----
-      ---*----
-      ---*----
-      ***-****
-      ---*----
-      ---*----
-      ---*----
-      ---*----
+      --------
+      --------
+      --------
+      --------
+      *-------
+      *-------
+      *-------
+      -****---
     "
 
     assert_bv_equals(expected, bv)
@@ -631,6 +660,34 @@ class TestGameState < Test::Unit::TestCase
       ---*----
       ---*----
       --*-***-
+      ---*----
+      ---*----
+      ---*----
+      --------
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+  
+  def test_own_pieces_should_block_rook_attack
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      ---P----
+      --------
+      --Pr--r-
+      --------
+      --------
+      ---P----
+      --------
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+
+    expected = "
+      --------
+      ---*----
+      ---*----
+      --*-**--
       ---*----
       ---*----
       ---*----
@@ -867,6 +924,34 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
+  
+  def test_centre_bishop_attacks_should_be_blockable_by_own_bishop()
+    b = GameState.new()
+
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --b-----
+      --------
+      b-------
+    ")
+    b.calculate_bishop_attack(Colour::WHITE)
+
+    expected = "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      -*------
+      --------
+    "
+    assert_attack_state(expected, b, Colour::WHITE)
+  end  
 
   def test_corner_queen_should_attack()
     b = GameState.new()
@@ -952,6 +1037,62 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end
 
+  def test_centre_queen_attack_should_be_blockable_by_own_colour()
+    b = GameState.new()
+
+    place_pieces(b, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - p - p - -
+      - - - - - - - - 
+      - - - q - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    ")
+    b.calculate_queen_attack(Colour::WHITE)
+
+    expected = "
+      - - - - - - - -
+      * - - - - - - -
+      - * - - - - - -
+      - - * * * - - -
+      * * * - * * * * 
+      - - * * * - - - 
+      - * - * - * - - 
+      * - - * - - * - 
+    "
+    assert_attack_state(expected, b, Colour::WHITE)
+  end
+  
+  def test_rook_of_own_colour_should_block_on_rank_and_file()
+    b = GameState.new()
+
+    place_pieces(b, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - - - - 
+      - - - - - - - - 
+      r - r - - - - - 
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, A1)
+
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -  
+      - - - - - - - - 
+      * - - - - - - - 
+      - * - - - - - - 
+    "
+    assert_bv_equals(expected, bv)
+  end  
+  
   def test_centre_king_should_attack_outwards()
     b = GameState.new()
 
@@ -1744,4 +1885,50 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -"
     assert_move_state(e, expected, A5)    
   end
+  
+  def test_calculate_rook_move_should_work_from_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - - - - ")
+    expected = "
+      @ - - - - - - -
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - - 
+      @ - - - - - - -
+      - @ @ @ @ @ @ @"
+    assert_move_state(e, expected, A1)        
+  end
+  
+  def test_calculate_rook_move_should_work_with_other_piece_around
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      R - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - r - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - - 
+      @ - - - - - - -
+      - @ @ @ @ - - -"
+    assert_move_state(e, expected, A1)        
+  end  
 end

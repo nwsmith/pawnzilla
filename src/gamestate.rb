@@ -268,7 +268,8 @@ class GameState
     
     @calc_mv_lookup = {
       Chess::Piece::PAWN => method(:calc_all_mv_pawn),
-      Chess::Piece::KNIGHT => method(:calc_all_mv_knight)
+      Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
+      Chess::Piece::ROOK => method(:calc_all_mv_rook)
     }
 
     @clr_pos = {
@@ -502,8 +503,8 @@ class GameState
     bv = 0
     bv = bv | calculate_file_attack(clr, coord)
     
-    bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::ROOK), \
-                  GameState.get_rank(bv_piece))
+    bv |= calculate_rank_attack(clr, coord)
+    
     bv
   end
   
@@ -559,7 +560,7 @@ class GameState
     
     0.upto(63) do |i|
       if (1 << i & bv_piece != 0)
-        bv |= calculate_diagonal_attack(i)
+        bv |= calculate_diagonal_attack(clr, i)
       end
     end
     
@@ -573,7 +574,7 @@ class GameState
 
     0.upto(63) do |i|
       if (1 << i & bv_piece != 0)
-        bv |= calculate_diagonal_attack(i)
+        bv |= calculate_diagonal_attack(clr, i)
       end
     end
     
@@ -587,8 +588,7 @@ class GameState
       end
     end
     
-    bv |= calculate_rank_attack(clr, Chess::Piece.new(clr, Chess::Piece::QUEEN), \
-                  GameState.get_rank(bv_piece))
+    bv |= calculate_rank_attack(clr, Coord.new(GameState::get_rank(bv_piece), GameState::get_file(bv_piece)))
     
     @attack[clr][Chess::Piece::QUEEN] = bv
   end
@@ -646,19 +646,32 @@ class GameState
     bv = 0
 
     attacking_piece = get_sw(coord)
-    all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val}      
+    all_pieces = @clr_pos.values.inject(0) {|mask,val| mask | val} 
+    opp_pieces = @clr_pos[clr.flip]
 
     chk_cell = attacking_piece - 8
     while (chk_cell > 0)
-      bv |= 1 << chk_cell
-      break if ((1 << chk_cell) & all_pieces) != 0
+      if ((1 << chk_cell) & all_pieces) == 0 
+        bv |= 1 << chk_cell
+      else
+        if ((1 << chk_cell) & opp_pieces) > 0 
+          bv |= 1 << chk_cell
+        end
+        break
+      end
       chk_cell -= 8
     end
 
     chk_cell = attacking_piece + 8
     while (chk_cell <= 63)
-      bv |= 1 << chk_cell
-      break if ((1 << chk_cell) & all_pieces) != 0
+      if ((1 << chk_cell) & all_pieces) == 0
+        bv |= 1 << chk_cell
+      else
+        if ((1 << chk_cell) & opp_pieces) > 0
+          bv |= 1 << chk_cell
+        end
+        break
+      end
       chk_cell += 8
     end
 
@@ -667,11 +680,11 @@ class GameState
   
   
   # generate a bv for this piece on the given rank
-  def calculate_rank_attack(clr, piece, rank)
-    piece_bv = @pos[piece.name]
+  def calculate_rank_attack(clr, coord)
+    piece_bv = 0x1 << get_sw(coord)
+    attacking_piece = piece_bv
 
     attack_bitbrd = 0
-    attacking_piece = @clr_pos[clr] & piece_bv & RANK_MASKS[rank]
     opp_pieces = @clr_pos[clr.flip]
     all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
 
@@ -691,7 +704,7 @@ class GameState
         attack_bitbrd |= chk_cell
       else
         if (opp_pieces & chk_cell) > 0
-          attack_bitbrd |= chk_cell
+        attack_bitbrd |= chk_cell
         end
         break
       end
@@ -705,7 +718,7 @@ class GameState
         attack_bitbrd |= chk_cell
       else
         if (chk_cell & opp_pieces) > 0
-          attack_bitbrd |= chk_cell
+        attack_bitbrd |= chk_cell
         end
         break;
       end
@@ -715,11 +728,12 @@ class GameState
   end
   
   # generates a bv for a diagonal attack given a square
-  def calculate_diagonal_attack(sq)
+  def calculate_diagonal_attack(clr, sq)
     mask_left  = 0x80_80_80_80_80_80_80_80
     mask_right = 0x01_01_01_01_01_01_01_01
     bv = 0
     all_pieces = @clr_pos.values.inject(0) {|mask, val| mask | val}
+    opp_pieces = @clr_pos[clr.flip]
 
     operations = [
        [mask_left,  -9], # SW -> NE
@@ -741,7 +755,9 @@ class GameState
       until(next_sq_off_edge || blocked)
         chk_sq = next_sq
         next_sq = chk_sq + shift_width
-        bv |= (1 << chk_sq)
+        if ((1 << chk_sq) & all_pieces) == 0 || ((1 << chk_sq) & opp_pieces) > 0 
+          bv |= (1 << chk_sq)
+        end
 
         next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
         blocked  = (1 << chk_sq) & all_pieces != 0
@@ -917,7 +933,11 @@ class GameState
     
     mv_bv
   end
-      
+  
+  def calc_all_mv_rook(src)
+    return calculate_rook_attack(sq_at(src).piece.colour, src)
+  end
+  
   def chk_mv(src, dest) 
     return false if src.x < 0 || src.y < 0
     return false if dest.x < 0 || dest.y < 0
