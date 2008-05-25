@@ -921,6 +921,33 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end  
   
+  def test_bottom_bishop_should_attack_diagonally_adjacent_opposing_piece()
+    b = GameState.new()
+
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      -P-P----
+      --b-----
+    ")
+    b.calculate_bishop_attack(Colour::WHITE, C1)
+
+    expected = "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      -*-*----
+      --------
+    "
+    assert_attack_state(expected, b, Colour::WHITE)
+  end  
   #------
   # Rook
   #------
@@ -1749,6 +1776,101 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, A5)    
   end
   
+  #--------
+  # Bishop
+  #--------
+  def test_calculate_bishop_move_should_work_from_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - b - - - - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - @
+    - - - - - - @ -
+    - - - - - @ - -
+    @ - - - @ - - - 
+    - @ - @ - - - - 
+    - - - - - - - -"
+    assert_move_state(e, expected, C1)        
+  end
+  
+  def test_calculate_bishop_move_should_stop_with_opposing_pieces
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - N - -
+      P - - - - - - - 
+      - P - - - - - - 
+      - - b - - - - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - @ - -
+    - - - - @ - - - 
+    - @ - @ - - - - 
+    - - - - - - - -"
+    assert_move_state(e, expected, C1)        
+  end
+
+  def test_calculate_bishop_move_should_stop_with_same_colour_pieces
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - n - -
+      P - - - - - - - 
+      - p - - - - - - 
+      - - b - - - - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - @ - - - 
+    - - - @ - - - - 
+    - - - - - - - -"
+    assert_move_state(e, expected, C1)        
+  end
+
+  def test_calculate_bishop_move_should_stop_with_same_colour_bishops
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - b - -
+      P - - - - - - - 
+      - b - - - - - - 
+      - - b - - - - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - @ - - - 
+    - - - @ - - - - 
+    - - - - - - - -"
+    assert_move_state(e, expected, C1)        
+  end
+   
   #------
   # Rook
   #------

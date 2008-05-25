@@ -269,6 +269,7 @@ class GameState
     @calc_mv_lookup = {
       Chess::Piece::PAWN => method(:calc_all_mv_pawn),
       Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
+      Chess::Piece::BISHOP => method(:calc_all_mv_bishop),
       Chess::Piece::ROOK => method(:calc_all_mv_rook)
     }
 
@@ -892,7 +893,7 @@ class GameState
       next_sq = chk_sq + shift_width
 
       next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
-      blocked  = (1 << next_sq) & all_pieces != 0
+      blocked  = false
 
       until(next_sq_off_edge || blocked)
         chk_sq = next_sq
@@ -960,6 +961,10 @@ class GameState
     mv_bv |= get_bv(src.west.west.north) if chk_mv(src, src.west.west.north)
     
     mv_bv
+  end
+  
+  def calc_all_mv_bishop(src)
+    return calculate_bishop_attack(sq_at(src).piece.colour, src)
   end
   
   def calc_all_mv_rook(src)
