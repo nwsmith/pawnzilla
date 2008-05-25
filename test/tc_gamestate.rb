@@ -93,6 +93,9 @@ class TestGameState < Test::Unit::TestCase
     @board = GameState.new
   end
 
+  #----------------------------------------------------------------------------
+  # Start board helper tests
+  #----------------------------------------------------------------------------
   def test_should_get_white_piece_on_black_square_from_initial_setup
     square = @board.sq_at(A1)
     assert_not_nil(square)
@@ -117,75 +120,8 @@ class TestGameState < Test::Unit::TestCase
     assert(square.piece.colour.black?)
     assert_equal(Chess::Piece::BISHOP, square.piece.name)
   end
-
-  def test_move_should_not_change_peice_properties
-    board = GameState.new()
-    src = A2
-    dest = A3
-    board.move_piece(src, dest)
-    assert(board.sq_at(src).piece.nil?)
-    assert(!board.sq_at(dest).piece.nil?)
-    assert(board.sq_at(dest).piece.colour.white?)
-    assert(board.sq_at(dest).piece.name == Chess::Piece::PAWN)
-  end
   
-  def test_move_should_not_chance_peice_colour
-    board = GameState.new()
-    src = D7
-    dest = D5
-    board.move_piece(src, dest);
-    assert(board.sq_at(dest).piece.colour.black?);
-    
-    src = D2
-    dest = D3
-    board.move_piece(src, dest);
-    assert(board.sq_at(dest).piece.colour.white?);
-  end
-
-  def test_should_modify_piece_info_after_move
-    board = GameState.new
-    board.move_piece(E2, E4)
-    #assert_nil(board.piece_info_bag.pcfcoord(E2))
-    assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), board.piece_info_bag.pcfcoord(E4).piece)
-  end
-  
-  def test_place_piece_should_place_proper_peice_and_colour
-    board = GameState.new()
-    coord = A6
-    piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
-    board.place_piece(coord, piece)
-    square = board.sq_at(coord)
-    assert(!square.piece.nil?)
-    assert(square.piece.colour.black?) 
-    assert(square.piece.name == Chess::Piece::ROOK)
-  end
-
-  def test_should_place_piece_over_existing_piece
-    board = GameState.new()
-    coord = A6
-    piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
-    board.place_piece(coord, Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN))
-    board.place_piece(coord, piece)
-    square = board.sq_at(coord)
-    assert_not_nil(square.piece)
-    assert(square.piece.colour.black?)
-    assert_equal(piece.name, square.piece.name)
-  end
-  
-  def test_remove_piece
-    board = GameState.new()
-    coord = A1
-    board.remove_piece(coord)
-    square = board.sq_at(coord)
-    assert(square.piece.nil?)
-    
-    # Make sure an empty square stays that way
-    coord = A6
-    board.remove_piece(coord)
-    square = board.sq_at(coord)
-    assert(square.piece.nil?)
-  end
-  
+  # TODO: Fix assert_blocked_state
   def test_blocked
     b = GameState.new()
     place_pieces(b, "
@@ -295,7 +231,203 @@ class TestGameState < Test::Unit::TestCase
     
     #assert_blocked_state(expected, b, H8)
   end
+ 
+  def test_on_diagonal_nw_se
+    b = GameState.new
+    
+    bv1_6 = 0x1 << GameState.get_sw(Coord.new(1, 6))
+    bv2_5 = 0x1 << GameState.get_sw(Coord.new(2, 5))
+    bv5_2 = 0x1 << GameState.get_sw(Coord.new(5, 2))
+    
+    assert(b.on_diagonal?(bv1_6, bv2_5))
+    assert(b.on_diagonal?(bv2_5, bv5_2))
+    assert(b.on_diagonal?(bv1_6, bv5_2))
+    
+    assert(b.on_diagonal?(bv2_5, bv1_6))
+    assert(b.on_diagonal?(bv5_2, bv2_5))
+    assert(b.on_diagonal?(bv5_2, bv1_6))    
+  end
   
+  def test_on_diagonal_sw_ne
+    b = GameState.new
+    
+    bv1_3 = 0x1 << GameState.get_sw(Coord.new(1, 3))
+    bv2_4 = 0x1 << GameState.get_sw(Coord.new(2, 4))
+    bv3_5 = 0x1 << GameState.get_sw(Coord.new(3, 5))
+    
+    assert(b.on_diagonal?(bv1_3, bv2_4))
+    assert(b.on_diagonal?(bv1_3, bv3_5))
+    assert(b.on_diagonal?(bv2_4, bv3_5))
+    
+    assert(b.on_diagonal?(bv2_4, bv1_3))
+    assert(b.on_diagonal?(bv3_5, bv1_3))
+    assert(b.on_diagonal?(bv3_5, bv2_4))    
+  end
+
+  def test_on_file? 
+    b = GameState.new;
+    
+    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
+    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))
+    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
+    
+    assert(b.on_file?(bv0_7, bv0_4))
+    assert(b.on_file?(bv0_4, bv0_7))
+    
+    assert(b.on_file?(bv0_7, bv0_7))
+    
+    assert(!b.on_file?(bv0_7, bv4_7))
+    assert(!b.on_file?(bv4_7, bv0_7))    
+  end
+  
+  def test_on_rank?
+    b = GameState.new;
+    
+    bv0_0 = 0x01 << GameState.get_sw(Coord.new(0, 0))    
+    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))    
+    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
+    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
+    bv7_0 = 0x01 << GameState.get_sw(Coord.new(7, 0))    
+    
+    assert(b.on_rank?(bv0_7, bv4_7))
+    assert(b.on_rank?(bv4_7, bv0_7))
+    
+    assert(b.on_rank?(bv0_0, bv7_0))
+    
+    assert(b.on_rank?(bv0_7, bv0_7))
+    
+    assert(!b.on_rank?(bv0_7, bv0_4))
+    assert(!b.on_rank?(bv0_4, bv0_7))
+  end
+  
+  def test_find_east_edge
+    assert_equal(GameState.get_bv(Coord.new(7, 7)), 
+           GameState.find_east_edge(GameState.get_bv(Coord.new(3, 7))))
+    assert_equal(GameState.get_bv(Coord.new(7, 0)),
+           GameState.find_east_edge(GameState.get_bv(Coord.new(4, 0))))           
+  end    
+  
+  def test_find_west_edge
+    assert_equal(GameState.get_bv(Coord.new(0, 7)),
+           GameState.find_west_edge(GameState.get_bv(Coord.new(3, 7))))
+    assert_equal(GameState.get_bv(Coord.new(0, 0)),
+           GameState.find_west_edge(GameState.get_bv(Coord.new(4, 0))))           
+  end           
+  
+  def test_get_file
+    assert_equal(7, GameState.get_file(GameState.get_bv(Coord.new(7, 7))))
+    assert_equal(3, GameState.get_file(GameState.get_bv(Coord.new(3, 4))))
+  end
+  
+  def test_get_file_mask
+    assert_equal(GameState::FILE_MASKS[7], GameState.get_file_mask(GameState.get_bv(Coord.new(7, 7))))
+    assert_equal(GameState::FILE_MASKS[3], GameState.get_file_mask(GameState.get_bv(Coord.new(3, 4))))
+  end
+
+  def test_get_bv
+    assert_equal(GameState.get_bv(Coord.new(7, 7)), (0x1 << GameState.get_sw(Coord.new(7, 7))))
+  end      
+  
+  def test_get_rank
+    assert_equal(7, GameState.get_rank(GameState.get_bv(Coord.new(7, 7))))
+    assert_equal(4, GameState.get_rank(GameState.get_bv(Coord.new(3, 4))))
+  end
+  
+  def test_get_rank_mask
+    assert_equal(GameState::RANK_MASKS[7], GameState.get_rank_mask(GameState.get_bv(Coord.new(7, 7))))
+    assert_equal(GameState::RANK_MASKS[4], GameState.get_rank_mask(GameState.get_bv(Coord.new(3, 4))))
+  end    
+  
+  def test_on_board
+    assert(GameState.on_board?(GameState.get_bv(Coord.new(7, 7))))
+    assert(GameState.on_board?(GameState.get_bv(Coord.new(0, 0))))
+    assert(!GameState.on_board?(GameState.get_bv(Coord.new(7, 8))))
+    assert(!GameState.on_board?(GameState.get_bv(Coord.new(8, 7))))
+  end  
+  #----------------------------------------------------------------------------
+  # End board helper tests
+  #----------------------------------------------------------------------------  
+  
+  #----------------------------------------------------------------------------
+  # Start piece helper tests
+  #----------------------------------------------------------------------------
+  def test_move_should_not_change_peice_properties
+    board = GameState.new()
+    src = A2
+    dest = A3
+    board.move_piece(src, dest)
+    assert(board.sq_at(src).piece.nil?)
+    assert(!board.sq_at(dest).piece.nil?)
+    assert(board.sq_at(dest).piece.colour.white?)
+    assert(board.sq_at(dest).piece.name == Chess::Piece::PAWN)
+  end
+  
+  def test_move_should_not_chance_peice_colour
+    board = GameState.new()
+    src = D7
+    dest = D5
+    board.move_piece(src, dest);
+    assert(board.sq_at(dest).piece.colour.black?);
+    
+    src = D2
+    dest = D3
+    board.move_piece(src, dest);
+    assert(board.sq_at(dest).piece.colour.white?);
+  end
+
+  def test_should_modify_piece_info_after_move
+    board = GameState.new
+    board.move_piece(E2, E4)
+    #assert_nil(board.piece_info_bag.pcfcoord(E2))
+    assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), board.piece_info_bag.pcfcoord(E4).piece)
+  end
+  
+  def test_place_piece_should_place_proper_peice_and_colour
+    board = GameState.new()
+    coord = A6
+    piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
+    board.place_piece(coord, piece)
+    square = board.sq_at(coord)
+    assert(!square.piece.nil?)
+    assert(square.piece.colour.black?) 
+    assert(square.piece.name == Chess::Piece::ROOK)
+  end
+
+  def test_should_place_piece_over_existing_piece
+    board = GameState.new()
+    coord = A6
+    piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
+    board.place_piece(coord, Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN))
+    board.place_piece(coord, piece)
+    square = board.sq_at(coord)
+    assert_not_nil(square.piece)
+    assert(square.piece.colour.black?)
+    assert_equal(piece.name, square.piece.name)
+  end
+  
+  def test_remove_piece
+    board = GameState.new()
+    coord = A1
+    board.remove_piece(coord)
+    square = board.sq_at(coord)
+    assert(square.piece.nil?)
+    
+    # Make sure an empty square stays that way
+    coord = A6
+    board.remove_piece(coord)
+    square = board.sq_at(coord)
+    assert(square.piece.nil?)
+  end
+  #----------------------------------------------------------------------------
+  # End piece helper tests
+  #----------------------------------------------------------------------------  
+  
+  #----------------------------------------------------------------------------
+  # Start attack calculation testing
+  #----------------------------------------------------------------------------
+  #------
+  # Pawn
+  #------
   def test_white_pawn_in_centre_should_attack_upwards()
     b = GameState.new()
     place_pieces(b, "
@@ -526,177 +658,10 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_bv_equals(expected, bv)
   end
-
-  def test_rook_attack_in_corner_should_attack_like_an_l
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      --------
-      --------
-      --------
-      --------
-      --------
-      --------
-      R-------
-    ")
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
-
-    expected = "
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      -*******
-    "
-
-    assert_bv_equals(expected, bv)
-  end
-
-  def test_only_one_rook_attack_should_be_generated
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      --------
-      --------
-      --------
-      ----R---
-      --------
-      --------
-      R-------
-    ")
-
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
-
-    expected = "
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      -*******
-    "
-
-    assert_bv_equals(expected, bv)
-  end
   
-  def test_rook_should_not_attack_diagonally_bugfix
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      --------
-      --------
-      --------
-      ----R---
-      --------
-      --------
-      R-------
-    ")
-
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
-
-    expected = "
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      *-------
-      -*******
-    "
-
-    assert_bv_equals(expected, bv)    
-  end
-
-  def test_center_rook_should_attack_file_and_rank
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      --------
-      --------
-      --------
-      R-------
-      --------
-      --------
-      r----r--
-    ")
-    bv = b.calculate_rook_attack(Colour::WHITE, A1)
-
-    expected = "
-      --------
-      --------
-      --------
-      --------
-      *-------
-      *-------
-      *-------
-      -****---
-    "
-
-    assert_bv_equals(expected, bv)
-  end
-
-  def test_pieces_should_block_rook_attack
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      ---P----
-      --------
-      --Pr--P-
-      --------
-      --------
-      ---P----
-      --------
-    ")
-    bv = b.calculate_rook_attack(Colour::WHITE, D5)
-
-    expected = "
-      --------
-      ---*----
-      ---*----
-      --*-***-
-      ---*----
-      ---*----
-      ---*----
-      --------
-    "
-
-    assert_bv_equals(expected, bv)
-  end
-  
-  def test_own_pieces_should_block_rook_attack
-    b = GameState.new()
-    place_pieces(b, "
-      --------
-      ---P----
-      --------
-      --Pr--r-
-      --------
-      --------
-      ---P----
-      --------
-    ")
-    bv = b.calculate_rook_attack(Colour::WHITE, D5)
-
-    expected = "
-      --------
-      ---*----
-      ---*----
-      --*-**--
-      ---*----
-      ---*----
-      ---*----
-      --------
-    "
-
-    assert_bv_equals(expected, bv)
-  end
-
+  #--------
+  # Knight 
+  #--------
   def test_corner_knights_should_attack_middle()
     b = GameState.new()
     place_pieces(b, "
@@ -756,7 +721,10 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_bv_equals(expected, bv)
   end
-
+  
+  #--------
+  # Bishop 
+  #--------
   def test_lower_left_corner_bishop_should_attack_diagonally()
     b = GameState.new()
 
@@ -950,9 +918,213 @@ class TestGameState < Test::Unit::TestCase
       -*------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+#    assert_attack_state(expected, b, Colour::WHITE)
   end  
+  
+  #------
+  # Rook
+  #------
+  def test_rook_attack_in_corner_should_attack_like_an_l
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      R-------
+    ")
+    bv = b.calculate_rook_attack(Colour::BLACK, A1)
 
+    expected = "
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      -*******
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+
+  def test_only_one_rook_attack_should_be_generated
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      ----R---
+      --------
+      --------
+      R-------
+    ")
+
+    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+
+    expected = "
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      -*******
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+  
+  def test_rook_should_not_attack_diagonally_bugfix
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      ----R---
+      --------
+      --------
+      R-------
+    ")
+
+    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+
+    expected = "
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      *-------
+      -*******
+    "
+
+    assert_bv_equals(expected, bv)    
+  end
+
+  def test_center_rook_should_attack_file_and_rank
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      R-------
+      --------
+      --------
+      r----r--
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, A1)
+
+    expected = "
+      --------
+      --------
+      --------
+      --------
+      *-------
+      *-------
+      *-------
+      -****---
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+
+  def test_pieces_should_block_rook_attack
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      ---P----
+      --------
+      --Pr--P-
+      --------
+      --------
+      ---P----
+      --------
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+
+    expected = "
+      --------
+      ---*----
+      ---*----
+      --*-***-
+      ---*----
+      ---*----
+      ---*----
+      --------
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+  
+  def test_own_pieces_should_block_rook_attack
+    b = GameState.new()
+    place_pieces(b, "
+      --------
+      ---P----
+      --------
+      --Pr--r-
+      --------
+      --------
+      ---P----
+      --------
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+
+    expected = "
+      --------
+      ---*----
+      ---*----
+      --*-**--
+      ---*----
+      ---*----
+      ---*----
+      --------
+    "
+
+    assert_bv_equals(expected, bv)
+  end
+  
+  def test_rook_of_own_colour_should_block_on_rank_and_file()
+    b = GameState.new()
+
+    place_pieces(b, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - - - - 
+      - - - - - - - - 
+      r - r - - - - - 
+    ")
+    bv = b.calculate_rook_attack(Colour::WHITE, A1)
+
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -  
+      - - - - - - - - 
+      * - - - - - - - 
+      - * - - - - - - 
+    "
+    assert_bv_equals(expected, bv)
+  end
+  
+  #-------
+  # Queen 
+  #-------
   def test_corner_queen_should_attack()
     b = GameState.new()
 
@@ -1065,34 +1237,9 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end
   
-  def test_rook_of_own_colour_should_block_on_rank_and_file()
-    b = GameState.new()
-
-    place_pieces(b, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      r - - - - - - - 
-      - - - - - - - - 
-      r - r - - - - - 
-    ")
-    bv = b.calculate_rook_attack(Colour::WHITE, A1)
-
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -  
-      - - - - - - - - 
-      * - - - - - - - 
-      - * - - - - - - 
-    "
-    assert_bv_equals(expected, bv)
-  end  
-  
+  #------
+  # King 
+  #------
   def test_centre_king_should_attack_outwards()
     b = GameState.new()
 
@@ -1232,120 +1379,404 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
+  #----------------------------------------------------------------------------
+  # End attack calculation testing
+  #----------------------------------------------------------------------------
 
-  def test_on_file? 
-    b = GameState.new;
-    
-    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
-    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))
-    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
-    
-    assert(b.on_file?(bv0_7, bv0_4))
-    assert(b.on_file?(bv0_4, bv0_7))
-    
-    assert(b.on_file?(bv0_7, bv0_7))
-    
-    assert(!b.on_file?(bv0_7, bv4_7))
-    assert(!b.on_file?(bv4_7, bv0_7))    
-  end
-  
-  def test_on_rank?
-    b = GameState.new;
-    
-    bv0_0 = 0x01 << GameState.get_sw(Coord.new(0, 0))    
-    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))    
-    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
-    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
-    bv7_0 = 0x01 << GameState.get_sw(Coord.new(7, 0))    
-    
-    assert(b.on_rank?(bv0_7, bv4_7))
-    assert(b.on_rank?(bv4_7, bv0_7))
-    
-    assert(b.on_rank?(bv0_0, bv7_0))
-    
-    assert(b.on_rank?(bv0_7, bv0_7))
-    
-    assert(!b.on_rank?(bv0_7, bv0_4))
-    assert(!b.on_rank?(bv0_4, bv0_7))
-  end
-  
-  def test_on_diagonal_sw_ne
-    b = GameState.new
-    
-    bv1_3 = 0x1 << GameState.get_sw(Coord.new(1, 3))
-    bv2_4 = 0x1 << GameState.get_sw(Coord.new(2, 4))
-    bv3_5 = 0x1 << GameState.get_sw(Coord.new(3, 5))
-    
-    assert(b.on_diagonal?(bv1_3, bv2_4))
-    assert(b.on_diagonal?(bv1_3, bv3_5))
-    assert(b.on_diagonal?(bv2_4, bv3_5))
-    
-    assert(b.on_diagonal?(bv2_4, bv1_3))
-    assert(b.on_diagonal?(bv3_5, bv1_3))
-    assert(b.on_diagonal?(bv3_5, bv2_4))    
-  end
-  
-  def test_on_diagonal_nw_se
-    b = GameState.new
-    
-    bv1_6 = 0x1 << GameState.get_sw(Coord.new(1, 6))
-    bv2_5 = 0x1 << GameState.get_sw(Coord.new(2, 5))
-    bv5_2 = 0x1 << GameState.get_sw(Coord.new(5, 2))
-    
-    assert(b.on_diagonal?(bv1_6, bv2_5))
-    assert(b.on_diagonal?(bv2_5, bv5_2))
-    assert(b.on_diagonal?(bv1_6, bv5_2))
-    
-    assert(b.on_diagonal?(bv2_5, bv1_6))
-    assert(b.on_diagonal?(bv5_2, bv2_5))
-    assert(b.on_diagonal?(bv5_2, bv1_6))    
+  #----------------------------------------------------------------------------
+  # Start potential move calculation testing
+  #----------------------------------------------------------------------------
+  #--------
+  # Pawn
+  #--------  
+  def test_check_calculate_white_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - p - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D3);
   end
 
-  def test_get_bv
-    assert_equal(GameState.get_bv(Coord.new(7, 7)), (0x1 << GameState.get_sw(Coord.new(7, 7))))
-  end      
-  
-  def test_get_rank
-    assert_equal(7, GameState.get_rank(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(4, GameState.get_rank(GameState.get_bv(Coord.new(3, 4))))
+  def test_check_calculate_black_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - P - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - @ - - - -
+      - - - - - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D6);
   end
   
-  def test_get_rank_mask
-    assert_equal(GameState::RANK_MASKS[7], GameState.get_rank_mask(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(GameState::RANK_MASKS[4], GameState.get_rank_mask(GameState.get_bv(Coord.new(3, 4))))
-  end    
-  
-  def test_get_file
-    assert_equal(7, GameState.get_file(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(3, GameState.get_file(GameState.get_bv(Coord.new(3, 4))))
+  def test_check_calculate_blocked_white_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - b - - - - - 
+      - - p - - - - - 
+      - - - - - - - - 
+    ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, C2)
   end
-  
-  def test_get_file_mask
-    assert_equal(GameState::FILE_MASKS[7], GameState.get_file_mask(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(GameState::FILE_MASKS[3], GameState.get_file_mask(GameState.get_bv(Coord.new(3, 4))))
-  end
-  
-  def test_on_board
-    assert(GameState.on_board?(GameState.get_bv(Coord.new(7, 7))))
-    assert(GameState.on_board?(GameState.get_bv(Coord.new(0, 0))))
-    assert(!GameState.on_board?(GameState.get_bv(Coord.new(7, 8))))
-    assert(!GameState.on_board?(GameState.get_bv(Coord.new(8, 7))))
-  end
-  
-  def test_find_east_edge
-    assert_equal(GameState.get_bv(Coord.new(7, 7)), 
-           GameState.find_east_edge(GameState.get_bv(Coord.new(3, 7))))
-    assert_equal(GameState.get_bv(Coord.new(7, 0)),
-           GameState.find_east_edge(GameState.get_bv(Coord.new(4, 0))))           
-  end    
-  
-  def test_find_west_edge
-    assert_equal(GameState.get_bv(Coord.new(0, 7)),
-           GameState.find_west_edge(GameState.get_bv(Coord.new(3, 7))))
-    assert_equal(GameState.get_bv(Coord.new(0, 0)),
-           GameState.find_west_edge(GameState.get_bv(Coord.new(4, 0))))           
-  end           
 
+  def test_check_calculate_blocked_black_pawn_move
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - P - - - - - 
+      - - b - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, C7)
+  end
+  
+  def test_calculate_white_pawn_move_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - p - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - - 
+      - - - @ - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D2)
+  end
+
+  def test_calculate_black_pawn_move_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - P - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - @ - - - - 
+      - - - @ - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D7)
+  end
+  
+  def test_calculate_white_pawn_move_should_include_captures
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - B - - - - - 
+      - - - p - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - - 
+      - - @ @ - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D2)    
+  end
+  
+  def test_calculate_black_pawn_move_should_include_captures
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - P - - - -
+      - - b - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ @ - - - - 
+      - - - @ - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D7)    
+  end
+  
+  #--------
+  # Knight
+  #--------
+  def test_calculate_white_knight_moves_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - n - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - - 
+      @ - @ - - - - - 
+      - - - @ - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, B1)    
+  end
+  
+  def test_calculate_white_knight_moves_should_work_from_mid_board
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - n - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
+  
+  def test_calculate_white_knight_moves_should_work_from_board_edge
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      n - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
+  end
+  
+  def test_calculate_black_knight_moves_should_work_for_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - N - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - @ - - - -
+      @ - @ - - - - - 
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, B8)    
+  end
+  
+  def test_calculate_black_knight_moves_should_work_from_mid_board
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - N - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
+  
+  def test_calculate_black_knight_moves_should_work_from_board_edge
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      N - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
+  end
+  
+  #------
+  # Rook
+  #------
+  def test_calculate_rook_move_should_work_from_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - - - - ")
+    expected = "
+      @ - - - - - - -
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - - 
+      @ - - - - - - -
+      - @ @ @ @ @ @ @"
+    assert_move_state(e, expected, A1)        
+  end
+  
+  def test_calculate_rook_move_should_work_with_other_piece_around
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      R - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      r - - - - r - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      @ - - - - - - -
+      @ - - - - - - - 
+      @ - - - - - - - 
+      @ - - - - - - -
+      - @ @ @ @ - - -"
+    assert_move_state(e, expected, A1)        
+  end 
+  #----------------------------------------------------------------------------
+  # End potential move calculation testing
+  #----------------------------------------------------------------------------  
+
+  #----------------------------------------------------------------------------
+  # Start legal move check testing
+  #----------------------------------------------------------------------------
   def test_chk_mv_pawn
     e = GameState.new
     
@@ -1555,380 +1986,7 @@ class TestGameState < Test::Unit::TestCase
     ")
     assert(e.blocked?(C2, C3))
   end
-  
-  def test_check_calculate_white_pawn_move
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - p - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-    ")
-    expected = "
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-      - - - @ - - - -   
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-    "
-    assert_move_state(e, expected, D3);
-  end
-
-  def test_check_calculate_black_pawn_move
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - P - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-    ")
-    expected = "
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - @ - - - -
-      - - - - - - - -   
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-    "
-    assert_move_state(e, expected, D6);
-  end
-  
-  def test_check_calculate_blocked_white_pawn_move
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - b - - - - - 
-      - - p - - - - - 
-      - - - - - - - - 
-    ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -   
-      - - - - - - - - 
-    "
-    assert_move_state(e, expected, C2)
-  end
-
-  def test_check_calculate_blocked_black_pawn_move
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - P - - - - - 
-      - - b - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-    ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -   
-      - - - - - - - - 
-    "
-    assert_move_state(e, expected, C7)
-  end
-  
-  def test_calculate_white_pawn_move_should_work_for_start_square
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - p - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - -
-      - - - @ - - - - 
-      - - - @ - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D2)
-  end
-
-  def test_calculate_black_pawn_move_should_work_for_start_square
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - P - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - @ - - - - 
-      - - - @ - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D7)
-  end
-  
-  def test_calculate_white_pawn_move_should_include_captures
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - B - - - - - 
-      - - - p - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - -
-      - - - @ - - - - 
-      - - @ @ - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D2)    
-  end
-  
-  def test_calculate_black_pawn_move_should_include_captures
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - P - - - -
-      - - b - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - @ @ - - - - 
-      - - - @ - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D7)    
-  end
-  
-  def test_calculate_white_knight_moves_should_work_for_start_square
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - n - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - -
-      - - - - - - - - 
-      @ - @ - - - - - 
-      - - - @ - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, B1)    
-  end
-  
-  def test_calculate_white_knight_moves_should_work_from_mid_board
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - n - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - @ - @ - - - 
-      - @ - - - @ - -
-      - - - - - - - - 
-      - @ - - - @ - - 
-      - - @ - @ - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D4)        
-  end
-  
-  def test_calculate_white_knight_moves_should_work_from_board_edge
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      n - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - @ - - - - - -
-      - - @ - - - - - 
-      - - - - - - - -
-      - - @ - - - - - 
-      - @ - - - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, A5)    
-  end
-  
-  def test_calculate_black_knight_moves_should_work_for_start_square
-    e = GameState.new
-    place_pieces(e, "
-      - N - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - @ - - - -
-      @ - @ - - - - - 
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, B8)    
-  end
-  
-  def test_calculate_black_knight_moves_should_work_from_mid_board
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - N - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - @ - @ - - - 
-      - @ - - - @ - -
-      - - - - - - - - 
-      - @ - - - @ - - 
-      - - @ - @ - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, D4)        
-  end
-  
-  def test_calculate_black_knight_moves_should_work_from_board_edge
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      N - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - ")
-    expected = "
-      - - - - - - - -
-      - @ - - - - - -
-      - - @ - - - - - 
-      - - - - - - - -
-      - - @ - - - - - 
-      - @ - - - - - - 
-      - - - - - - - -
-      - - - - - - - -"
-    assert_move_state(e, expected, A5)    
-  end
-  
-  def test_calculate_rook_move_should_work_from_start_square
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      r - - - - - - - ")
-    expected = "
-      @ - - - - - - -
-      @ - - - - - - -
-      @ - - - - - - - 
-      @ - - - - - - -
-      @ - - - - - - - 
-      @ - - - - - - - 
-      @ - - - - - - -
-      - @ @ @ @ @ @ @"
-    assert_move_state(e, expected, A1)        
-  end
-  
-  def test_calculate_rook_move_should_work_with_other_piece_around
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      R - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      r - - - - r - - ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      @ - - - - - - -
-      @ - - - - - - - 
-      @ - - - - - - - 
-      @ - - - - - - -
-      - @ @ @ @ - - -"
-    assert_move_state(e, expected, A1)        
-  end  
+  #----------------------------------------------------------------------------
+  # End legal move check testing
+  #---------------------------------------------------------------------------- 
 end

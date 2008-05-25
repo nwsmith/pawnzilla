@@ -308,35 +308,6 @@ class GameState
     @piece_info_bag = PieceInfoBag.new;
   end
 
-  def move_piece(src, dest)
-    @piece_info_bag.pcfcoord(src).coord = dest
-
-    # bit vector representing the source square
-    src_bv = 0x1 << get_sw(src)
-    
-    # bit vector representing the destination square
-    dest_bv = 0x1 << get_sw(dest)
-    
-    # bit vector representing the change required for the move
-    ch_bv = (src_bv | dest_bv)
-     
-    @clr_pos.each_key do |key|
-      @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
-    end
-
-    @pos.each_key do |key|
-      if (@pos[key] & src_bv) == src_bv
-        @pos[key] ^= ch_bv
-        return
-      end
-    end
-  end
-
-  def move!(src, dest)
-    require 'move'
-    @moves.push(Move.execute(src, dest, self))
-  end
-
   def clear()    
     @clr_pos.each_key {|key| @clr_pos[key] = 0}
     @pos.each_key {|key| @pos[key] = 0}
@@ -346,20 +317,62 @@ class GameState
       end
     end    
   end
+  # Output a text representation of the current board state using the specified separator
+  # If no separator is defined, the default separator is used.
+  
+  def to_txt(sep = DEFAULT_SEPARATOR)
+    tr = Translator::PieceTranslator.new()
+    txt, row = '', 8;
+
+    # Because we store the board in a standard orientation, in order to make the board
+    # look "right side up" in a textual representation, we have to do the y-axis in
+    # reverse.        
+    (7).downto(0) do |y|
+      # Output the rank number (for alg coord)
+      txt += "#{row}" + sep
+      row -= 1
+      
+      # Output the pieces on the rank
+      (0...8).each do |x|
+        sq = sq_at(Coord.new(x, y))
+        txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
+        txt += sep
+      end
+      
+      txt += "\n"
+    end
+
+    # Offset to compensate for rank numbers in layout
+    (sep.length + 1).times do 
+      txt += DEFAULT_SEPARATOR 
+    end
+
+    # Output the file letters
+    (97...(97 + 8)).each do |col|
+      txt += col.chr + sep
+    end 
+
+    txt += "\n"
+  end
+  #----------------------------------------------------------------------------
+  # Start bit-vector helpers
+  # ---------------------------------------------------------------------------
   
   # get the shift width required to get the square specified by the provided 
   # coord
   #
   # This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes
-  # to get to the proper rank, then by bits to get to the proper file
+  # to get to the proper rank, then by bits to get to the proper file  
+  def GameState.get_sw(coord)
+    63 - (8 * coord.y) - coord.x
+  end
+
   def get_sw(coord) 
     GameState.get_sw(coord)
   end
   
-  def GameState.get_sw(coord)
-    63 - (8 * coord.y) - coord.x
-  end
-  
+  # get a bitvector with a single bit set, representing the square at the 
+  # provided coord.  
   def GameState.get_bv(coord)
     0x1 << get_sw(coord)
   end
@@ -368,34 +381,138 @@ class GameState
     GameState.get_bv(coord)
   end  
 
+  def GameState.pp_bv
+    out = ""
+    63.downto(0) do |i|
+      out += @bv[i].to_s
+      out += " " if (i % 8 == 0)
+    end
+    out.chop
+  end
+  
+  def pp_bv(bv)
+    out = ""
+    63.downto(0) do |i|
+      out += bv[i].to_s
+      out += " " if (i % 8 == 0)
+    end
+    out.chop
+  end
+  #----------------------------------------------------------------------------
+  # End bit-vector helpers
+  # ---------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Start board helpers
+  #----------------------------------------------------------------------------
+
+  # Determine the colour of the square at the given coord
   def GameState.clrfcoord(coord) 
     ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
   end
-  
-  def sq_at(coord) 
-    square = Chess::Square.new(coord, GameState.clrfcoord(coord))
-    mask = GameState.get_bv(coord)
-    
-    # Look for a piece of either colour in that square
-    piece = nil
-    color = (@clr_pos[Colour::BLACK] & mask) == mask \
-      ? Colour::BLACK \
-      : (@clr_pos[Colour::WHITE] & mask) == mask \
-        ? Colour::WHITE \
-        : nil
 
-    # Determine piece type
-    if !color.nil?          
-      @pos.each_key do |key|
-        if (@pos[key] & mask) == mask
-          square.piece = Chess::Piece.new(color, key)
-        end
-      end
-    end
-    
-    square
+  def GameState::find_east_edge(bv) 
+    # formula is
+    # x = board_size
+    # y = rank of bit vector
+    # z = right edge
+    # 
+    # z = 2^(x^2 - x - xy)
+    # 
+    # or: 
+    # 
+    # 2^(board_size*(board_size - 1 - rank))
+    0x1 << ((7 - GameState.get_rank(bv)) << 3)
   end
 
+  def GameState::find_west_edge(bv)
+    # formula is
+    # x = board_size
+    # y = rank of bit vector
+    # z = left edge
+    # 
+    # z = 2^(x^2 - xy - 1)
+    # 
+    # or:
+    # 
+    # 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
+    0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
+  end 
+
+  def GameState::get_file(bv)
+    file = 7
+    while (bv & 0xFF) != bv
+      bv >>= 8
+    end
+    while (bv & 0x01) != bv
+      file -= 1
+      bv >>= 1
+    end
+    file
+  end
+  
+  def GameState::get_file_mask(bv) 
+    return FILE_MASKS[get_file(bv)]    
+  end  
+  
+  def GameState::get_rank(bv) 
+    rank = 7
+    while (bv & 0xFF) != bv
+      rank -= 1
+      bv >>= 8
+    end
+    rank
+  end
+  
+  def GameState::get_rank_mask(bv) 
+    return RANK_MASKS[get_rank(bv)]
+  end
+  
+  def GameState::on_board?(bv)
+    bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
+  end  
+
+  # Is the given coord attacked by any piece of the given colour
+  def attacked?(clr, coord)
+    (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
+  end    
+
+  #
+  # TODO: This is a placeholder implementation based on sq_at, 
+  # so it's quite inefficient
+  # 
+  def blocked?(src, dest) 
+    l = Line.new(src, dest)
+      
+    l.each_coord do |c|        
+      return true unless sq_at(c).piece.nil? || c == src
+    end
+    
+    false
+  end  
+  
+  def on_diagonal?(src, dest) 
+    # Normalize coordinates to be west to east
+    src, dest = dest, src if dest < src
+    
+    dest_orig = dest
+
+    # Check south to north
+    while dest > 0
+      return true if (src & dest) == dest
+      dest >>= 9
+    end
+    
+    # Check north to South
+    dest = dest_orig
+    
+    while dest > 0
+      return true if (src & dest) == dest
+      dest >>= 7
+    end
+    
+    false
+  end  
+  
   def on_file?(src, dest) 
     src, dest = dest, src if dest < src
     
@@ -419,27 +536,67 @@ class GameState
     return (dest - src).between?(0x00, 0xFF)
   end 
   
-  def on_diagonal?(src, dest) 
-    # Normalize coordinates to be west to east
-    src, dest = dest, src if dest < src
+  def sq_at(coord) 
+    square = Chess::Square.new(coord, GameState.clrfcoord(coord))
+    mask = GameState.get_bv(coord)
     
-    dest_orig = dest
+    # Look for a piece of either colour in that square
+    piece = nil
+    color = (@clr_pos[Colour::BLACK] & mask) == mask \
+      ? Colour::BLACK \
+      : (@clr_pos[Colour::WHITE] & mask) == mask \
+        ? Colour::WHITE \
+        : nil
 
-    # Check south to north
-    while dest > 0
-      return true if (src & dest) == dest
-      dest >>= 9
+    # Determine piece type
+    if !color.nil?          
+      @pos.each_key do |key|
+        if (@pos[key] & mask) == mask
+          square.piece = Chess::Piece.new(color, key)
+        end
+      end
     end
     
-    # Check north to South
-    dest = dest_orig
+    square
+  end  
+  #----------------------------------------------------------------------------
+  # End board helpers
+  # ---------------------------------------------------------------------------
+  
+  #----------------------------------------------------------------------------
+  # Start piece helpers
+  #----------------------------------------------------------------------------
+  def move?(src, dest)
+    chk_mv(src, dest)
+  end
+  
+  def move!(src, dest)
+    require 'move'
+    @moves.push(Move.execute(src, dest, self))
+  end
+   
+  def move_piece(src, dest)
+    @piece_info_bag.pcfcoord(src).coord = dest
+
+    # bit vector representing the source square
+    src_bv = 0x1 << get_sw(src)
     
-    while dest > 0
-      return true if (src & dest) == dest
-      dest >>= 7
+    # bit vector representing the destination square
+    dest_bv = 0x1 << get_sw(dest)
+    
+    # bit vector representing the change required for the move
+    ch_bv = (src_bv | dest_bv)
+     
+    @clr_pos.each_key do |key|
+      @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
     end
-    
-    false
+
+    @pos.each_key do |key|
+      if (@pos[key] & src_bv) == src_bv
+        @pos[key] ^= ch_bv
+        return
+      end
+    end
   end
     
   def place_piece(coord, piece) 
@@ -464,24 +621,13 @@ class GameState
     @clr_pos[piece.colour] ^= pc_bv
     @pos[piece.name] ^= pc_bv
   end
-  
-  #
-  # TODO: This is a placeholder implementation based on sq_at, so it's quite inefficient
-  # 
-  def blocked?(src, dest) 
-    l = Line.new(src, dest)
-      
-    l.each_coord do |c|        
-      return true unless sq_at(c).piece.nil? || c == src
-    end
-    
-    false
-  end
-  
-  def attacked?(clr, coord)
-    (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
-  end    
-  
+  #----------------------------------------------------------------------------
+  # End piece helpers
+  #----------------------------------------------------------------------------
+
+  #----------------------------------------------------------------------------
+  # Start attack calculation
+  #----------------------------------------------------------------------------
   def calculate_pawn_attack(clr, coord)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
@@ -641,7 +787,6 @@ class GameState
     @attack[clr].values.inject(0) {|bv, val| bv | val}
   end
   
-  # generate a bv for this piece on the given file
   def calculate_file_attack(clr, coord)
     bv = 0
 
@@ -678,8 +823,6 @@ class GameState
     bv
   end
   
-  
-  # generate a bv for this piece on the given rank
   def calculate_rank_attack(clr, coord)
     piece_bv = 0x1 << get_sw(coord)
     attacking_piece = piece_bv
@@ -727,7 +870,6 @@ class GameState
     attack_bitbrd
   end
   
-  # generates a bv for a diagonal attack given a square
   def calculate_diagonal_attack(clr, sq)
     mask_left  = 0x80_80_80_80_80_80_80_80
     mask_right = 0x01_01_01_01_01_01_01_01
@@ -766,126 +908,12 @@ class GameState
 
     bv
   end
-  
-  def GameState::get_rank(bv) 
-    rank = 7
-    while (bv & 0xFF) != bv
-      rank -= 1
-      bv >>= 8
-    end
-    rank
-  end
-  
-  def GameState::get_rank_mask(bv) 
-    return RANK_MASKS[get_rank(bv)]
-  end
-  
-  def GameState::get_file(bv)
-    file = 7
-    while (bv & 0xFF) != bv
-      bv >>= 8
-    end
-    while (bv & 0x01) != bv
-      file -= 1
-      bv >>= 1
-    end
-    file
-  end
-  
-  def GameState::get_file_mask(bv) 
-    return FILE_MASKS[get_file(bv)]    
-  end
-  
-  def GameState::on_board?(bv)
-    bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
-  end
-  
-  def GameState::find_east_edge(bv) 
-    # formula is
-    # x = board_size
-    # y = rank of bit vector
-    # z = right edge
-    # 
-    # z = 2^(x^2 - x - xy)
-    # 
-    # or: 
-    # 
-    # 2^(board_size*(board_size - 1 - rank))
-    0x1 << ((7 - GameState.get_rank(bv)) << 3)
-  end
-
-  def GameState::find_west_edge(bv)
-    # formula is
-    # x = board_size
-    # y = rank of bit vector
-    # z = left edge
-    # 
-    # z = 2^(x^2 - xy - 1)
-    # 
-    # or:
-    # 
-    # 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
-    0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
-  end 
-
-  def GameState.pp_bv
-    out = ""
-    63.downto(0) do |i|
-      out += @bv[i].to_s
-      out += " " if (i % 8 == 0)
-    end
-    out.chop
-  end
-  
-  def pp_bv(bv)
-    out = ""
-    63.downto(0) do |i|
-      out += bv[i].to_s
-      out += " " if (i % 8 == 0)
-    end
-    out.chop
-  end
-  
-  # Output a text representation of the current board state using the specified separator
-  # If no separator is defined, the default separator is used.
-  def to_txt(sep = DEFAULT_SEPARATOR)
-    tr = Translator::PieceTranslator.new()
-    txt, row = '', 8;
-
-    # Because we store the board in a standard orientation, in order to make the board
-    # look "right side up" in a textual representation, we have to do the y-axis in
-    # reverse.        
-    (7).downto(0) do |y|
-      # Output the rank number (for alg coord)
-      txt += "#{row}" + sep
-      row -= 1
-      
-      # Output the pieces on the rank
-      (0...8).each do |x|
-        sq = sq_at(Coord.new(x, y))
-        txt += sq.piece.nil? ? "-" : tr.to_txt(sq.piece)
-        txt += sep
-      end
-      
-      txt += "\n"
-    end
-
-    # Offset to compensate for rank numbers in layout
-    (sep.length + 1).times do 
-      txt += DEFAULT_SEPARATOR 
-    end
-
-    # Output the file letters
-    (97...(97 + 8)).each do |col|
-      txt += col.chr + sep
-    end 
-
-    txt += "\n"
-  end
-  
-  def move?(src, dest)
-    chk_mv(src, dest)
-  end
+  #----------------------------------------------------------------------------
+  # End attack calculation
+  #----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Start potential move calculation
+  #---------------------------------------------------------------------------- 
   
   # Note: For now, calculating all possible moves is a just-in-time calculation,
   # so we will return the bit vector representing all possible moves.  You'd
@@ -937,7 +965,12 @@ class GameState
   def calc_all_mv_rook(src)
     return calculate_rook_attack(sq_at(src).piece.colour, src)
   end
-  
+  #----------------------------------------------------------------------------
+  # End potential move calculation
+  #---------------------------------------------------------------------------- 
+  #----------------------------------------------------------------------------
+  # Start legal move checks
+  #---------------------------------------------------------------------------- 
   def chk_mv(src, dest) 
     return false if src.x < 0 || src.y < 0
     return false if dest.x < 0 || dest.y < 0
@@ -1043,4 +1076,8 @@ class GameState
     
     (!dest_pc.nil? && !knight.colour.opposite?(dest_pc.colour)) || true
   end
+  #----------------------------------------------------------------------------
+  # Start legal move checks
+  #---------------------------------------------------------------------------- 
+
 end
