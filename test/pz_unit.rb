@@ -106,6 +106,20 @@ H7 = Coord.from_alg("h7")
 H8 = Coord.from_alg("h8")
 
 class Test::Unit::TestCase
+  def assert_state(expected, gamestate, message = nil) 
+    tr = Translator::PieceTranslator.new
+    processed_expected = expected.gsub(/\s+/, "")
+    
+    gamestate_state = ""
+    0.upto(63) do |i| 
+      square = gamestate.sq_at(Coord.from_alg(get_alg_coord_notation(i)))
+      gamestate_state += square.piece.nil? ? "-" : tr.to_txt(square.piece)
+    end
+    
+    full_message = create_pretty_message(message, processed_expected, gamestate_state, gamestate)
+    assert_block(full_message) {processed_expected == gamestate_state}
+  end
+  
   def assert_attack_state(expected, gamestate, clr, message = nil)
     processed_expected = expected.gsub(/\s+/, "")
  
@@ -224,7 +238,7 @@ class Test::Unit::TestCase
     # Create a nicely formatted message
     full_message = message == nil ? "" : message
     full_message += "Given board malformed!\n" if processed_expected.length != 64
-    full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*]/)
+    full_message += "Given board has illegal characters\n" if processed_expected.match(/[^-*@pPnNbBrRqQkK]/)
     full_message += "Board:\n#{gamestate.to_txt}\n"
     full_message += "Expected:\n#{format_board(processed_expected)}\n"
     full_message
@@ -234,7 +248,7 @@ class Test::Unit::TestCase
     # Create a nicely formatted message
     full_message = message == nil ? "" : message
     full_message += "Given board malformed!\n" if expected.length != 64
-    full_message += "Given board has illegal characters\n" if expected.match(/[^-*]/)
+    full_message += "Given board has illegal characters\n" if expected.match(/[^-*@pPnNbBrRqQkK]/)
     full_message += "Board:\n#{gamestate.to_txt}\n" if gamestate != nil
     full_message += "Expected:\n#{format_board(expected)}\n"
     full_message += "Actual:\n#{format_board(actual)}\n"
