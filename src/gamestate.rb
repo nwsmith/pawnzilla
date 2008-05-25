@@ -630,11 +630,12 @@ class GameState
   #----------------------------------------------------------------------------
   # Start attack calculation
   #----------------------------------------------------------------------------
-  def calculate_pawn_attack(clr, coord)
+  def calculate_pawn_attack(coord)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-    bv_p = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::PAWN]
+    bv_p = (0x01 << get_sw(coord))
+    clr = sq_at(coord).piece.colour
 
     # right attack
     bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
@@ -645,19 +646,20 @@ class GameState
     bv
   end
   
-  def calculate_rook_attack(clr, coord)
-    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::ROOK]
+  def calculate_rook_attack(coord)
+    clr = sq_at(coord).piece.colour
     
-    bv = 0
-    bv = bv | calculate_file_attack(clr, coord)
+    bv = 0x0
     
+    bv |= calculate_file_attack(clr, coord)    
     bv |= calculate_rank_attack(clr, coord)
     
     bv
   end
   
-  def calculate_knight_attack(clr, coord)
-    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::KNIGHT]
+  def calculate_knight_attack(coord)
+    
+    bv_piece = (1 << get_sw(coord))
     bv = 0
     
     # knight attack position legend for below (k == knight)
@@ -702,9 +704,11 @@ class GameState
     bv
   end
   
-  def calculate_bishop_attack(clr, coord)
+  def calculate_bishop_attack(coord)
     bv = 0
-    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::BISHOP]    
+    bv_piece = (1 << get_sw(coord))
+    clr = sq_at(coord).piece.colour
+
     
     0.upto(63) do |i|
       if (1 << i & bv_piece != 0)
@@ -715,19 +719,12 @@ class GameState
     @attack[clr][Chess::Piece::BISHOP] = bv
   end
   
-  def calculate_queen_attack(clr, coord)
-    bv = 0
+  def calculate_queen_attack(coord)
+    bv = 0x0 
+    clr = sq_at(coord).piece.colour
 
-    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
-
-    0.upto(63) do |i|
-      if (1 << i == bv_piece)
-        bv |= calculate_diagonal_attack(clr, i)
-      end
-    end
-    
-    bv |= calculate_file_attack(clr, coord)    
-    bv |= calculate_rank_attack(clr, coord)
+    bv |= calculate_bishop_attack(coord);
+    bv |= calculate_rook_attack(coord);
     
     @attack[clr][Chess::Piece::QUEEN] = bv
     return bv
@@ -957,15 +954,15 @@ class GameState
   end
   
   def calc_all_mv_bishop(src)
-    return calculate_bishop_attack(sq_at(src).piece.colour, src)
+    return calculate_bishop_attack(src)
   end
   
   def calc_all_mv_rook(src)
-    return calculate_rook_attack(sq_at(src).piece.colour, src)
+    return calculate_rook_attack(src)
   end
   
   def calc_all_mv_queen(src)
-    return calculate_queen_attack(sq_at(src).piece.colour, src)
+    return calculate_queen_attack(src)
   end
   #----------------------------------------------------------------------------
   # End potential move calculation

@@ -440,7 +440,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(Colour::WHITE, C4)
+    bv = b.calculate_pawn_attack(C4)
 
     expected = "
       --------
@@ -467,7 +467,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(Colour::BLACK, C4)
+    bv = b.calculate_pawn_attack(C4)
 
     expected = "
       --------
@@ -495,7 +495,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(Colour::WHITE, A4)
+    bv = b.calculate_pawn_attack(A4)
 
     expected = "
       --------
@@ -523,7 +523,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(Colour::BLACK, A4)
+    bv = b.calculate_pawn_attack(A4)
 
     expected = "
       --------
@@ -552,7 +552,7 @@ class TestGameState < Test::Unit::TestCase
       --------
     ")
 
-    bv = b.calculate_pawn_attack(Colour::WHITE, H4)
+    bv = b.calculate_pawn_attack(H4)
 
     expected = "
       --------
@@ -580,7 +580,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(Colour::BLACK, H4)
+    bv = b.calculate_pawn_attack(H4)
 
     expected = "
       --------
@@ -598,7 +598,17 @@ class TestGameState < Test::Unit::TestCase
 
   def test_white_pawn_on_top_edge_should_not_attack()
     b = GameState.new()
-    bv = b.calculate_pawn_attack(Colour::WHITE, D8)
+    place_pieces(b, "
+      ---p----
+      --------
+      --------
+      --------
+      P-------
+      --------
+      --------
+      --------
+    ")
+    bv = b.calculate_pawn_attack(D8)
 
     expected = "
       --------
@@ -616,7 +626,7 @@ class TestGameState < Test::Unit::TestCase
   def test_black_pawn_on_bottem_edge_should_not_attack()
     b = GameState.new()
     b.clear()
-    bv = b.calculate_pawn_attack(Colour::BLACK, D1)
+    bv = b.calculate_pawn_attack(D1)
 
     expected = "
       --------
@@ -644,7 +654,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       ---P----
     ")
-    bv = b.calculate_pawn_attack(Colour::BLACK, A4)
+    bv = b.calculate_pawn_attack(D1)
 
     expected = "
       --------
@@ -675,10 +685,10 @@ class TestGameState < Test::Unit::TestCase
       n------n
     ")
 
-    bv = b.calculate_knight_attack(Colour::WHITE, A1) \
-       | b.calculate_knight_attack(Colour::WHITE, A8) \
-       | b.calculate_knight_attack(Colour::WHITE, H1) \
-       | b.calculate_knight_attack(Colour::WHITE, H8)
+    bv = b.calculate_knight_attack(A1) \
+       | b.calculate_knight_attack(A8) \
+       | b.calculate_knight_attack(H1) \
+       | b.calculate_knight_attack(H8)
 
     expected = "
       --------
@@ -707,7 +717,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_knight_attack(Colour::WHITE, D4)
+    bv = b.calculate_knight_attack(D4)
 
     expected = "
       --------
@@ -738,7 +748,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       b-------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, A1)
+    b.calculate_bishop_attack(A1)
 
     expected = "
       -------*
@@ -766,7 +776,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       -------b
     ")
-    b.calculate_bishop_attack(Colour::WHITE, H1)
+    b.calculate_bishop_attack(H1)
 
     expected = "
       *-------
@@ -794,7 +804,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, A8)
+    b.calculate_bishop_attack(A8)
 
     expected = "
       --------
@@ -822,7 +832,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, H8)
+    b.calculate_bishop_attack(H8)
 
     expected = "
       --------
@@ -850,7 +860,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, D4)
+    b.calculate_bishop_attack(D4)
 
     expected = "
       -------*
@@ -878,7 +888,7 @@ class TestGameState < Test::Unit::TestCase
       -Q---Q--
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, D4)
+    b.calculate_bishop_attack(D4)
 
     expected = "
       --------
@@ -906,7 +916,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       b-------
     ")
-    b.calculate_bishop_attack(Colour::WHITE, A1)
+    b.calculate_bishop_attack(A1)
 
     expected = "
       --------
@@ -934,7 +944,7 @@ class TestGameState < Test::Unit::TestCase
       -P-P----
       --b-----
     ")
-    b.calculate_bishop_attack(Colour::WHITE, C1)
+    b.calculate_bishop_attack(C1)
 
     expected = "
       --------
@@ -963,7 +973,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       R-------
     ")
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+    bv = b.calculate_rook_attack(A1)
 
     expected = "
       *-------
@@ -992,7 +1002,7 @@ class TestGameState < Test::Unit::TestCase
       R-------
     ")
 
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+    bv = b.calculate_rook_attack(A1)
 
     expected = "
       *-------
@@ -1021,7 +1031,7 @@ class TestGameState < Test::Unit::TestCase
       R-------
     ")
 
-    bv = b.calculate_rook_attack(Colour::BLACK, A1)
+    bv = b.calculate_rook_attack(A1)
 
     expected = "
       *-------
@@ -1049,7 +1059,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       r----r--
     ")
-    bv = b.calculate_rook_attack(Colour::WHITE, A1)
+    bv = b.calculate_rook_attack(A1)
 
     expected = "
       --------
@@ -1077,7 +1087,7 @@ class TestGameState < Test::Unit::TestCase
       ---P----
       --------
     ")
-    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+    bv = b.calculate_rook_attack(D5)
 
     expected = "
       --------
@@ -1105,7 +1115,7 @@ class TestGameState < Test::Unit::TestCase
       ---P----
       --------
     ")
-    bv = b.calculate_rook_attack(Colour::WHITE, D5)
+    bv = b.calculate_rook_attack(D5)
 
     expected = "
       --------
@@ -1134,7 +1144,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       r - r - - - - - 
     ")
-    bv = b.calculate_rook_attack(Colour::WHITE, A1)
+    bv = b.calculate_rook_attack(A1)
 
     expected = "
       - - - - - - - -
@@ -1165,7 +1175,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       q-------
     ")
-    b.calculate_queen_attack(Colour::WHITE, A1)
+    b.calculate_queen_attack(A1)
 
     expected = "
       *------*
@@ -1193,7 +1203,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       ---q----
     ")
-    b.calculate_queen_attack(Colour::WHITE, D1)
+    b.calculate_queen_attack(D1)
 
     expected = "
       ---*----
@@ -1221,7 +1231,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_queen_attack(Colour::WHITE, D4)
+    b.calculate_queen_attack(D4)
 
     expected = "
       ---*---*
@@ -1249,7 +1259,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_queen_attack(Colour::WHITE, D4)
+    b.calculate_queen_attack(D4)
 
     expected = "
       --------
@@ -1277,7 +1287,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
     ")
-    b.calculate_queen_attack(Colour::WHITE, D4)
+    b.calculate_queen_attack(D4)
 
     expected = "
       - - - - - - - -
@@ -1305,7 +1315,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       q - q - - - - - 
     ")
-    b.calculate_queen_attack(Colour::WHITE, A1)
+    b.calculate_queen_attack(A1)
 
     expected = "
       - - - - - - - -
