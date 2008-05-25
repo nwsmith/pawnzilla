@@ -53,6 +53,10 @@ class Coord
     @y -= 1
   end
   
+  def west_of?(coord)
+    return @x < coord.x
+  end
+  
   # Returns the coordinate west of this one
   def west
     return Coord.new(@x-1, @y)
@@ -61,6 +65,10 @@ class Coord
   # Modifies the current coordinate to be the one directly west
   def west!
     @x -= 1
+  end
+  
+  def east_of?(coord)
+    return @x > coord.x
   end
   
   # Returns the coordinate east of this one

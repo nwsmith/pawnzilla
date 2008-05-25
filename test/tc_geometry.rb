@@ -105,6 +105,16 @@ class TestCoord < Test::Unit::TestCase
   def test_should_create_algebraic_coord_at_southwest_corner
     assert_equal('h1', Coord.new(7, 0).to_alg)
   end
+
+  def test_should_determine_if_coord_is_west
+    assert(A1.west_of?(B1))
+    assert(!B1.west_of?(A1))
+  end
+
+  def test_should_determine_if_coord_is_east
+    assert(B1.east_of?(A1))
+    assert(!A1.east_of?(B1))
+  end
   
   def test_should_return_north
     coord = A1
