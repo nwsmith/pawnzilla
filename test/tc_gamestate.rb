@@ -1180,6 +1180,34 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end
 
+  def test_bottom_queen_should_attack()
+    b = GameState.new()
+
+    place_pieces(b, "
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      --------
+      ---q----
+    ")
+    b.calculate_queen_attack(Colour::WHITE, D1)
+
+    expected = "
+      ---*----
+      ---*----
+      ---*----
+      ---*---*
+      *--*--*-
+      -*-*-*--
+      --***---
+      ***-****
+    "
+    assert_attack_state(expected, b, Colour::WHITE)
+  end
+  
   def test_centre_queen_should_attack_outwards()
     b = GameState.new()
 
@@ -1291,6 +1319,7 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
+  
   #------
   # King 
   #------
@@ -1919,6 +1948,102 @@ class TestGameState < Test::Unit::TestCase
       - @ @ @ @ - - -"
     assert_move_state(e, expected, A1)        
   end 
+
+  #-------
+  # Queen
+  #-------
+  def test_calculate_queen_move_should_work_from_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - q - - - - ")
+    expected = "
+    - - - @ - - - -
+    - - - @ - - - -
+    - - - @ - - - -
+    - - - @ - - - @
+    @ - - @ - - @ -
+    - @ - @ - @ - - 
+    - - @ @ @ - - - 
+    @ @ @ - @ @ @ @"
+    assert_move_state(e, expected, D1)    
+  end
+
+  def test_calculate_queen_move_should_be_stopped_by_opposing_pieces
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - P - P - P - - 
+      - - - - - - - - 
+      - P - q - P - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - @ - @ - @ - - 
+    - - @ @ @ - - - 
+    - @ @ - @ @ - -"
+    assert_move_state(e, expected, D1)    
+  end
+  
+  def test_calculate_queen_move_should_be_stopped_by_friendly_pieces
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - p - p - p - - 
+      - - - - - - - - 
+      - p - q - p - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - - 
+    - - @ @ @ - - - 
+    - - @ - @ - - -"
+    assert_move_state(e, expected, D1)    
+  end
+  
+  def test_calculate_queen_move_should_be_stopped_by_friendly_queens
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - q - q - q - - 
+      - - - - - - - - 
+      - q - q - q - - ")
+    expected = "
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - -
+    - - - - - - - - 
+    - - @ @ @ - - - 
+    - - @ - @ - - -"
+    assert_move_state(e, expected, D1)    
+  end
+    
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  

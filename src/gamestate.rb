@@ -270,7 +270,8 @@ class GameState
       Chess::Piece::PAWN => method(:calc_all_mv_pawn),
       Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
       Chess::Piece::BISHOP => method(:calc_all_mv_bishop),
-      Chess::Piece::ROOK => method(:calc_all_mv_rook)
+      Chess::Piece::ROOK => method(:calc_all_mv_rook),
+      Chess::Piece::QUEEN => method(:calc_all_mv_queen)
     }
 
     @clr_pos = {
@@ -720,24 +721,16 @@ class GameState
     bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
 
     0.upto(63) do |i|
-      if (1 << i & bv_piece != 0)
+      if (1 << i == bv_piece)
         bv |= calculate_diagonal_attack(clr, i)
       end
     end
     
-    0.upto(7) do |x|
-      0.upto(7) do |y|
-        coord = Coord.new(x, y)
-        sw = get_sw(coord)
-        if (bv_piece & (1 << sw)) != 0
-          bv |= calculate_file_attack(clr, coord)
-        end
-      end
-    end
-    
-    bv |= calculate_rank_attack(clr, Coord.new(GameState::get_rank(bv_piece), GameState::get_file(bv_piece)))
+    bv |= calculate_file_attack(clr, coord)    
+    bv |= calculate_rank_attack(clr, coord)
     
     @attack[clr][Chess::Piece::QUEEN] = bv
+    return bv
   end
 
   def calculate_king_attack(clr)
@@ -969,6 +962,10 @@ class GameState
   
   def calc_all_mv_rook(src)
     return calculate_rook_attack(sq_at(src).piece.colour, src)
+  end
+  
+  def calc_all_mv_queen(src)
+    return calculate_queen_attack(sq_at(src).piece.colour, src)
   end
   #----------------------------------------------------------------------------
   # End potential move calculation
