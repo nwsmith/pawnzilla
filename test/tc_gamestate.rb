@@ -400,6 +400,110 @@ class TestGameState < Test::Unit::TestCase
     assert(board.sq_at(dest).piece.colour.white?);
   end
 
+  def test_white_should_be_able_to_castle_kingside
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - r 
+    ")
+    e.move!(E1, G1)
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - r k - 
+    "
+    assert_state(expected, e) 
+  end
+
+  def test_white_should_be_able_to_castle_queenside
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      r - - - k - - -
+    ")
+    e.move!(E1, C1)
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - k r - - - - 
+    "
+    assert_state(expected, e) 
+  end
+
+  def test_black_should_be_able_to_castle_kingside
+    e = GameState.new
+    place_pieces(e, "
+      - - - - K - - R
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.move!(E8, G8)
+    expected = "
+      - - - - - R K -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_state(expected, e) 
+  end
+  
+  def test_black_should_be_able_to_castle_queenside
+    e = GameState.new
+    place_pieces(e, "
+      R - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ")
+    e.move!(E8, C8)
+    expected = "
+      - - K R - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_state(expected, e) 
+  end
+  
   def test_should_modify_piece_info_after_move
     board = GameState.new
     board.move_piece(E2, E4)

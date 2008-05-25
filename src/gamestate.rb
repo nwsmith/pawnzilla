@@ -257,6 +257,8 @@ class GameState
   attr_reader :piece_info_bag
       
   def initialize()     
+    @moves = []
+    
     @white_can_castle_kingside = true;
     @white_can_castle_queenside = true;
     @black_can_castle_kingside = true;
@@ -590,8 +592,33 @@ class GameState
   end
   
   def move!(src, dest)
-    require 'move'
-    @moves.push(Move.execute(src, dest, self))
+    raise :illegal_move unless chk_mv(src, dest)
+    
+    l = Line.new(src, dest)
+    src_sq = sq_at(src)
+    dest_sq = sq_at(dest)
+    piece = src_sq.piece
+    
+    if src_sq.piece.name == Chess::Piece::KING and l.len == 3
+      # Castling
+      # Move the king
+      move_piece(src, dest)
+      
+      if src.west_of?(dest)
+        # Kingside
+        # Jump the rook over the king
+        move_piece(Coord.from_alg(piece.colour.white? ? "h1" : "h8"), \
+                   dest.west)
+      else 
+        # Queenside
+        # Jump the rook over the king
+        move_piece(Coord.from_alg(piece.colour.white? ? "a1" : "a8"), \
+                   dest.east)
+      end
+    else
+      require 'move'
+      @moves.push(Move.execute(src, dest, self))
+    end
   end
    
   def move_piece(src, dest)
