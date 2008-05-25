@@ -1138,7 +1138,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       q-------
     ")
-    b.calculate_queen_attack(Colour::WHITE)
+    b.calculate_queen_attack(Colour::WHITE, A1)
 
     expected = "
       *------*
@@ -1166,7 +1166,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_queen_attack(Colour::WHITE)
+    b.calculate_queen_attack(Colour::WHITE, D4)
 
     expected = "
       ---*---*
@@ -1194,7 +1194,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_queen_attack(Colour::WHITE)
+    b.calculate_queen_attack(Colour::WHITE, D4)
 
     expected = "
       --------
@@ -1222,7 +1222,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
     ")
-    b.calculate_queen_attack(Colour::WHITE)
+    b.calculate_queen_attack(Colour::WHITE, D4)
 
     expected = "
       - - - - - - - -
@@ -1237,6 +1237,33 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end
   
+  def test_centre_queen_attack_should_be_blockable_by_own_colour_queens()
+    b = GameState.new()
+
+    place_pieces(b, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      q - q - - - - - 
+      - - - - - - - - 
+      q - q - - - - - 
+    ")
+    b.calculate_queen_attack(Colour::WHITE, A1)
+
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      * * - - - - - -
+      - * - - - - - -
+    "
+    assert_attack_state(expected, b, Colour::WHITE)
+  end
   #------
   # King 
   #------

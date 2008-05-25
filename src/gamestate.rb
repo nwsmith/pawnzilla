@@ -713,10 +713,10 @@ class GameState
     @attack[clr][Chess::Piece::BISHOP] = bv
   end
   
-  def calculate_queen_attack(clr)
+  def calculate_queen_attack(clr, coord)
     bv = 0
 
-    bv_piece = @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
 
     0.upto(63) do |i|
       if (1 << i & bv_piece != 0)
