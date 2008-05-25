@@ -280,24 +280,49 @@ class TestGameState < Test::Unit::TestCase
     assert(!b.on_file?(bv4_7, bv0_7))    
   end
   
-  def test_on_rank?
-    b = GameState.new;
+  def test_on_rank_on_bottom_should_be_true_both_directions
+    b = GameState.new
+    a1_bv = 0x01 << GameState.get_sw(A1)
+    h1_bv = 0x01 << GameState.get_sw(H1)
     
-    bv0_0 = 0x01 << GameState.get_sw(Coord.new(0, 0))    
-    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))    
-    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
-    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
-    bv7_0 = 0x01 << GameState.get_sw(Coord.new(7, 0))    
+    assert(b.on_rank?(a1_bv, h1_bv))
+    assert(b.on_rank?(h1_bv, a1_bv))
+  end  
+  
+  def test_on_rank_on_top_should_be_true_both_directions
+    b = GameState.new
+    a8_bv = 0x01 << GameState.get_sw(A8)
+    h8_bv = 0x01 << GameState.get_sw(H8)
     
-    assert(b.on_rank?(bv0_7, bv4_7))
-    assert(b.on_rank?(bv4_7, bv0_7))
+    assert(b.on_rank?(a8_bv, h8_bv))
+    assert(b.on_rank?(h8_bv, a8_bv))
+  end
+  
+  def test_on_rank_in_centre_should_be_true_both_directions
+    b = GameState.new
+    a4_bv = 0x01 << GameState.get_sw(A4)
+    h4_bv = 0x01 << GameState.get_sw(H4)
     
-    assert(b.on_rank?(bv0_0, bv7_0))
+    assert(b.on_rank?(a4_bv, h4_bv))
+    assert(b.on_rank?(h4_bv, a4_bv))
+  end
+  
+  def test_on_rank_should_not_be_true_for_same_file
+    b = GameState.new
+    a1_bv = 0x01 << GameState.get_sw(A1)
+    a8_bv = 0x01 << GameState.get_sw(A8)
     
-    assert(b.on_rank?(bv0_7, bv0_7))
+    assert(!b.on_rank?(a1_bv, a8_bv))
+    assert(!b.on_rank?(a8_bv, a1_bv))
+  end
+  
+  def test_on_rank_shold_not_be_true_for_same_diagonal
+    b = GameState.new
+    a1_bv = 0x01 << GameState.get_sw(A1)
+    h8_bv = 0x01 << GameState.get_sw(H8)
     
-    assert(!b.on_rank?(bv0_7, bv0_4))
-    assert(!b.on_rank?(bv0_4, bv0_7))
+    assert(!b.on_rank?(a1_bv, h8_bv))
+    assert(!b.on_rank?(h8_bv, a1_bv))
   end
   
   def test_find_east_edge
@@ -958,6 +983,7 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end  
+
   #------
   # Rook
   #------
@@ -2061,6 +2087,10 @@ class TestGameState < Test::Unit::TestCase
   #----------------------------------------------------------------------------
   # Start legal move check testing
   #----------------------------------------------------------------------------
+  
+  #------
+  # Pawn
+  #------
   def test_chk_mv_pawn
     e = GameState.new
     
@@ -2224,37 +2254,6 @@ class TestGameState < Test::Unit::TestCase
     assert(!e.chk_mv(F4, E3)) 
   end
   
-  def test_bug_chk_knight_move_allows_moving_to_h1_from_b1
-    e = GameState.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -   
-      - n - - - - - - 
-    ")
-    assert(!e.chk_mv(B1, Coord.new(-1, 1))) 
-  end
-  
-  def test_check_mv_bishop
-    e = GameState.new
-    
-    # cannot move a blocked bishop
-    assert(!e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
-    e.remove_piece(Coord.from_alg('d2'))
-    assert(e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
-
-  end
-  
-  def test_rook_cannot_hop_pawn
-    # Unit test for a bug condition -> Rook can hop a pawn
-    e = GameState.new
-    assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
-  end
-  
   def test_pawn_blocks_pawn
     # Unit test for a bug condition -> Pawns don't seem to be blocked
     e = GameState.new
@@ -2270,6 +2269,110 @@ class TestGameState < Test::Unit::TestCase
     ")
     assert(e.blocked?(C2, C3))
   end
+  
+  #--------
+  # Knight
+  #--------
+  def test_bug_chk_knight_move_allows_moving_to_h1_from_b1
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - n - - - - - - 
+    ")
+    assert(!e.chk_mv(B1, Coord.new(-1, 1))) 
+  end
+  
+  #--------
+  # Bishop
+  #--------
+  def test_check_mv_bishop
+    e = GameState.new
+    
+    # cannot move a blocked bishop
+    assert(!e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
+    e.remove_piece(Coord.from_alg('d2'))
+    assert(e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
+
+  end
+  
+  #------
+  # Rook
+  #------
+  def test_rook_cannot_hop_pawn
+    # Unit test for a bug condition -> Rook can hop a pawn
+    e = GameState.new
+    assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
+  end
+  
+  #------
+  # King
+  #------
+  def test_white_king_should_have_kingside_castling_available
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - r 
+    ")
+    assert(e.chk_mv(E1, G1)) 
+  end
+  
+  def test_white_king_should_have_queenside_castling_available
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      r - - - k - - - 
+    ")
+    assert(e.chk_mv(E1, C1)) 
+  end
+
+  def test_black_king_should_have_kingside_castling_available
+    e = GameState.new
+    place_pieces(e, "
+      - - - - K - - R
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(e.chk_mv(E8, G8)) 
+  end
+  
+  def test_white_king_should_have_queenside_castling_available
+    e = GameState.new
+    place_pieces(e, "
+      R - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(e.chk_mv(E8, C8)) 
+  end
+  
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 

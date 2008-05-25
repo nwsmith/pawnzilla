@@ -257,6 +257,11 @@ class GameState
   attr_reader :piece_info_bag
       
   def initialize()     
+    @white_can_castle_kingside = true;
+    @white_can_castle_queenside = true;
+    @black_can_castle_kingside = true;
+    @black_can_castle_kingside = true;
+    
     @chk_lookup = {
       Chess::Piece::BISHOP => method(:chk_mv_bishop),
       Chess::Piece::KING => method(:chk_mv_king),
@@ -568,6 +573,18 @@ class GameState
   #----------------------------------------------------------------------------
   # Start piece helpers
   #----------------------------------------------------------------------------
+  def can_castle?(colour) 
+    can_castle_kingside?(colour) or can_castle_queenside?(colour)
+  end
+  
+  def can_castle_kingside?(colour) 
+    colour.white? ? @white_can_castle_kingside : @black_can_castle_kingside
+  end
+  
+  def can_castle_queenside?(colour) 
+    colour.black ? @black_can_castle_queenside : @white_can_castle_queenside
+  end
+  
   def move?(src, dest)
     chk_mv(src, dest)
   end
@@ -1055,11 +1072,26 @@ class GameState
   def chk_mv_king(src, dest) 
     l = Line.new(src, dest)
     
-    # Kings can only move one square
-    return false unless l.len == 1
+    king = sq_at(src).piece
+    
+    #TODO: this is probably better verified as part of game state
+    in_start_position = king.colour.white? \
+      ? src == Coord.from_alg("e1") \
+      : src == Coord.from_alg("e8")
+    
+    # King can only move one square unless castling
+    if (not in_start_position) or (not can_castle?(king.colour)) 
+      return false unless l.len == 1
+    else
+      return false unless l.len == 3
+    end
+
+    if (l.len == 3) 
+      # Castling is only left/right
+      return false unless src.on_rank?(dest)
+    end    
     
     # Can only capture opposite coloured pieces
-    king = sq_at(src).piece
     dest_pc = sq_at(dest).piece
     
     (!dest_pc.nil? && !king.color.opposite?(dest_pc.color)) || true
