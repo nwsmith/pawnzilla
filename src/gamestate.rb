@@ -363,7 +363,7 @@ class GameState
   #
   # This formula is derived from (8 * (7 - y)) + (7 - x), it shifts by bytes
   # to get to the proper rank, then by bits to get to the proper file  
-  def GameState.get_sw(coord)
+  def self.get_sw(coord)
     63 - (8 * coord.y) - coord.x
   end
 
@@ -373,7 +373,7 @@ class GameState
   
   # get a bitvector with a single bit set, representing the square at the 
   # provided coord.  
-  def GameState.get_bv(coord)
+  def self.get_bv(coord)
     0x1 << get_sw(coord)
   end
 
@@ -381,7 +381,7 @@ class GameState
     GameState.get_bv(coord)
   end  
 
-  def GameState.pp_bv
+  def self.pp_bv
     out = ""
     63.downto(0) do |i|
       out += @bv[i].to_s
@@ -406,11 +406,11 @@ class GameState
   #----------------------------------------------------------------------------
 
   # Determine the colour of the square at the given coord
-  def GameState.clrfcoord(coord) 
+  def self.clrfcoord(coord) 
     ((coord.x + coord.y) & 1 == 0) ? Colour::BLACK : Colour::WHITE
   end
 
-  def GameState::find_east_edge(bv) 
+  def self.find_east_edge(bv) 
     # formula is
     # x = board_size
     # y = rank of bit vector
@@ -424,7 +424,7 @@ class GameState
     0x1 << ((7 - GameState.get_rank(bv)) << 3)
   end
 
-  def GameState::find_west_edge(bv)
+  def self.find_west_edge(bv)
     # formula is
     # x = board_size
     # y = rank of bit vector
@@ -438,7 +438,7 @@ class GameState
     0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
   end 
 
-  def GameState::get_file(bv)
+  def self.get_file(bv)
     file = 7
     while (bv & 0xFF) != bv
       bv >>= 8
@@ -450,11 +450,11 @@ class GameState
     file
   end
   
-  def GameState::get_file_mask(bv) 
+  def self.get_file_mask(bv) 
     return FILE_MASKS[get_file(bv)]    
   end  
   
-  def GameState::get_rank(bv) 
+  def self.get_rank(bv) 
     rank = 7
     while (bv & 0xFF) != bv
       rank -= 1
@@ -463,11 +463,11 @@ class GameState
     rank
   end
   
-  def GameState::get_rank_mask(bv) 
+  def self.get_rank_mask(bv) 
     return RANK_MASKS[get_rank(bv)]
   end
   
-  def GameState::on_board?(bv)
+  def self.on_board?(bv)
     bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
   end  
 
