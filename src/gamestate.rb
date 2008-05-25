@@ -700,9 +700,9 @@ class GameState
     bv
   end
   
-  def calculate_bishop_attack(clr)
+  def calculate_bishop_attack(clr, coord)
     bv = 0
-    bv_piece = @clr_pos[clr] & @pos[Chess::Piece::BISHOP]
+    bv_piece = (1 << get_sw(coord)) & @clr_pos[clr] & @pos[Chess::Piece::BISHOP]    
     
     0.upto(63) do |i|
       if (1 << i & bv_piece != 0)
@@ -892,7 +892,7 @@ class GameState
       next_sq = chk_sq + shift_width
 
       next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
-      blocked  = false
+      blocked  = (1 << next_sq) & all_pieces != 0
 
       until(next_sq_off_edge || blocked)
         chk_sq = next_sq

@@ -738,7 +738,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       b-------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, A1)
 
     expected = "
       -------*
@@ -753,7 +753,7 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end
 
-  def test_lower_rightt_corner_bishop_should_attack_diagonally()
+  def test_lower_right_corner_bishop_should_attack_diagonally()
     b = GameState.new()
 
     place_pieces(b, "
@@ -766,7 +766,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       -------b
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, H1)
 
     expected = "
       *-------
@@ -794,7 +794,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, A8)
 
     expected = "
       --------
@@ -822,7 +822,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, H8)
 
     expected = "
       --------
@@ -850,7 +850,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, D4)
 
     expected = "
       -------*
@@ -878,7 +878,7 @@ class TestGameState < Test::Unit::TestCase
       -Q---Q--
       --------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, D4)
 
     expected = "
       --------
@@ -906,7 +906,7 @@ class TestGameState < Test::Unit::TestCase
       --------
       b-------
     ")
-    b.calculate_bishop_attack(Colour::WHITE)
+    b.calculate_bishop_attack(Colour::WHITE, A1)
 
     expected = "
       --------
@@ -918,7 +918,7 @@ class TestGameState < Test::Unit::TestCase
       -*------
       --------
     "
-#    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, Colour::WHITE)
   end  
   
   #------
