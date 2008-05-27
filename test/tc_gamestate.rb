@@ -160,6 +160,21 @@ class TestGameState < Test::Unit::TestCase
     ")  
     assert(e.attacked?(Colour::BLACK, F1))
   end
+  
+  def test_attacked_should_work_for_simple_file_attack_on_C1_bug
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - R - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")  
+    assert(e.attacked?(Colour::BLACK, C1))
+  end
  
   # TODO: Fix assert_blocked_state
   def test_blocked
@@ -2516,7 +2531,156 @@ class TestGameState < Test::Unit::TestCase
     ")
     assert(e.chk_mv(E8, C8)) 
   end
+   
+  def test_white_king_cannot_castle_kingside_through_file_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - R - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - r 
+    ")
+    assert(!e.chk_mv(E1, G1))
+  end
   
+  def test_white_king_cannot_castle_kingside_when_destination_is_attacked
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - R -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - r 
+    ")
+    assert(!e.chk_mv(E1, G1))    
+  end
+  
+  def test_white_king_cannot_castle_kingside_through_diagaonal_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - B - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - r 
+    ")
+    assert(!e.chk_mv(E1, G1))
+  end
+  
+  def test_white_king_cannot_castle_queenside_through_file_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - R - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      r - - - k - - - 
+    ")
+    assert(!e.chk_mv(E1, C1))
+  end  
+  
+  def test_white_king_cannot_castle_queenside_when_destination_attacked
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - R - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      r - - - k - - - 
+    ")
+    assert(!e.chk_mv(E1, C1))
+  end  
+  
+  def test_white_king_cannot_castle_queenside_through_diagonal_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - Q - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      r - - - k - - - 
+    ")
+    assert(!e.chk_mv(E1, C1))
+  end
+  
+  def test_black_king_cannot_castle_kingside_through_file_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - K - - R
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - r - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(!e.chk_mv(E8, G8))
+  end
+  
+  def test_black_king_cannot_castle_kingside_through_diagonal_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - K - - R
+      - - - - - - - -
+      - - - - - - - -
+      - - b - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(!e.chk_mv(E8, G8))
+  end  
+  
+  def test_black_king_cannot_castle_queenside_through_file_check
+    e = GameState.new
+    place_pieces(e, "
+      R - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - r - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(!e.chk_mv(E8, C8))
+  end
+  
+  def test_black_king_canot_castle_queenside_through_diagonal_check
+    e = GameState.new
+    place_pieces(e, "
+      R - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - b - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    assert(!e.chk_mv(E8, C8))    
+  end
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 

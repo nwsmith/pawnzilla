@@ -611,7 +611,7 @@ class GameState
   end
   
   def move!(src, dest)
-    raise :illegal_move unless chk_mv(src, dest)
+    raise ArgumentException unless chk_mv(src, dest)
     
     l = Line.new(src, dest)
     src_sq = sq_at(src)
@@ -1181,8 +1181,12 @@ class GameState
 
     if (l.len == 3) 
       # Castling is only left/right
-      return false unless src.on_rank?(dest)
-    end    
+      return false unless src.on_rank?(dest)      
+      
+      l.each_coord do |coord|
+        return false if attacked?(king.colour.flip, coord)
+      end
+    end  
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
