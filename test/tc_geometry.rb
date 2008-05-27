@@ -21,6 +21,17 @@ require "test/unit"
 require "pz_unit"
 require "geometry"
 
+class TestLine < Test::Unit::TestCase
+  def test_line_e1_to_c1_should_work_bugfix
+    line = Line.new(E1, C1)
+    coords = []
+    line.each_coord {|coord| coords.push coord}
+    assert_equal(C1, coords[0])
+    assert_equal(D1, coords[1])
+    assert_equal(E1, coords[2])
+  end
+end
+
 class TestCoord < Test::Unit::TestCase
   def test_should_detect_SW_to_NE_diagonal
     assert(Coord.same_diag?(A1, B2))

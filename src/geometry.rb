@@ -186,7 +186,7 @@ class Line
     y = c0.y + y_inc
           
     # Make sure the src is here
-    yield @c0
+    yield c0
     
     # Now check where we're going
     if c0.on_diag?(c1) 
