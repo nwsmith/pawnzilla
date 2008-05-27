@@ -92,6 +92,31 @@ class TestGameState < Test::Unit::TestCase
   def setup 
     @board = GameState.new
   end
+  #----------------------------------------------------------------------------
+  # Start bit-vector helper tests
+  #----------------------------------------------------------------------------
+  def test_get_coord_from_bv_should_fail_when_more_than_one_bit_set
+    assert_raises(ArgumentError) {GameState.get_coord_for_bv(0x03)}    
+  end
+  
+  def test_get_coord_from_bv_should_not_faile_when_one_bit_set
+    assert_nothing_raised {GameState.get_coord_for_bv(0x02)} 
+  end
+  
+  def test_get_coord_from_bv_should_return_H8
+    assert_equal H8, GameState.get_coord_for_bv(0x00_00_00_00_00_00_00_01) 
+  end
+  
+  def test_get_coord_from_bv_should_return_A1
+    assert_equal A1, GameState.get_coord_for_bv(0x80_00_00_00_00_00_00_00)
+  end
+  
+  def test_get_sw_should_get_correct_value_for_H8
+    assert_equal GameState.get_sw(H8), 0
+  end
+  #----------------------------------------------------------------------------
+  # End bit-vector helper tests
+  #----------------------------------------------------------------------------
 
   #----------------------------------------------------------------------------
   # Start board helper tests
@@ -121,6 +146,21 @@ class TestGameState < Test::Unit::TestCase
     assert_equal(Chess::Piece::BISHOP, square.piece.name)
   end
   
+  def test_attacked_should_work_for_simple_file_attack
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - R - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")  
+    assert(e.attacked?(Colour::BLACK, F1))
+  end
+ 
   # TODO: Fix assert_blocked_state
   def test_blocked
     b = GameState.new()
@@ -1410,7 +1450,7 @@ class TestGameState < Test::Unit::TestCase
     place_pieces(b, "
       - - - - - - - -
       - - - - - - - -
-      - - - p - p - -
+      - - - b - - - -
       - - - - - - - - 
       - - - q - - - - 
       - - - - - - - - 
@@ -1420,9 +1460,9 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_queen_attack(D4)
 
     expected = "
-      - - - - - - - -
-      * - - - - - - -
-      - * - - - - - -
+      - - - - - - - *
+      * - - - - - * -
+      - * - - - * - -
       - - * * * - - -
       * * * - * * * * 
       - - * * * - - - 

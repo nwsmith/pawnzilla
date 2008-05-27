@@ -367,6 +367,25 @@ class GameState
   # Start bit-vector helpers
   # ---------------------------------------------------------------------------
   
+  def self.get_coord_for_bv(bv) 
+    # only one bit can be set for this to be a legal square bv
+    raise ArgumentError, "Illegal bv for square" unless bv & -bv == bv    
+
+    # TODO: This is so inefficient it hurts, but will do for now
+    0.upto(7) do |x|
+      0.upto(7) do |y|
+        coord = Coord.new(x, y)
+        if 0x01 << get_sw(coord) == bv
+          return coord
+        end
+      end
+    end
+  end
+  
+  def get_coord_for_bv(bv)
+    GameState.get_coord_for_bv(bv)
+  end
+  
   # get the shift width required to get the square specified by the provided 
   # coord
   #
@@ -819,6 +838,53 @@ class GameState
   end
   
   def calculate_colour_attack(clr)
+    #TODO: This could be refactored to be a lot nicer...
+    pawn_bv = @clr_pos[clr] & @pos[Chess::Piece::PAWN]
+    0.upto(63) do |i|
+      bv = 0x1 << i
+      if bv & pawn_bv == bv
+        @attack[clr][Chess::Piece::PAWN] = \
+          calculate_pawn_attack(get_coord_for_bv(bv))
+      end
+    end
+    
+    knight_bv = @clr_pos[clr] & @pos[Chess::Piece::KNIGHT]
+    0.upto(63) do |i|
+      bv = 0x1 << i
+      if bv & knight_bv == bv
+        @attack[clr][Chess::Piece::KNIGHT] = \
+          calculate_knight_attack(get_coord_for_bv(bv))
+      end
+    end
+    
+    bishop_bv = @clr_pos[clr] & @pos[Chess::Piece::BISHOP]
+    0.upto(63) do |i|
+      bv = 0x1 << i
+      if bv & bishop_bv == bv
+        @attack[clr][Chess::Piece::BISHOP] = \
+          calculate_bishop_attack(get_coord_for_bv(bv))
+      end
+    end
+    
+    rook_bv = @clr_pos[clr] & @pos[Chess::Piece::ROOK]
+    0.upto(63) do |i|
+      bv = 0x1 << i
+      if bv & rook_bv == bv
+        @attack[clr][Chess::Piece::ROOK] = \
+          calculate_rook_attack(get_coord_for_bv(bv))
+      end
+    end
+    
+    queen_bv = @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
+    0.upto(63) do |i|
+      bv = 0x1 << i
+      if bv & queen_bv == bv
+        @attack[clr][Chess::Piece::QUEEN] = \
+          calculate_queen_attack(get_coord_for_bv(bv))
+      end
+    end
+    
+    @attack[clr][Chess::Piece::KING] = calculate_king_attack(clr)
     @attack[clr].values.inject(0) {|bv, val| bv | val}
   end
   
