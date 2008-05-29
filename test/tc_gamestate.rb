@@ -2159,14 +2159,14 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - q - - - - ")
     expected = "
-    - - - @ - - - -
-    - - - @ - - - -
-    - - - @ - - - -
-    - - - @ - - - @
-    @ - - @ - - @ -
-    - @ - @ - @ - - 
-    - - @ @ @ - - - 
-    @ @ @ - @ @ @ @"
+      - - - @ - - - -
+      - - - @ - - - -
+      - - - @ - - - -
+      - - - @ - - - @
+      @ - - @ - - @ -
+      - @ - @ - @ - - 
+      - - @ @ @ - - - 
+      @ @ @ - @ @ @ @"
     assert_move_state(e, expected, D1)    
   end
 
@@ -2239,6 +2239,78 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, D1)    
   end
     
+  #------
+  # King
+  # ------
+  def test_calculate_king_move_should_work_from_start_square
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - k - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - @ @ @ - - 
+      - - - @ - @ - -"
+    assert_move_state(e, expected, E1)    
+  end 
+  
+  def test_calculate_king_move_should_work_for_center_king
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - k - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - @ @ @ - - -
+      - - @ - @ - - -
+      - - @ @ @ - - - 
+      - - - - - - - - 
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)    
+  end
+  
+  def test_calculate_king_move_should_not_allow_moving_into_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - R - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - k - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - @ @ - - 
+      - - - - - @ - -"
+    assert_move_state(e, expected, E1)    
+  end
+  
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  
@@ -2485,6 +2557,36 @@ class TestGameState < Test::Unit::TestCase
       - - - - k - - r 
     ")
     assert(e.chk_mv(E1, G1)) 
+  end
+  
+  def test_white_king_should_be_able_to_move_west
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - - 
+      ")
+    assert(e.chk_mv(E1, D1))
+  end
+  
+  def test_white_king_should_not_be_able_to_move_into_check
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - R - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - k - - - 
+      ")
+    assert(!e.chk_mv(E1, D1))
   end
   
   def test_white_king_should_have_queenside_castling_available

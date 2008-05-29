@@ -278,7 +278,8 @@ class GameState
       Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
       Chess::Piece::BISHOP => method(:calc_all_mv_bishop),
       Chess::Piece::ROOK => method(:calc_all_mv_rook),
-      Chess::Piece::QUEEN => method(:calc_all_mv_queen)
+      Chess::Piece::QUEEN => method(:calc_all_mv_queen),
+      Chess::Piece::KING => method(:calc_all_mv_king)
     }
 
     @clr_pos = {
@@ -1074,6 +1075,21 @@ class GameState
   def calc_all_mv_queen(src)
     return calculate_queen_attack(src)
   end
+  
+  def calc_all_mv_king(src) 
+    mv_bv = 0x0
+    
+    mv_bv |= get_bv src.west if chk_mv src, src.west
+    mv_bv |= get_bv src.northwest if chk_mv src, src.northwest
+    mv_bv |= get_bv src.north if chk_mv src, src.north
+    mv_bv |= get_bv src.northeast if chk_mv src, src.northeast
+    mv_bv |= get_bv src.east if chk_mv src, src.east
+    mv_bv |= get_bv src.southeast if chk_mv src, src.southeast
+    mv_bv |= get_bv src.south if chk_mv src, src.south
+    mv_bv |= get_bv src.southwest if chk_mv src, src.southwest
+
+    mv_bv
+  end
   #----------------------------------------------------------------------------
   # End potential move calculation
   #---------------------------------------------------------------------------- 
@@ -1166,27 +1182,22 @@ class GameState
     l = Line.new(src, dest)
     
     king = sq_at(src).piece
-    
-    #TODO: this is probably better verified as part of game state
-    in_start_position = king.colour.white? \
-      ? src == Coord.from_alg("e1") \
-      : src == Coord.from_alg("e8")
-    
-    # King can only move one square unless castling
-    if (not in_start_position) or (not can_castle?(king.colour)) 
-      return false unless l.len == 1
-    else
-      return false unless l.len == 3
-    end
 
+    # King can only move one square unless castling
     if (l.len == 3) 
+      return false unless can_castle? king.colour
+      
       # Castling is only left/right
       return false unless src.on_rank?(dest)      
       
       l.each_coord do |coord|
         return false if attacked?(king.colour.flip, coord)
       end
-    end  
+      
+      return true
+    end 
+
+    return false unless l.len == 2 and not attacked? king.colour.flip, dest
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
