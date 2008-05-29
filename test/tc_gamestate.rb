@@ -2311,6 +2311,28 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, E1)    
   end
   
+  def test_calculate_king_move_should_allow_no_moves_for_checkmate
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - p p p 
+      - - - - R - - k")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -"
+    assert_move_state(e, expected, H1)    
+  end
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  
@@ -2544,6 +2566,21 @@ class TestGameState < Test::Unit::TestCase
   #------
   # King
   #------
+  def test_white_king_should_not_be_able_to_wrap_around_board_bugfix
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - k 
+      ")
+    assert(!e.chk_mv(H1, Coord.new(8, 1)))
+  end
+  
   def test_white_king_should_have_kingside_castling_available
     e = GameState.new
     place_pieces(e, "
@@ -2783,7 +2820,31 @@ class TestGameState < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E8, C8))    
   end
+
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 
+  
+  #----------------------------------------------------------------------------
+  # Start checkmate detection testing
+  #----------------------------------------------------------------------------
+  def test_should_detect_back_rank_mate
+    e = GameState.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - p p p   
+      - - - R - - - k 
+      ")
+    assert(e.checkmate?)
+  end 
+  
+  #----------------------------------------------------------------------------
+  # End checkmate detection testing
+  #---------------------------------------------------------------------------- 
+
 end

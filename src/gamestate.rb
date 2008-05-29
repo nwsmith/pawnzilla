@@ -1097,8 +1097,10 @@ class GameState
   # Start legal move checks
   #---------------------------------------------------------------------------- 
   def chk_mv(src, dest) 
-    return false if src.x < 0 || src.y < 0
-    return false if dest.x < 0 || dest.y < 0
+    return false if src.x < 0 or src.y < 0
+    return false if dest.x < 0 or dest.y < 0
+    return false if src.x > 7 or src.y > 7
+    return false if dest.x > 7 or dest.y > 7
     pc = sq_at(src).piece
     pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
   end
@@ -1201,8 +1203,7 @@ class GameState
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
-    
-    (!dest_pc.nil? && !king.color.opposite?(dest_pc.color)) || true
+    dest_pc.nil? || king.colour.opposite?(dest_pc.colour)
   end
   
   def chk_mv_knight(src, dest) 
@@ -1218,5 +1219,15 @@ class GameState
   #----------------------------------------------------------------------------
   # Start legal move checks
   #---------------------------------------------------------------------------- 
-
+  #----------------------------------------------------------------------------
+  # Start checkmate detection
+  #---------------------------------------------------------------------------- 
+  def checkmate?
+    src = get_coord_for_bv(@clr_pos[Colour::WHITE] & @pos[Chess::Piece::KING])
+    
+    calc_all_mv_king(src) == 0 and attacked? Colour::BLACK, src
+  end
+  #----------------------------------------------------------------------------
+  # End checkmate detection
+  #---------------------------------------------------------------------------- 
 end
