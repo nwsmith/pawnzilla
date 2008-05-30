@@ -24,7 +24,7 @@ puts
 puts "Copyright 2005 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
 puts
 
-e = GameState.new
+e = RulesEngine.new
 move_list = []
 
 # Main Game Loop

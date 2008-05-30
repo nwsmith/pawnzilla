@@ -24,7 +24,7 @@ require "gamestate"
 
 class MoveTest < Test::Unit::TestCase
   def setup
-    @state = GameState.new
+    @state = RulesEngine.new
     @state.clear
     @w_p = Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN)
   end

@@ -144,7 +144,7 @@ class Test::Unit::TestCase
     actual = ""
 
     0.upto(63) do |i|
-      i_bv = GameState.get_bv(Coord.from_alg(get_alg_coord_notation(i)));
+      i_bv = RulesEngine.get_bv(Coord.from_alg(get_alg_coord_notation(i)));
       actual += i_bv & mv_bv == i_bv ? "@" : "-"
     end
     
@@ -228,7 +228,7 @@ class Test::Unit::TestCase
     bv_str = "";
     0.upto(63) do |i|
       coord = Coord.from_alg(get_alg_coord_notation(i))
-      bv_str += ((0x1 << GameState.get_sw(coord)) & bv != 0) ? "*" : "-"
+      bv_str += ((0x1 << RulesEngine.get_sw(coord)) & bv != 0) ? "*" : "-"
     end
 
     bv_str

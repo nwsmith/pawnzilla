@@ -90,29 +90,29 @@ end
 
 class TestGameState < Test::Unit::TestCase
   def setup 
-    @board = GameState.new
+    @board = RulesEngine.new
   end
   #----------------------------------------------------------------------------
   # Start bit-vector helper tests
   #----------------------------------------------------------------------------
   def test_get_coord_from_bv_should_fail_when_more_than_one_bit_set
-    assert_raises(ArgumentError) {GameState.get_coord_for_bv(0x03)}    
+    assert_raises(ArgumentError) {RulesEngine.get_coord_for_bv(0x03)}    
   end
   
   def test_get_coord_from_bv_should_not_faile_when_one_bit_set
-    assert_nothing_raised {GameState.get_coord_for_bv(0x02)} 
+    assert_nothing_raised {RulesEngine.get_coord_for_bv(0x02)} 
   end
   
   def test_get_coord_from_bv_should_return_H8
-    assert_equal H8, GameState.get_coord_for_bv(0x00_00_00_00_00_00_00_01) 
+    assert_equal H8, RulesEngine.get_coord_for_bv(0x00_00_00_00_00_00_00_01) 
   end
   
   def test_get_coord_from_bv_should_return_A1
-    assert_equal A1, GameState.get_coord_for_bv(0x80_00_00_00_00_00_00_00)
+    assert_equal A1, RulesEngine.get_coord_for_bv(0x80_00_00_00_00_00_00_00)
   end
   
   def test_get_sw_should_get_correct_value_for_H8
-    assert_equal GameState.get_sw(H8), 0
+    assert_equal RulesEngine.get_sw(H8), 0
   end
   #----------------------------------------------------------------------------
   # End bit-vector helper tests
@@ -147,7 +147,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_attacked_should_work_for_simple_file_attack
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -162,7 +162,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_attacked_should_work_for_simple_file_attack_on_C1_bug
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -178,7 +178,7 @@ class TestGameState < Test::Unit::TestCase
  
   # TODO: Fix assert_blocked_state
   def test_blocked
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -272,7 +272,7 @@ class TestGameState < Test::Unit::TestCase
     #assert_blocked_state(expected, b, C4)
 
     # Unit test for a bug condition -> Rook can hop a pawn
-    b = GameState.new()
+    b = RulesEngine.new()
     expected = "
       ******--
       --------
@@ -288,11 +288,11 @@ class TestGameState < Test::Unit::TestCase
   end
  
   def test_on_diagonal_nw_se
-    b = GameState.new
+    b = RulesEngine.new
     
-    bv1_6 = 0x1 << GameState.get_sw(Coord.new(1, 6))
-    bv2_5 = 0x1 << GameState.get_sw(Coord.new(2, 5))
-    bv5_2 = 0x1 << GameState.get_sw(Coord.new(5, 2))
+    bv1_6 = 0x1 << RulesEngine.get_sw(Coord.new(1, 6))
+    bv2_5 = 0x1 << RulesEngine.get_sw(Coord.new(2, 5))
+    bv5_2 = 0x1 << RulesEngine.get_sw(Coord.new(5, 2))
     
     assert(b.on_diagonal?(bv1_6, bv2_5))
     assert(b.on_diagonal?(bv2_5, bv5_2))
@@ -304,11 +304,11 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_on_diagonal_sw_ne
-    b = GameState.new
+    b = RulesEngine.new
     
-    bv1_3 = 0x1 << GameState.get_sw(Coord.new(1, 3))
-    bv2_4 = 0x1 << GameState.get_sw(Coord.new(2, 4))
-    bv3_5 = 0x1 << GameState.get_sw(Coord.new(3, 5))
+    bv1_3 = 0x1 << RulesEngine.get_sw(Coord.new(1, 3))
+    bv2_4 = 0x1 << RulesEngine.get_sw(Coord.new(2, 4))
+    bv3_5 = 0x1 << RulesEngine.get_sw(Coord.new(3, 5))
     
     assert(b.on_diagonal?(bv1_3, bv2_4))
     assert(b.on_diagonal?(bv1_3, bv3_5))
@@ -320,11 +320,11 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_on_file? 
-    b = GameState.new;
+    b = RulesEngine.new;
     
-    bv0_7 = 0x01 << GameState.get_sw(Coord.new(0, 7))
-    bv0_4 = 0x01 << GameState.get_sw(Coord.new(0, 4))
-    bv4_7 = 0x01 << GameState.get_sw(Coord.new(4, 7))
+    bv0_7 = 0x01 << RulesEngine.get_sw(Coord.new(0, 7))
+    bv0_4 = 0x01 << RulesEngine.get_sw(Coord.new(0, 4))
+    bv4_7 = 0x01 << RulesEngine.get_sw(Coord.new(4, 7))
     
     assert(b.on_file?(bv0_7, bv0_4))
     assert(b.on_file?(bv0_4, bv0_7))
@@ -336,93 +336,93 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_on_rank_on_bottom_should_be_true_both_directions
-    b = GameState.new
-    a1_bv = 0x01 << GameState.get_sw(A1)
-    h1_bv = 0x01 << GameState.get_sw(H1)
+    b = RulesEngine.new
+    a1_bv = 0x01 << RulesEngine.get_sw(A1)
+    h1_bv = 0x01 << RulesEngine.get_sw(H1)
     
     assert(b.on_rank?(a1_bv, h1_bv))
     assert(b.on_rank?(h1_bv, a1_bv))
   end  
   
   def test_on_rank_on_top_should_be_true_both_directions
-    b = GameState.new
-    a8_bv = 0x01 << GameState.get_sw(A8)
-    h8_bv = 0x01 << GameState.get_sw(H8)
+    b = RulesEngine.new
+    a8_bv = 0x01 << RulesEngine.get_sw(A8)
+    h8_bv = 0x01 << RulesEngine.get_sw(H8)
     
     assert(b.on_rank?(a8_bv, h8_bv))
     assert(b.on_rank?(h8_bv, a8_bv))
   end
   
   def test_on_rank_in_centre_should_be_true_both_directions
-    b = GameState.new
-    a4_bv = 0x01 << GameState.get_sw(A4)
-    h4_bv = 0x01 << GameState.get_sw(H4)
+    b = RulesEngine.new
+    a4_bv = 0x01 << RulesEngine.get_sw(A4)
+    h4_bv = 0x01 << RulesEngine.get_sw(H4)
     
     assert(b.on_rank?(a4_bv, h4_bv))
     assert(b.on_rank?(h4_bv, a4_bv))
   end
   
   def test_on_rank_should_not_be_true_for_same_file
-    b = GameState.new
-    a1_bv = 0x01 << GameState.get_sw(A1)
-    a8_bv = 0x01 << GameState.get_sw(A8)
+    b = RulesEngine.new
+    a1_bv = 0x01 << RulesEngine.get_sw(A1)
+    a8_bv = 0x01 << RulesEngine.get_sw(A8)
     
     assert(!b.on_rank?(a1_bv, a8_bv))
     assert(!b.on_rank?(a8_bv, a1_bv))
   end
   
   def test_on_rank_shold_not_be_true_for_same_diagonal
-    b = GameState.new
-    a1_bv = 0x01 << GameState.get_sw(A1)
-    h8_bv = 0x01 << GameState.get_sw(H8)
+    b = RulesEngine.new
+    a1_bv = 0x01 << RulesEngine.get_sw(A1)
+    h8_bv = 0x01 << RulesEngine.get_sw(H8)
     
     assert(!b.on_rank?(a1_bv, h8_bv))
     assert(!b.on_rank?(h8_bv, a1_bv))
   end
   
   def test_find_east_edge
-    assert_equal(GameState.get_bv(Coord.new(7, 7)), 
-           GameState.find_east_edge(GameState.get_bv(Coord.new(3, 7))))
-    assert_equal(GameState.get_bv(Coord.new(7, 0)),
-           GameState.find_east_edge(GameState.get_bv(Coord.new(4, 0))))           
+    assert_equal(RulesEngine.get_bv(Coord.new(7, 7)), 
+           RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(3, 7))))
+    assert_equal(RulesEngine.get_bv(Coord.new(7, 0)),
+           RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(4, 0))))           
   end    
   
   def test_find_west_edge
-    assert_equal(GameState.get_bv(Coord.new(0, 7)),
-           GameState.find_west_edge(GameState.get_bv(Coord.new(3, 7))))
-    assert_equal(GameState.get_bv(Coord.new(0, 0)),
-           GameState.find_west_edge(GameState.get_bv(Coord.new(4, 0))))           
+    assert_equal(RulesEngine.get_bv(Coord.new(0, 7)),
+           RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(3, 7))))
+    assert_equal(RulesEngine.get_bv(Coord.new(0, 0)),
+           RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(4, 0))))           
   end           
   
   def test_get_file
-    assert_equal(7, GameState.get_file(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(3, GameState.get_file(GameState.get_bv(Coord.new(3, 4))))
+    assert_equal(7, RulesEngine.get_file(RulesEngine.get_bv(Coord.new(7, 7))))
+    assert_equal(3, RulesEngine.get_file(RulesEngine.get_bv(Coord.new(3, 4))))
   end
   
   def test_get_file_mask
-    assert_equal(GameState::FILE_MASKS[7], GameState.get_file_mask(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(GameState::FILE_MASKS[3], GameState.get_file_mask(GameState.get_bv(Coord.new(3, 4))))
+    assert_equal(RulesEngine::FILE_MASKS[7], RulesEngine.get_file_mask(RulesEngine.get_bv(Coord.new(7, 7))))
+    assert_equal(RulesEngine::FILE_MASKS[3], RulesEngine.get_file_mask(RulesEngine.get_bv(Coord.new(3, 4))))
   end
 
   def test_get_bv
-    assert_equal(GameState.get_bv(Coord.new(7, 7)), (0x1 << GameState.get_sw(Coord.new(7, 7))))
+    assert_equal(RulesEngine.get_bv(Coord.new(7, 7)), (0x1 << RulesEngine.get_sw(Coord.new(7, 7))))
   end      
   
   def test_get_rank
-    assert_equal(7, GameState.get_rank(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(4, GameState.get_rank(GameState.get_bv(Coord.new(3, 4))))
+    assert_equal(7, RulesEngine.get_rank(RulesEngine.get_bv(Coord.new(7, 7))))
+    assert_equal(4, RulesEngine.get_rank(RulesEngine.get_bv(Coord.new(3, 4))))
   end
   
   def test_get_rank_mask
-    assert_equal(GameState::RANK_MASKS[7], GameState.get_rank_mask(GameState.get_bv(Coord.new(7, 7))))
-    assert_equal(GameState::RANK_MASKS[4], GameState.get_rank_mask(GameState.get_bv(Coord.new(3, 4))))
+    assert_equal(RulesEngine::RANK_MASKS[7], RulesEngine.get_rank_mask(RulesEngine.get_bv(Coord.new(7, 7))))
+    assert_equal(RulesEngine::RANK_MASKS[4], RulesEngine.get_rank_mask(RulesEngine.get_bv(Coord.new(3, 4))))
   end    
   
   def test_on_board
-    assert(GameState.on_board?(GameState.get_bv(Coord.new(7, 7))))
-    assert(GameState.on_board?(GameState.get_bv(Coord.new(0, 0))))
-    assert(!GameState.on_board?(GameState.get_bv(Coord.new(7, 8))))
-    assert(!GameState.on_board?(GameState.get_bv(Coord.new(8, 7))))
+    assert(RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(7, 7))))
+    assert(RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(0, 0))))
+    assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(7, 8))))
+    assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(8, 7))))
   end  
   #----------------------------------------------------------------------------
   # End board helper tests
@@ -432,7 +432,7 @@ class TestGameState < Test::Unit::TestCase
   # Start piece helper tests
   #----------------------------------------------------------------------------
   def test_move_should_not_change_peice_properties
-    board = GameState.new()
+    board = RulesEngine.new()
     src = A2
     dest = A3
     board.move_piece(src, dest)
@@ -443,7 +443,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_move_should_not_chance_peice_colour
-    board = GameState.new()
+    board = RulesEngine.new()
     src = D7
     dest = D5
     board.move_piece(src, dest);
@@ -456,7 +456,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_should_be_able_to_castle_kingside
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -482,7 +482,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_should_be_able_to_castle_queenside
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -508,7 +508,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_should_be_able_to_castle_kingside
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - K - - R
       - - - - - - - -
@@ -534,7 +534,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_black_should_be_able_to_castle_queenside
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       R - - - K - - -
       - - - - - - - -
@@ -560,14 +560,14 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_should_modify_piece_info_after_move
-    board = GameState.new
+    board = RulesEngine.new
     board.move_piece(E2, E4)
     #assert_nil(board.piece_info_bag.pcfcoord(E2))
     assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), board.piece_info_bag.pcfcoord(E4).piece)
   end
   
   def test_place_piece_should_place_proper_peice_and_colour
-    board = GameState.new()
+    board = RulesEngine.new()
     coord = A6
     piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
     board.place_piece(coord, piece)
@@ -578,7 +578,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_should_place_piece_over_existing_piece
-    board = GameState.new()
+    board = RulesEngine.new()
     coord = A6
     piece = Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK)
     board.place_piece(coord, Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN))
@@ -590,7 +590,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_remove_piece
-    board = GameState.new()
+    board = RulesEngine.new()
     coord = A1
     board.remove_piece(coord)
     square = board.sq_at(coord)
@@ -613,7 +613,7 @@ class TestGameState < Test::Unit::TestCase
   # Pawn
   #------
   def test_white_pawn_in_centre_should_attack_upwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -640,7 +640,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_in_centre_should_attack_downwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -668,7 +668,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_on_left_edge_should_attack_upwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -696,7 +696,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_on_left_edge_should_attack_downwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -724,7 +724,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_on_right_edge_should_attack_upwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -753,7 +753,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_on_right_edge_should_attack_downwards()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -781,7 +781,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_on_top_edge_should_not_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       ---p----
       --------
@@ -808,7 +808,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_on_bottem_edge_should_not_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
     b.clear()
     bv = b.calculate_pawn_attack(D1)
 
@@ -827,7 +827,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_on_bottem_edge_should_not_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -857,7 +857,7 @@ class TestGameState < Test::Unit::TestCase
   # Knight 
   #--------
   def test_corner_knights_should_attack_middle()
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       n------n
       --------
@@ -889,7 +889,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_centre_knight_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -920,7 +920,7 @@ class TestGameState < Test::Unit::TestCase
   # Bishop 
   #--------
   def test_lower_left_corner_bishop_should_attack_diagonally()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -948,7 +948,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_lower_right_corner_bishop_should_attack_diagonally()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -976,7 +976,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_upper_left_corner_bishop_should_attack_diagonally()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       b-------
@@ -1004,7 +1004,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_upper_right_corner_bishop_should_attack_diagonally()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       -------b
@@ -1032,7 +1032,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_centre_bishop_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1060,7 +1060,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_centre_bishop_attacks_should_be_blockable()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1088,7 +1088,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_centre_bishop_attacks_should_be_blockable_by_own_bishop()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1116,7 +1116,7 @@ class TestGameState < Test::Unit::TestCase
   end  
   
   def test_bottom_bishop_should_attack_diagonally_adjacent_opposing_piece()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1147,7 +1147,7 @@ class TestGameState < Test::Unit::TestCase
   # Rook
   #------
   def test_rook_attack_in_corner_should_attack_like_an_l
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -1175,7 +1175,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_only_one_rook_attack_should_be_generated
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -1204,7 +1204,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_rook_should_not_attack_diagonally_bugfix
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -1233,7 +1233,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_center_rook_should_attack_file_and_rank
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       --------
@@ -1261,7 +1261,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_pieces_should_block_rook_attack
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       ---P----
@@ -1289,7 +1289,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_own_pieces_should_block_rook_attack
-    b = GameState.new()
+    b = RulesEngine.new()
     place_pieces(b, "
       --------
       ---P----
@@ -1317,7 +1317,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_rook_of_own_colour_should_block_on_rank_and_file()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       - - - - - - - -
@@ -1348,7 +1348,7 @@ class TestGameState < Test::Unit::TestCase
   # Queen 
   #-------
   def test_corner_queen_should_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1376,7 +1376,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_bottom_queen_should_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1404,7 +1404,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_centre_queen_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1432,7 +1432,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_centre_queen_attack_should_be_blockable()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1460,7 +1460,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_centre_queen_attack_should_be_blockable_by_own_colour()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       - - - - - - - -
@@ -1488,7 +1488,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_centre_queen_attack_should_be_blockable_by_own_colour_queens()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       - - - - - - - -
@@ -1519,7 +1519,7 @@ class TestGameState < Test::Unit::TestCase
   # King 
   #------
   def test_centre_king_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1547,7 +1547,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_left_king_should_attack()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1575,7 +1575,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_right_king_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1603,7 +1603,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_top_king_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       ---k----
@@ -1631,7 +1631,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_bottom_king_should_attack_outwards()
-    b = GameState.new()
+    b = RulesEngine.new()
 
     place_pieces(b, "
       --------
@@ -1668,7 +1668,7 @@ class TestGameState < Test::Unit::TestCase
   # Pawn
   #--------  
   def test_check_calculate_white_pawn_move
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - - 
       - - - - - - - - 
@@ -1693,7 +1693,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_check_calculate_black_pawn_move
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - - 
       - - - - - - - - 
@@ -1718,7 +1718,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_check_calculate_blocked_white_pawn_move
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - - 
@@ -1743,7 +1743,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_check_calculate_blocked_black_pawn_move
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - P - - - - - 
@@ -1768,7 +1768,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_white_pawn_move_should_work_for_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1791,7 +1791,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_calculate_black_pawn_move_should_work_for_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - P - - - -
@@ -1814,7 +1814,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_white_pawn_move_should_include_captures
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1837,7 +1837,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_black_pawn_move_should_include_captures
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - P - - - -
@@ -1863,7 +1863,7 @@ class TestGameState < Test::Unit::TestCase
   # Knight
   #--------
   def test_calculate_white_knight_moves_should_work_for_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1886,7 +1886,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_white_knight_moves_should_work_from_mid_board
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1909,7 +1909,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_white_knight_moves_should_work_from_board_edge
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1932,7 +1932,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_black_knight_moves_should_work_for_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - N - - - - - -
       - - - - - - - -
@@ -1955,7 +1955,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_black_knight_moves_should_work_from_mid_board
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -1978,7 +1978,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_black_knight_moves_should_work_from_board_edge
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2004,7 +2004,7 @@ class TestGameState < Test::Unit::TestCase
   # Bishop
   #--------
   def test_calculate_bishop_move_should_work_from_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2027,7 +2027,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_bishop_move_should_stop_with_opposing_pieces
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2050,7 +2050,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_calculate_bishop_move_should_stop_with_same_colour_pieces
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2073,7 +2073,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_calculate_bishop_move_should_stop_with_same_colour_bishops
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2099,7 +2099,7 @@ class TestGameState < Test::Unit::TestCase
   # Rook
   #------
   def test_calculate_rook_move_should_work_from_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2122,7 +2122,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_rook_move_should_work_with_other_piece_around
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2148,7 +2148,7 @@ class TestGameState < Test::Unit::TestCase
   # Queen
   #-------
   def test_calculate_queen_move_should_work_from_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2171,7 +2171,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_calculate_queen_move_should_be_stopped_by_opposing_pieces
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2194,7 +2194,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_queen_move_should_be_stopped_by_friendly_pieces
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2217,7 +2217,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_queen_move_should_be_stopped_by_friendly_queens
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2243,7 +2243,7 @@ class TestGameState < Test::Unit::TestCase
   # King
   # ------
   def test_calculate_king_move_should_work_from_start_square
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2266,7 +2266,7 @@ class TestGameState < Test::Unit::TestCase
   end 
   
   def test_calculate_king_move_should_work_for_center_king
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2289,7 +2289,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_king_move_should_not_allow_moving_into_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2312,7 +2312,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_calculate_king_move_should_allow_no_moves_for_checkmate
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2345,7 +2345,7 @@ class TestGameState < Test::Unit::TestCase
   # Pawn
   #------
   def test_chk_mv_pawn
-    e = GameState.new
+    e = RulesEngine.new
     
     # cannot move a "pawn" from an empty square
     assert_equal(e.chk_mv(Coord.from_alg('e3'), Coord.from_alg('e4')), false)
@@ -2377,7 +2377,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_should_have_en_passant_available_NW
-    e = GameState.new
+    e = RulesEngine.new
 
     place_pieces(e, "
       - - - - - - - -
@@ -2394,7 +2394,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_should_have_en_passant_available_NE
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2410,7 +2410,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_should_not_have_en_passant_available_if_not_pawn
-    e = GameState.new
+    e = RulesEngine.new
     
     place_pieces(e, "
       - - - - - - - - 
@@ -2427,7 +2427,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_white_pawn_should_not_have_en_passant_available_if_one_square_moved
-    e = GameState.new
+    e = RulesEngine.new
 
     place_pieces(e, "
       - - - - - - - -
@@ -2444,7 +2444,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_should_have_en_passant_available_SW
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2460,7 +2460,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_should_have_en_passant_available_SE
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2476,7 +2476,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_should_not_have_en_passant_available_if_not_pawn
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2492,7 +2492,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_pawn_should_not_have_en_passant_available_if_one_square_moved 
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2509,7 +2509,7 @@ class TestGameState < Test::Unit::TestCase
   
   def test_pawn_blocks_pawn
     # Unit test for a bug condition -> Pawns don't seem to be blocked
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - - 
       - - - - - - - - 
@@ -2527,7 +2527,7 @@ class TestGameState < Test::Unit::TestCase
   # Knight
   #--------
   def test_bug_chk_knight_move_allows_moving_to_h1_from_b1
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2545,7 +2545,7 @@ class TestGameState < Test::Unit::TestCase
   # Bishop
   #--------
   def test_check_mv_bishop
-    e = GameState.new
+    e = RulesEngine.new
     
     # cannot move a blocked bishop
     assert(!e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
@@ -2559,7 +2559,7 @@ class TestGameState < Test::Unit::TestCase
   #------
   def test_rook_cannot_hop_pawn
     # Unit test for a bug condition -> Rook can hop a pawn
-    e = GameState.new
+    e = RulesEngine.new
     assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
   end
   
@@ -2567,7 +2567,7 @@ class TestGameState < Test::Unit::TestCase
   # King
   #------
   def test_white_king_should_not_be_able_to_wrap_around_board_bugfix
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2582,7 +2582,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_should_have_kingside_castling_available
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2597,7 +2597,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_should_be_able_to_move_west
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2612,7 +2612,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_should_not_be_able_to_move_into_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2627,7 +2627,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_should_have_queenside_castling_available
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2642,7 +2642,7 @@ class TestGameState < Test::Unit::TestCase
   end
 
   def test_black_king_should_have_kingside_castling_available
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - K - - R
       - - - - - - - -
@@ -2657,7 +2657,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_should_have_queenside_castling_available
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       R - - - K - - -
       - - - - - - - -
@@ -2672,7 +2672,7 @@ class TestGameState < Test::Unit::TestCase
   end
    
   def test_white_king_cannot_castle_kingside_through_file_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2687,7 +2687,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_cannot_castle_kingside_when_destination_is_attacked
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2702,7 +2702,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_cannot_castle_kingside_through_diagaonal_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2717,7 +2717,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_white_king_cannot_castle_queenside_through_file_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2732,7 +2732,7 @@ class TestGameState < Test::Unit::TestCase
   end  
   
   def test_white_king_cannot_castle_queenside_when_destination_attacked
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2747,7 +2747,7 @@ class TestGameState < Test::Unit::TestCase
   end  
   
   def test_white_king_cannot_castle_queenside_through_diagonal_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
@@ -2762,7 +2762,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_black_king_cannot_castle_kingside_through_file_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - K - - R
       - - - - - - - -
@@ -2777,7 +2777,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_black_king_cannot_castle_kingside_through_diagonal_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - K - - R
       - - - - - - - -
@@ -2792,7 +2792,7 @@ class TestGameState < Test::Unit::TestCase
   end  
   
   def test_black_king_cannot_castle_queenside_through_file_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       R - - - K - - -
       - - - - - - - -
@@ -2807,7 +2807,7 @@ class TestGameState < Test::Unit::TestCase
   end
   
   def test_black_king_canot_castle_queenside_through_diagonal_check
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       R - - - K - - -
       - - - - - - - -
@@ -2829,7 +2829,7 @@ class TestGameState < Test::Unit::TestCase
   # Start checkmate detection testing
   #----------------------------------------------------------------------------
   def test_should_detect_back_rank_mate
-    e = GameState.new
+    e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -

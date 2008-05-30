@@ -28,7 +28,7 @@ module Network
     @move_cnt
 
     def initialize()
-      @engine = GameState.new
+      @engine = RulesEngine.new
       @move_cnt = 0
     end
 

@@ -228,7 +228,7 @@ class PieceInfoBag
   end
 end
 
-class GameState
+class RulesEngine
   DEFAULT_SEPARATOR = ' '
 
   RANK_MASKS = [
@@ -384,7 +384,7 @@ class GameState
   end
   
   def get_coord_for_bv(bv)
-    GameState.get_coord_for_bv(bv)
+    RulesEngine.get_coord_for_bv(bv)
   end
   
   # get the shift width required to get the square specified by the provided 
@@ -397,7 +397,7 @@ class GameState
   end
 
   def get_sw(coord) 
-    GameState.get_sw(coord)
+    RulesEngine.get_sw(coord)
   end
   
   # get a bitvector with a single bit set, representing the square at the 
@@ -407,7 +407,7 @@ class GameState
   end
 
   def get_bv(coord) 
-    GameState.get_bv(coord)
+    RulesEngine.get_bv(coord)
   end  
 
   def self.pp_bv
@@ -450,7 +450,7 @@ class GameState
     # or: 
     # 
     # 2^(board_size*(board_size - 1 - rank))
-    0x1 << ((7 - GameState.get_rank(bv)) << 3)
+    0x1 << ((7 - RulesEngine.get_rank(bv)) << 3)
   end
 
   def self.find_west_edge(bv)
@@ -464,7 +464,7 @@ class GameState
     # or:
     # 
     # 2^(board_size*(board_size - 1 - rank) + (board_size - 1))
-    0x1 << (((7 - GameState.get_rank(bv)) << 3) + 7)
+    0x1 << (((7 - RulesEngine.get_rank(bv)) << 3) + 7)
   end 
 
   def self.get_file(bv)
@@ -566,8 +566,8 @@ class GameState
   end 
   
   def sq_at(coord) 
-    square = Chess::Square.new(coord, GameState.clrfcoord(coord))
-    mask = GameState.get_bv(coord)
+    square = Chess::Square.new(coord, RulesEngine.clrfcoord(coord))
+    mask = RulesEngine.get_bv(coord)
     
     # Look for a piece of either colour in that square
     piece = nil
@@ -938,8 +938,8 @@ class GameState
       return 0            
     end
     
-    left_edge = GameState.find_west_edge(attacking_piece)
-    right_edge = GameState.find_east_edge(attacking_piece)
+    left_edge = RulesEngine.find_west_edge(attacking_piece)
+    right_edge = RulesEngine.find_east_edge(attacking_piece)
     
     chk_cell = attacking_piece
     loop do
