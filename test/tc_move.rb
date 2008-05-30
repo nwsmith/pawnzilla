@@ -20,7 +20,7 @@ require "test/unit"
 require "pz_unit"
 require "colour"
 require "move"
-require "gamestate"
+require "rulesengine"
 
 class MoveTest < Test::Unit::TestCase
   def setup
