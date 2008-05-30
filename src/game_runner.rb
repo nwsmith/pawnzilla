@@ -14,13 +14,14 @@ class GameRunner
     return @rules_engine.checkmate?(Colour::WHITE) || \
       @rules_engine.checkmate?(Colour::BLACK)
   end
-  
+    
   def move
     move = @to_move.white? \
       ? @white_move_engine.get_move(@to_move, @rules_engine) \
       : @black_move_engine.get_move(@to_move, @rules_engine)
     @rules_engine.move!(move.src, move.dest)
     @to_move = @to_move.flip
+    move
   end
   
   def to_move

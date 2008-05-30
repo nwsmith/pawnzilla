@@ -41,7 +41,9 @@ loop do
   puts runner.rules_engine.to_txt
   puts
   
-  runner.move
+  move = runner.move
+  
+  puts "#{move.src.to_alg}-#{move.dest.to_alg}"
 end
 #  
 #  

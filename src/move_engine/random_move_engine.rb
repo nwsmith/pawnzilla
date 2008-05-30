@@ -13,7 +13,6 @@ class RandomMoveEngine < MoveEngine
       coord = gamestate.get_coord_for_bv(bv)
       piece = gamestate.sq_at(coord).piece
       if (!piece.nil? && piece.colour == clr) 
-
           mv_bv = gamestate.calculate_all_moves(coord)
           if (mv_bv > 0) 
             src = coord
