@@ -454,6 +454,32 @@ class TestGameState < Test::Unit::TestCase
     board.move_piece(src, dest);
     assert(board.sq_at(dest).piece.colour.white?);
   end
+  
+  def test_piece_should_move
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - p - - -   
+      - - - - - - - - 
+    ")
+    e.move!(E2, E4)
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - p - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    "
+    assert_state(expected, e)     
+  end
 
   def test_white_should_be_able_to_castle_kingside
     e = RulesEngine.new
