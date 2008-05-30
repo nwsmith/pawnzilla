@@ -2827,8 +2827,8 @@ class TestGameState < Test::Unit::TestCase
   
   #----------------------------------------------------------------------------
   # Start checkmate detection testing
-  #----------------------------------------------------------------------------
-  def test_should_detect_back_rank_mate
+  #----------------------------------------------------------------------------  
+  def test_should_detect_white_kingside_back_rank_mate
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
@@ -2838,10 +2838,40 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - p p p   
-      - - - R - - - k 
+      - - - R - - k - 
       ")
-    assert(e.checkmate?)
+    assert(e.checkmate?(Colour::WHITE))
   end 
+
+  def test_should_detect_white_queenside_back_rank_mate
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      p p p - - - - -   
+      - k - - R - - - 
+      ")
+    assert(e.checkmate?(Colour::WHITE))
+  end 
+  
+  def test_should_detect_scholars_mate
+    e = RulesEngine.new
+    place_pieces(e, "
+      R N B - K B N R
+      P P P P - P P P
+      - - - - P - - -
+      - - - - - - - -
+      - - - - - - p Q 
+      - - - - - p - - 
+      p p p p p - - p   
+      r n b q k b n r 
+      ")
+    assert(e.checkmate?(Colour::WHITE))    
+  end
   
   #----------------------------------------------------------------------------
   # End checkmate detection testing

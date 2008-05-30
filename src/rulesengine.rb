@@ -1222,11 +1222,17 @@ class RulesEngine
   #----------------------------------------------------------------------------
   # Start checkmate detection
   #---------------------------------------------------------------------------- 
-  def checkmate?
-    src = get_coord_for_bv(@clr_pos[Colour::WHITE] & @pos[Chess::Piece::KING])
-    
-    calc_all_mv_king(src) == 0 and attacked? Colour::BLACK, src
+  def checkmate?(clr)
+    src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
+    king = sq_at(src).piece
+    # The king blocks attacks, so removing him calculates properly
+    remove_piece(src)
+    calculate_colour_attack(clr.flip)
+    checkmate = calc_all_mv_king(src) == 0 and attacked? clr.flip, src
+    place_piece(src, king)
+    checkmate
   end
+  
   #----------------------------------------------------------------------------
   # End checkmate detection
   #---------------------------------------------------------------------------- 
