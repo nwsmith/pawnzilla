@@ -614,12 +614,11 @@ class RulesEngine
   def move!(src, dest)
     raise ArgumentException unless chk_mv(src, dest)
     
-    l = Line.new(src, dest)
     src_sq = sq_at(src)
     dest_sq = sq_at(dest)
     piece = src_sq.piece
     
-    if src_sq.piece.name == Chess::Piece::KING and l.len == 3
+    if src_sq.piece.name == Chess::Piece::KING and Line.new(src, dest).len == 3
       # Castling
       # Move the king
       move_piece(src, dest)
@@ -636,8 +635,7 @@ class RulesEngine
                    dest.east)
       end
     else
-      require 'move'
-      @moves.push(Move.execute(src, dest, self))
+      move_piece(src, dest)
     end
   end
    
@@ -660,7 +658,7 @@ class RulesEngine
     @pos.each_key do |key|
       if (@pos[key] & src_bv) == src_bv
         @pos[key] ^= ch_bv
-        return
+        #return
       end
     end
   end
@@ -1228,7 +1226,7 @@ class RulesEngine
     # The king blocks attacks, so removing him calculates properly
     remove_piece(src)
     calculate_colour_attack(clr.flip)
-    checkmate = calc_all_mv_king(src) == 0 and attacked? clr.flip, src
+    checkmate = (calc_all_mv_king(src) == 0) && (attacked? clr.flip, src)
     place_piece(src, king)
     checkmate
   end
