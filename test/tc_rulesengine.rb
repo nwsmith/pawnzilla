@@ -497,6 +497,21 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_state(expected, e)     
   end
+  
+  def test_knight_cannot_capture_own_piece
+    e = RulesEngine.new
+    place_pieces(e, "
+      R N B Q K B N R 
+      P P P P - - - P 
+      - - - - - - - - 
+      - - - - P P P - 
+      - - - - - - - - 
+      - - n - - p - p 
+      p p p p p k p -   
+      r - b q - b n r 
+    ")
+    assert(e.move?(B8, D7) == false)
+  end
 
   def test_white_should_be_able_to_castle_kingside
     e = RulesEngine.new

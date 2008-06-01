@@ -1233,7 +1233,7 @@ false
     knight = sq_at(src).piece
     dest_pc = sq_at(dest).piece
     
-    (!dest_pc.nil? && !knight.colour.opposite?(dest_pc.colour)) || true
+    dest_pc.nil? || knight.colour.opposite?(dest_pc.colour)
   end
   #----------------------------------------------------------------------------
   # Start legal move checks
