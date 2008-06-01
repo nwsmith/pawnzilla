@@ -37,10 +37,10 @@ puts
 begin
   loop do
   
-    break if runner.game_is_over
   
     puts runner.rules_engine.to_txt
     puts
+    break if runner.game_is_over
   
     move = runner.move
   

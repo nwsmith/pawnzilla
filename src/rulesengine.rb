@@ -253,11 +253,11 @@ class RulesEngine
     0x01_01_01_01_01_01_01_01    
   ]
 
-  attr_accessor :moves
+  attr_accessor :move_list
   attr_reader :piece_info_bag
       
   def initialize()     
-    @moves = []
+    @move_list = []
     
     @white_can_castle_kingside = true;
     @white_can_castle_queenside = true;
@@ -370,7 +370,7 @@ class RulesEngine
   
   def self.get_coord_for_bv(bv) 
     # only one bit can be set for this to be a legal square bv
-    raise ArgumentError, "Illegal bv for square" unless bv & -bv == bv    
+    raise ArgumentError, "Illegal bv for square #{pp_bv(bv)}" unless bv & -bv == bv    
 
     # TODO: This is so inefficient it hurts, but will do for now
     0.upto(7) do |x|
@@ -381,6 +381,8 @@ class RulesEngine
         end
       end
     end
+    
+    raise ArgumentError, "Could not find bv for square #{pp_bv(bv)}."
   end
   
   def get_coord_for_bv(bv)
@@ -410,10 +412,10 @@ class RulesEngine
     RulesEngine.get_bv(coord)
   end  
 
-  def self.pp_bv
+  def self.pp_bv(bv)
     out = ""
     63.downto(0) do |i|
-      out += @bv[i].to_s
+      out += bv[i].to_s
       out += " " if (i % 8 == 0)
     end
     out.chop
@@ -655,6 +657,8 @@ false
     else
       move_piece(src, dest)
     end
+    
+    @move_list.push(Move.new(src, dest))
   end
    
   def move_piece(src, dest)
@@ -1152,7 +1156,7 @@ false
           [Coord.new(src.x - 1, src.y), Coord.new(src.x + 1, src.y)].each do |ep_coord|
             ep_pc = sq_at(ep_coord).piece
             unless ep_pc.nil? || ep_pc.name != Chess::Piece::PAWN
-              last_mv = @moves.last
+              last_mv = @move_list.last
               return last_mv.dest == ep_coord && last_mv.src == Coord.new(ep_coord.x, ep_coord.y + (pc_src.colour.white? ? 2 : -2))
             end
           end
@@ -1189,7 +1193,7 @@ false
     pc_dest = sq_at(dest).piece
     pc_src = sq_at(src).piece
     
-    (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true      
+    (!pc_dest.nil? && !pc_src.colour.opposite?(pc_dest.colour)) || true      
   end
   
   def chk_mv_queen(src, dest)
