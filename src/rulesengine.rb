@@ -253,8 +253,7 @@ class RulesEngine
     0x01_01_01_01_01_01_01_01    
   ]
 
-  attr_accessor :move_list
-  attr_reader :piece_info_bag
+  attr_accessor :piece_info_bag, :move_list
       
   def initialize()     
     @move_list = []

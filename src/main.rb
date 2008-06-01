@@ -88,7 +88,7 @@ puts
     
     
     trace += "------ for testing -----\n\n"
-    trace += "e = GameState.new\n"
+    trace += "e = RulesEngine.new\n"
     trace += "place_pieces(e, \"\n"
     gamestate_state = ""
     0.upto(63) do |i| 
@@ -106,9 +106,12 @@ puts
       else 
         trace += "black_move_engine.add_move("
       end
-      trace += "Move.new(Coord.from_alg(\"#{move.src.to_alg}\"), Coord.from_alg(\"#{move.dest.to_alg}\"))\n"
+      trace += "Move.new(Coord.from_alg(\"#{move.src.to_alg}\"), Coord.from_alg(\"#{move.dest.to_alg}\")))\n"
     end
-        err_cnt += 1
+    trace += "runner = TestGameRunner.new(white_move_engine, black_move_engine)\n"
+    trace += "runner.replay\n"
+    trace += "#assertions here\n"
+    err_cnt += 1
     filename = "/tmp/pz_err_" + err_cnt.to_s
 
     File.open(filename, 'w') {|f| f.write(trace)}
