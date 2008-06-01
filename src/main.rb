@@ -29,21 +29,32 @@ puts
 
 #e = RulesEngine.new
 #move_list = []
-  white_move_engine = HumanMoveEngine.new
+  white_move_engine = RandomMoveEngine.new
   black_move_engine = RandomMoveEngine.new
   runner = GameRunner.new(white_move_engine, black_move_engine)
 
 # Main Game Loop
-loop do
+begin
+  loop do
   
-  break if runner.game_is_over
+    break if runner.game_is_over
   
+    puts runner.rules_engine.to_txt
+    puts
+  
+    move = runner.move
+  
+    puts "#{move.src.to_alg}-#{move.dest.to_alg}"
+  end
+rescue Exception => e
+  puts "caught #{e.class} : #{e.message}"
+  puts caller
+  puts 
+  puts "was trying #{runner.move_list.last}"
   puts runner.rules_engine.to_txt
-  puts
-  
-  move = runner.move
-  
-  puts "#{move.src.to_alg}-#{move.dest.to_alg}"
+  runner.move_list.each do |move|
+    puts "(#{move.src.to_alg},#{move.dest.to_alg})"
+  end
 end
 #  
 #  
