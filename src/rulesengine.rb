@@ -511,13 +511,28 @@ class RulesEngine
   # 
   def blocked?(src, dest) 
     l = Line.new(src, dest)
+    
+    src_pc = sq_at(src).piece
+    
+    if (src_pc.name == Chess::Piece::PAWN) 
+      if (src.on_file?(dest)) 
+        # pawns can't capture straight ahead
+        l.each_coord do |c|
+          return true unless sq_at(c).piece.nil? || c == src
+        end
+      end
+    end
       
-    l.each_coord do |c|        
+    l.each_coord do |c|  
+      break if c == dest      
       return true unless sq_at(c).piece.nil? || c == src
     end
     
-    false
+    dest_pc = sq_at(dest).piece
+    dest_pc.nil? || src_pc.colour.opposite?(dest_pc.colour)
+false
   end  
+  
   
   def on_diagonal?(src, dest) 
     # Normalize coordinates to be west to east
@@ -612,7 +627,10 @@ class RulesEngine
   end
   
   def move!(src, dest)
-    raise ArgumentException unless chk_mv(src, dest)
+    unless chk_mv(src, dest)
+      raise ArgumentError, "Illegal move: #{src.to_alg},#{dest.to_alg}"
+    end
+    
     
     src_sq = sq_at(src)
     dest_sq = sq_at(dest)
@@ -1161,7 +1179,7 @@ class RulesEngine
     pc_dest = sq_at(dest).piece
     pc_src = sq_at(src).piece
     
-    (!pc_dest.nil? && !pc_src.color.opposite?(pc_dest.color)) || true
+    pc_dest.nil? || pc_src.colour.flip == pc_dest.colour
   end
   
   def chk_mv_rook(src, dest) 

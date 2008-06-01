@@ -287,6 +287,22 @@ class TestGameState < Test::Unit::TestCase
     #assert_blocked_state(expected, b, H8)
   end
  
+  def test_bishop_should_not_be_blocked_by_capturable_pawn
+    e = RulesEngine.new
+    place_pieces(e, "      
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - P - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - b - - - - -
+    ")
+    assert(!e.blocked?(C1, G5))
+    assert(e.chk_mv(C1, G5))
+  end
+  
   def test_on_diagonal_nw_se
     b = RulesEngine.new
     
@@ -1767,31 +1783,6 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_move_state(e, expected, C2)
   end
-
-  def test_check_calculate_blocked_black_pawn_move
-    e = RulesEngine.new
-    place_pieces(e, "
-      - - - - - - - -
-      - - P - - - - - 
-      - - b - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-    ")
-    expected = "
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - -   
-      - - - - - - - - 
-    "
-    assert_move_state(e, expected, C7)
-  end
   
   def test_calculate_white_pawn_move_should_work_for_start_square
     e = RulesEngine.new
@@ -2542,7 +2533,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - - 
-      - - B - - - - - 
+      - - P - - - - - 
       - - p - - - - - 
       - - - - - - - - 
     ")
@@ -2902,5 +2893,22 @@ class TestGameState < Test::Unit::TestCase
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #---------------------------------------------------------------------------- 
-
+  #----------------------------------------------------------------------------
+  # Start smoke test result test cases
+  #----------------------------------------------------------------------------
+  def test_bishop_should_be_able_to_capture_pawn
+    e = RulesEngine.new
+    place_pieces(e, "      
+      R - B Q - B - R 
+      P P P - N P - - 
+      - - - - - - - - 
+      - - - - - - P - 
+      - - b - p - - - 
+      - - - - - - - p 
+      p p p - - p - - 
+      r - b q k - n r
+    ")
+    assert(!e.blocked?(C1, G5))
+    assert(e.chk_mv(C1, G5))
+  end
 end
