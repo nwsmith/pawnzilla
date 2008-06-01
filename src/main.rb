@@ -21,6 +21,7 @@ require "move"
 require "move_engine/human_move_engine"
 require "move_engine/random_move_engine"
 require "game_runner"
+require "game_monitor"
 
   # creates a alg coord notation for an index in a bv
   def get_alg_coord_notation(i)
@@ -59,6 +60,7 @@ puts
   white_move_engine = RandomMoveEngine.new
   black_move_engine = RandomMoveEngine.new
   runner = GameRunner.new(white_move_engine, black_move_engine)
+  monitor = GameMonitor.new(runner)
   err_cnt = 0
   max_run = 100
   verbose = false
@@ -66,15 +68,15 @@ puts
 
 # Main Game Loop
 0.upto(max_run) do |run_count|
-  puts runner.rules_engine.to_txt if verbose
+  puts monitor.gamerunner.rules_engine.to_txt if verbose
   puts if verbose
   begin
-    if (runner.game_is_over)
+    if (monitor.gamerunner.game_is_over)
      white_move_engine = RandomMoveEngine.new
      black_move_engine = RandomMoveEngine.new
-     runner = GameRunner.new(white_move_engine, black_move_engine)
+     monitor.gamerunner = GameRunner.new(white_move_engine, black_move_engine)
     end  
-    move = runner.move
+    move = monitor.move
   rescue Exception => e
     puts "Crash on run #{run_count}"
     trace = "caught #{e.class} : #{e.message}\n"
@@ -82,25 +84,23 @@ puts
       trace += line + "\n"  
     end
     trace += "\n"
-    trace += "#{runner.move_list.size} total plies\n"
-    trace += runner.rules_engine.to_txt
+    trace += "#{monitor.gamerunner.move_list.size} total plies\n"
+    trace += monitor.gamerunner.rules_engine.to_txt
     trace += "\n"
-    
-    
     trace += "------ for testing -----\n\n"
     trace += "e = RulesEngine.new\n"
     trace += "place_pieces(e, \"\n"
     gamestate_state = ""
     0.upto(63) do |i| 
-      square = runner.rules_engine.sq_at(Coord.from_alg(get_alg_coord_notation(i)))
+      square = monitor.gamerunner.rules_engine.sq_at(Coord.from_alg(get_alg_coord_notation(i)))
       gamestate_state += square.piece.nil? ? "-" : tr.to_txt(square.piece)
     end
     trace += format_board(gamestate_state)
     trace += "\")\n"
     trace += "white_move_engine = TestMoveEngine.new\n";
     trace += "black_move_engine = TestMoveEngine.new\n";
-    runner.move_list.each_index do |i|
-      move = runner.move_list[i]
+    monitor.gamerunner.move_list.each_index do |i|
+      move = monitor.gamerunner.move_list[i]
       if (i % 2 == 0) 
         trace += "white_move_engine.add_move("
       else 
@@ -112,8 +112,7 @@ puts
     trace += "runner.replay\n"
     trace += "#assertions here\n"
     err_cnt += 1
-    filename = "/tmp/pz_err_" + err_cnt.to_s
-
+    filename = "C:\\temp\\pz_err_" + err_cnt.to_s
     File.open(filename, 'w') {|f| f.write(trace)}
   #  
   #  file = File.new(filename)
@@ -122,6 +121,7 @@ puts
     white_move_engine = RandomMoveEngine.new
     black_move_engine = RandomMoveEngine.new
     runner = GameRunner.new(white_move_engine, black_move_engine)
+    monitor = GameMonitor.new(runner)
   ensure
     next
   end
