@@ -25,6 +25,7 @@ require "chess"
 require "geometry"
 require "tr"
 require "test_game_runner"
+require "test_move_engine"
 
 class TestPieceInfo < Test::Unit::TestCase
   def test_should_get_correct_colour
@@ -494,6 +495,47 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - - 
+    "
+    assert_state(expected, e)     
+  end
+  
+  def test_pawn_should_not_disappear_when_capturing
+    white_move_engine = TestMoveEngine.new
+    black_move_engine = TestMoveEngine.new
+    white_move_engine.add_move(Move.new(Coord.from_alg("e2"), Coord.from_alg("e3")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("g7"), Coord.from_alg("g5")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("c2"), Coord.from_alg("c3")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("a7"), Coord.from_alg("a5")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("g2"), Coord.from_alg("g3")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("f7"), Coord.from_alg("f6")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("a2"), Coord.from_alg("a4")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("g5"), Coord.from_alg("g4")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("b1"), Coord.from_alg("a3")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("a8"), Coord.from_alg("a7")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("e1"), Coord.from_alg("e2")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("e8"), Coord.from_alg("f7")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("c3"), Coord.from_alg("c4")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("a7"), Coord.from_alg("a8")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("g1"), Coord.from_alg("h3")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("f8"), Coord.from_alg("h6")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("f1"), Coord.from_alg("g2")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("f6"), Coord.from_alg("f5")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("e3"), Coord.from_alg("e4")))
+    black_move_engine.add_move(Move.new(Coord.from_alg("a8"), Coord.from_alg("a7")))
+    white_move_engine.add_move(Move.new(Coord.from_alg("h1"), Coord.from_alg("g1")))
+    runner = TestGameRunner.new(white_move_engine, black_move_engine)
+    runner.replay
+    e = runner.rules_engine
+    e.move!(F5, E4)
+    expected = "
+      - N B Q - - N R
+      R P P P P K - P
+      - - - - - - - B
+      P - - - - - - -
+      p - p - P - P -
+      n - - - - - p n
+      - p - p k p b p
+      r - b q - - r -
     "
     assert_state(expected, e)     
   end

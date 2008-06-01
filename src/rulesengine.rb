@@ -660,6 +660,8 @@ false
     @move_list.push(Move.new(src, dest))
   end
    
+  # Note that this just assumes that the move is valid, so make sure it's 
+  # called through something like move! that does verification.
   def move_piece(src, dest)
     @piece_info_bag.pcfcoord(src).coord = dest
 
@@ -671,15 +673,29 @@ false
     
     # bit vector representing the change required for the move
     ch_bv = (src_bv | dest_bv)
-     
+    
+    # remove captured piece
     @clr_pos.each_key do |key|
-      @clr_pos[key] ^= ch_bv if (@clr_pos[key] & src_bv) == src_bv
+      if ((@clr_pos[key] & dest_bv) == dest_bv)
+        @clr_pos[key] ^= dest_bv
+      end
+    end
+    @pos.each_key do |key|
+      if ((@pos[key] & dest_bv) == dest_bv)
+        @pos[key] ^= dest_bv
+      end
     end
 
+    
+    @clr_pos.each_key do |key|
+      if ((@clr_pos[key] & src_bv) == src_bv) 
+        @clr_pos[key] ^= ch_bv
+      end
+    end
+    
     @pos.each_key do |key|
       if (@pos[key] & src_bv) == src_bv
         @pos[key] ^= ch_bv
-        #return
       end
     end
   end

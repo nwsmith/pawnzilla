@@ -112,7 +112,7 @@ puts
     trace += "runner.replay\n"
     trace += "#assertions here\n"
     err_cnt += 1
-    filename = "C:\\temp\\pz_err_" + err_cnt.to_s
+    filename = "/tmp/pz_err_" + err_cnt.to_s
     File.open(filename, 'w') {|f| f.write(trace)}
   #  
   #  file = File.new(filename)
