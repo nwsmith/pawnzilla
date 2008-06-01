@@ -22,6 +22,33 @@ require "move_engine/human_move_engine"
 require "move_engine/random_move_engine"
 require "game_runner"
 
+  # creates a alg coord notation for an index in a bv
+  def get_alg_coord_notation(i)
+    x = i % 8
+    y = 8 - ((i - x) / 8)
+ 
+    (97 + x).chr + y.to_s
+  end
+ 
+  def process_board_string(board_string)
+    board_string.gsub(/\s+/, "")
+  end
+
+  
+  # Takes a processed board and renders it in a more readable form
+  def format_board(board_string)
+    board_string[0..7]   + "\n" +
+    board_string[8..15]  + "\n" +
+    board_string[16..23] + "\n" +
+    board_string[24..31] + "\n" +
+    board_string[32..39] + "\n" +
+    board_string[40..47] + "\n" +
+    board_string[48..55] + "\n" +
+    board_string[56..63] + "\n" +
+    ""
+  end
+
+
 puts "Pawnzilla game."
 puts
 puts "Copyright 2005 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
@@ -32,30 +59,116 @@ puts
   white_move_engine = RandomMoveEngine.new
   black_move_engine = RandomMoveEngine.new
   runner = GameRunner.new(white_move_engine, black_move_engine)
+  err_cnt = 0
+  max_run = 100
+  verbose = false
+  tr = Translator::PieceTranslator.new
 
 # Main Game Loop
-begin
-  loop do
-  
-  
-    puts runner.rules_engine.to_txt
-    puts
-    break if runner.game_is_over
-  
+0.upto(max_run) do |run_count|
+  puts runner.rules_engine.to_txt if verbose
+  puts if verbose
+  begin
+    if (runner.game_is_over)
+     white_move_engine = RandomMoveEngine.new
+     black_move_engine = RandomMoveEngine.new
+     runner = GameRunner.new(white_move_engine, black_move_engine)
+    end  
     move = runner.move
-  
-    puts "#{move.src.to_alg}-#{move.dest.to_alg}"
+  rescue Exception => e
+    puts "Crash on run #{run_count}"
+    trace = "caught #{e.class} : #{e.message}\n"
+    e.backtrace.each do |line|
+      trace += line + "\n"  
+    end
+    trace += "\n"
+    trace += "#{runner.move_list.size} total plies\n"
+    trace += runner.rules_engine.to_txt
+    trace += "\n"
+    
+    
+    trace += "------ for testing -----\n\n"
+    trace += "e = GameState.new\n"
+    trace += "place_pieces(e, \"\n"
+    gamestate_state = ""
+    0.upto(63) do |i| 
+      square = runner.rules_engine.sq_at(Coord.from_alg(get_alg_coord_notation(i)))
+      gamestate_state += square.piece.nil? ? "-" : tr.to_txt(square.piece)
+    end
+    trace += format_board(gamestate_state)
+    trace += "\")\n"
+    trace += "white_move_engine = TestMoveEngine.new\n";
+    trace += "black_move_engine = TestMoveEngine.new\n";
+    runner.move_list.each_index do |i|
+      move = runner.move_list[i]
+      if (i % 2 == 0) 
+        trace += "white_move_engine.add_move("
+      else 
+        trace += "black_move_engine.add_move("
+      end
+      trace += "Move.new(Coord.from_alg(\"#{move.src.to_alg}\"), Coord.from_alg(\"#{move.dest.to_alg}\"))\n"
+    end
+        err_cnt += 1
+    filename = "/tmp/pz_err_" + err_cnt.to_s
+
+    File.open(filename, 'w') {|f| f.write(trace)}
+  #  
+  #  file = File.new(filename)
+  #  file.write(trace)
+  #  file.close()
+    white_move_engine = RandomMoveEngine.new
+    black_move_engine = RandomMoveEngine.new
+    runner = GameRunner.new(white_move_engine, black_move_engine)
+  ensure
+    next
   end
-rescue Exception => e
-  puts "caught #{e.class} : #{e.message}"
-  puts e.backtrace
-  puts 
-  puts "was trying #{runner.move_list.last}"
-  puts runner.rules_engine.to_txt
-  runner.move_list.each do |move|
-    puts "(#{move.src.to_alg},#{move.dest.to_alg})"
-  end
+  puts "#{move.src.to_alg}-#{move.dest.to_alg}" if verbose
 end
+
+puts "There were #{err_cnt} crashes in #{max_run} games"
+
+
+#begin
+#  loop do
+#  
+#  
+#    puts runner.rules_engine.to_txt if verbose
+#    puts if verbose
+#    
+#    if (runner.game_is_over) 
+#      white_move_engine = RandomMoveEngine.new
+#      black_move_engine = RandomMoveEngine.new
+#      runner = GameRunner.new(white_move_engine, black_move_engine)
+#      break if (run_count >= max_run)
+#    end
+#    run_count += 1
+#  
+#    move = runner.move
+#  
+#    puts "#{move.src.to_alg}-#{move.dest.to_alg}" if verbose
+#  end
+#rescue Exception => e
+#  puts "Crash on run #{run_count}"
+#  trace = "caught #{e.class} : #{e.message}\n"
+#  e.backtrace.each do |line|
+#    trace += line + "\n"  
+#  end
+#  trace += "\n"
+#  trace += runner.rules_engine.to_txt
+#  trace += "\n"
+#  runner.move_list.each do |move|
+#    trace += "(#{move.src.to_alg},#{move.dest.to_alg})\n"
+#  end
+#  filename = "/tmp/pz_err_" + err_cnt.to_s
+#  err_cnt += 1
+#  File.open(filename, 'w') {|f| f.write(trace)}
+##  
+##  file = File.new(filename)
+##  file.write(trace)
+##  file.close()
+#ensure
+#  # keep going
+#end
 #  
 #  
 #  

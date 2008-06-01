@@ -9,8 +9,6 @@ class GameRunner
   end
   
   def game_is_over
-    puts "white: #{@rules_engine.checkmate?(Colour::WHITE)}"
-    puts "black: #{@rules_engine.checkmate?(Colour::BLACK)}"
     return @rules_engine.checkmate?(Colour::WHITE) || \
       @rules_engine.checkmate?(Colour::BLACK)
   end
