@@ -2951,7 +2951,23 @@ class TestGameState < Test::Unit::TestCase
   # End checkmate detection testing
   #---------------------------------------------------------------------------- 
   #----------------------------------------------------------------------------
-  # Start smoke test result test cases
+  # Start check detection testing
   #----------------------------------------------------------------------------
-
+  def test_should_detect_simple_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - R - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - - 
+    ")
+    assert(e.check?(Colour::WHITE))
+  end
+  #----------------------------------------------------------------------------
+  # Start check detection testing
+  #----------------------------------------------------------------------------
 end
