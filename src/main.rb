@@ -48,7 +48,7 @@ begin
   end
 rescue Exception => e
   puts "caught #{e.class} : #{e.message}"
-  puts caller
+  puts e.backtrace
   puts 
   puts "was trying #{runner.move_list.last}"
   puts runner.rules_engine.to_txt
