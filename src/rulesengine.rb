@@ -254,6 +254,7 @@ class RulesEngine
   ]
 
   attr_accessor :piece_info_bag, :move_list
+  attr_reader :clr_pos, :pos
       
   def initialize()     
     @move_list = []

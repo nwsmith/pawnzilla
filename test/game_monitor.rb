@@ -43,6 +43,16 @@ class GameMonitor
       err_ms += "After move:\n#{curr_pos}\n"
       raise ArgumentError, err_ms
     end
-  end
-  
+    
+    # Check two: kings just disappear sometimes, usually to illegal captures
+    e = @gamerunner.rules_engine
+    if ((e.clr_pos[Colour::WHITE] & e.pos[Chess::Piece::KING]) == 0 || \
+        (e.clr_pos[Colour::BLACK] & e.pos[Chess::Piece::KING]) == 0) 
+      err_ms = "King has disappeared!\n"
+      err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
+      err_ms += "Before move:\n#{prev_pos}\n"
+      err_ms += "After move:\n#{curr_pos}\n"
+      raise ArgumentError, err_ms
+    end
+  end  
 end

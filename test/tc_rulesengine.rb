@@ -2946,85 +2946,12 @@ class TestGameState < Test::Unit::TestCase
       r n b q k b n r 
       ")
     assert(e.checkmate?(Colour::WHITE))    
-  end
-  
+  end  
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #---------------------------------------------------------------------------- 
   #----------------------------------------------------------------------------
   # Start smoke test result test cases
   #----------------------------------------------------------------------------
-  def test_bishop_should_be_able_to_capture_pawn
-    e = RulesEngine.new
-    place_pieces(e, "      
-      R - B Q - B - R 
-      P P P - N P - - 
-      - - - - - - - - 
-      - - - - - - P - 
-      - - b - p - - - 
-      - - - - - - - p 
-      p p p - - p - - 
-      r - b q k - n r
-    ")
-    assert(!e.blocked?(C1, G5))
-    assert(e.chk_mv(C1, G5))
-  end
-  
-#  def test_method
-#    e = RulesEngine.new
-#place_pieces(e, "
-#-RB--B--
-#P----P-R
-#-N----PP
-#-PPP--pp
-#-ppQN---
-#--------
-#p--p-r--
-#rnb-kb--
-#")
-#white_move_engine = TestMoveEngine.new
-#black_move_engine = TestMoveEngine.new
-#white_move_engine.add_move(Move.new(Coord.from_alg("h2"), Coord.from_alg("h3")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("c7"), Coord.from_alg("c6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("h3"), Coord.from_alg("h4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("c6"), Coord.from_alg("c5")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g1"), Coord.from_alg("e2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("d7"), Coord.from_alg("d5")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("f2"), Coord.from_alg("f3")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("h7"), Coord.from_alg("h6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("h1"), Coord.from_alg("g1")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("e7"), Coord.from_alg("e5")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g2"), Coord.from_alg("g3")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("e5"), Coord.from_alg("e4")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("h4"), Coord.from_alg("h5")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("d8"), Coord.from_alg("f6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g1"), Coord.from_alg("g2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("b8"), Coord.from_alg("a6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("d1"), Coord.from_alg("e2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("b7"), Coord.from_alg("b5")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g2"), Coord.from_alg("f2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("h8"), Coord.from_alg("h7")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("f2"), Coord.from_alg("g2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("e8"), Coord.from_alg("d7")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("b2"), Coord.from_alg("b4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("a6"), Coord.from_alg("c7")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("f3"), Coord.from_alg("e4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("a8"), Coord.from_alg("b8")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g2"), Coord.from_alg("f2")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("d7"), Coord.from_alg("e7")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("c2"), Coord.from_alg("c4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("c7"), Coord.from_alg("a8")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g3"), Coord.from_alg("g4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("f6"), Coord.from_alg("d4")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g4"), Coord.from_alg("g5")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("a8"), Coord.from_alg("b6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("e2"), Coord.from_alg("g3")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("g7"), Coord.from_alg("g6")))
-#white_move_engine.add_move(Move.new(Coord.from_alg("g3"), Coord.from_alg("e4")))
-#black_move_engine.add_move(Move.new(Coord.from_alg("g8"), Coord.from_alg("e7")))
-#runner = TestGameRunner.new(white_move_engine, black_move_engine)
-#runner.replay
-#assert(runner.game_is_over)
-#
-#  end
+
 end
