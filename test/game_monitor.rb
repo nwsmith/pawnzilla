@@ -69,5 +69,19 @@ class GameMonitor
       err_ms += "After move:\n#{curr_pos}\n"
       raise ArgumentError, err_ms
     end
+    
+    #Check four: move did not result in king being in check
+    to_move = @gamerunner.to_move
+    
+    if ((to_move == Colour::BLACK && (!white_was_in_check && white_is_in_check)) || \
+        (to_move == Colour::WHITE && (!black_was_in_check && black_is_in_check)))
+      err_ms = "King moved into check!\n"
+      err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
+      err_ms += "Before move:\n#{prev_pos}\n"
+      err_ms += "After move:\n#{curr_pos}\n"
+      raise ArgumentError, err_ms      
+    end
+    
+    move
   end  
 end
