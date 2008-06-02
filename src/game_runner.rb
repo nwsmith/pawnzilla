@@ -38,5 +38,11 @@ class GameRunner
     @to_move
   end
   
+  def winner
+    return nil unless game_is_over
+    return Colour::WHITE if @rules_engine.checkmate?(Colour::WHITE)
+    return Colour::BLACK if @rules_engine.checkmate?(Colour::BLACK)
+  end
+  
   
 end
