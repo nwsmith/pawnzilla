@@ -26,6 +26,8 @@ class GameMonitor
   
   def move
     prev_pos = @gamerunner.rules_engine.to_txt
+    white_was_in_check = @gamerunner.rules_engine.check?(Colour::WHITE)
+    black_was_in_check = @gamerunner.rules_engine.check?(Colour::BLACK)
     
     move = @gamerunner.next_move
     src_pc = @gamerunner.rules_engine.sq_at(move.src).piece
@@ -49,6 +51,19 @@ class GameMonitor
     if ((e.clr_pos[Colour::WHITE] & e.pos[Chess::Piece::KING]) == 0 || \
         (e.clr_pos[Colour::BLACK] & e.pos[Chess::Piece::KING]) == 0) 
       err_ms = "King has disappeared!\n"
+      err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
+      err_ms += "Before move:\n#{prev_pos}\n"
+      err_ms += "After move:\n#{curr_pos}\n"
+      raise ArgumentError, err_ms
+    end
+    
+    #Check three: king did not get out of check
+    white_is_in_check = e.check?(Colour::WHITE)
+    black_is_in_check = e.check?(Colour::BLACK)
+
+    if ((white_was_in_check && white_is_in_check) || \
+          (black_was_in_check && black_is_in_check)) 
+      err_ms = "King did not move out of check!\n"
       err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
       err_ms += "Before move:\n#{prev_pos}\n"
       err_ms += "After move:\n#{curr_pos}\n"
