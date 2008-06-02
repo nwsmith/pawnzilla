@@ -81,7 +81,7 @@ puts
         break
       end  
       move = monitor.move
-      puts "#{move.src.to_alg}-#{move.dest.to_alg}" if !move.nil? && verbose
+      puts "#{move.src.to_alg}-#{move.dest.to_alg}" if verbose
     rescue Exception => e
       puts "Crash on run #{run_count}"
       trace = "caught #{e.class} : #{e.message}\n"

@@ -1,5 +1,5 @@
 class GameRunner
-  attr_reader(:rules_engine)
+  attr_reader(:rules_engine, :to_move)
   
   def initialize(white_move_engine, black_move_engine)
     @white_move_engine = white_move_engine
@@ -40,8 +40,8 @@ class GameRunner
   
   def winner
     return nil unless game_is_over
-    return Colour::WHITE if @rules_engine.checkmate?(Colour::WHITE)
-    return Colour::BLACK if @rules_engine.checkmate?(Colour::BLACK)
+    return Colour::BLACK if @rules_engine.checkmate?(Colour::WHITE)
+    return Colour::WHITE if @rules_engine.checkmate?(Colour::BLACK)
   end
   
   
