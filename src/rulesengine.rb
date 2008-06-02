@@ -821,13 +821,18 @@ false
   
   def calculate_queen_attack(coord)
     bv = 0x0 
+    bv_piece = (1 << get_sw(coord))
     clr = sq_at(coord).piece.colour
+    
+    0.upto(63) do |i|
+      if (0x01 << i & bv_piece != 0) 
+        bv |= calculate_diagonal_attack(clr, i)
+      end
+    end
 
-    bv |= calculate_bishop_attack(coord);
     bv |= calculate_rook_attack(coord);
     
     @attack[clr][Chess::Piece::QUEEN] = bv
-    return bv
   end
 
   def calculate_king_attack(clr)

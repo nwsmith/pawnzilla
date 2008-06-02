@@ -1245,6 +1245,30 @@ class TestGameState < Test::Unit::TestCase
     assert_attack_state(expected, b, Colour::WHITE)
   end  
 
+  def test_bishop_should_be_attacking_king
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - N - - K R -
+      N Q - - - - - -
+      P - p - B P p b
+      - n - P - - - p
+      - - - P - - - n
+      - r p - - - - -
+      q - - - p p - -
+      P - - k - b - r
+    ")
+    f8_bv = e.get_bv(F8)
+    bv = e.calculate_bishop_attack(H6)
+    puts
+    puts e.pp_bv(bv)
+    assert((f8_bv & bv) == f8_bv)
+    bv = e.calculate_colour_attack(Colour::WHITE)
+    puts e.pp_bv(bv)
+    assert((f8_bv & bv) == f8_bv)
+    puts
+    assert(e.check?(Colour::BLACK))
+  end
+  
   #------
   # Rook
   #------
@@ -1557,34 +1581,6 @@ class TestGameState < Test::Unit::TestCase
       --***---
       -*-*-*--
       *--*--*-
-    "
-    assert_attack_state(expected, b, Colour::WHITE)
-  end
-
-  def test_centre_queen_attack_should_be_blockable_by_own_colour()
-    b = RulesEngine.new()
-
-    place_pieces(b, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - b - - - -
-      - - - - - - - - 
-      - - - q - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-      - - - - - - - - 
-    ")
-    b.calculate_queen_attack(D4)
-
-    expected = "
-      - - - - - - - *
-      * - - - - - * -
-      - * - - - * - -
-      - - * * * - - -
-      * * * - * * * * 
-      - - * * * - - - 
-      - * - * - * - - 
-      * - - * - - * - 
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
@@ -2953,6 +2949,21 @@ class TestGameState < Test::Unit::TestCase
       n - - p p - R -
       - b N - - k r -
       - - - q - - - -
+    ")
+    assert(e.check?(Colour::BLACK))
+  end
+  
+  def test_pawn_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - N - - K R -
+      N Q - - - - - -
+      P - p - B P p b
+      - n - P - - - p
+      - - - P - - - n
+      - r p - - - - -
+      q - - - p p - -
+      P - - k - b - r
     ")
     assert(e.check?(Colour::BLACK))
   end
