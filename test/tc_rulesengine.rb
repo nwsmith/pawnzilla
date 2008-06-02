@@ -122,7 +122,7 @@ class TestGameState < Test::Unit::TestCase
 
   #----------------------------------------------------------------------------
   # Start board helper tests
-  #----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------  
   def test_should_get_white_piece_on_black_square_from_initial_setup
     square = @board.sq_at(A1)
     assert_not_nil(square)
@@ -953,6 +953,36 @@ class TestGameState < Test::Unit::TestCase
     assert_bv_equals(expected, bv)
   end
   
+  def test_pawn_should_attack_king
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - - - - - -
+      P B P P - P B -
+      - - - Q K N - P
+      - - p - - p - -
+      r - - - P - - p
+      n - - p p - R -
+      - b N - - k r -
+      - - - q - - - -
+    ")
+    bv = e.calculate_pawn_attack(F5)
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - * - * -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+    "
+    assert_bv_equals(expected, bv)
+    e6_bv = e.get_bv(E6)
+    assert((e6_bv & bv) == e6_bv)
+    bv = e.calculate_colour_attack(Colour::WHITE)
+    assert((e6_bv & bv) == e6_bv)
+  end
+  
   #--------
   # Knight 
   #--------
@@ -1186,34 +1216,6 @@ class TestGameState < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
-  
-  def test_centre_bishop_attacks_should_be_blockable_by_own_bishop()
-    b = RulesEngine.new()
-
-    place_pieces(b, "
-      --------
-      --------
-      --------
-      --------
-      --------
-      --b-----
-      --------
-      b-------
-    ")
-    b.calculate_bishop_attack(A1)
-
-    expected = "
-      --------
-      --------
-      --------
-      --------
-      --------
-      --------
-      -*------
-      --------
-    "
-    assert_attack_state(expected, b, Colour::WHITE)
-  end  
   
   def test_bottom_bishop_should_attack_diagonally_adjacent_opposing_piece()
     b = RulesEngine.new()
@@ -1583,34 +1585,6 @@ class TestGameState < Test::Unit::TestCase
       - - * * * - - - 
       - * - * - * - - 
       * - - * - - * - 
-    "
-    assert_attack_state(expected, b, Colour::WHITE)
-  end
-  
-  def test_centre_queen_attack_should_be_blockable_by_own_colour_queens()
-    b = RulesEngine.new()
-
-    place_pieces(b, "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
-      - - - - - - - - 
-      q - q - - - - - 
-      - - - - - - - - 
-      q - q - - - - - 
-    ")
-    b.calculate_queen_attack(A1)
-
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      * * - - - - - -
-      - * - - - - - -
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
@@ -2967,6 +2941,22 @@ class TestGameState < Test::Unit::TestCase
     ")
     assert(e.check?(Colour::WHITE))
   end
+  
+  def test_pawn_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - - - - - -
+      P B P P - P B -
+      - - - Q K N - P
+      - - p - - p - -
+      r - - - P - - p
+      n - - p p - R -
+      - b N - - k r -
+      - - - q - - - -
+    ")
+    assert(e.check?(Colour::BLACK))
+  end
+  
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------

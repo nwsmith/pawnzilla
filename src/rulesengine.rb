@@ -875,12 +875,14 @@ false
   end
   
   def calculate_colour_attack(clr)
+    all_attack = 0
+    
     #TODO: This could be refactored to be a lot nicer...
     pawn_bv = @clr_pos[clr] & @pos[Chess::Piece::PAWN]
     0.upto(63) do |i|
       bv = 0x1 << i
       if bv & pawn_bv == bv
-        @attack[clr][Chess::Piece::PAWN] = \
+        @attack[clr][Chess::Piece::PAWN] |= \
           calculate_pawn_attack(get_coord_for_bv(bv))
       end
     end
@@ -889,7 +891,7 @@ false
     0.upto(63) do |i|
       bv = 0x1 << i
       if bv & knight_bv == bv
-        @attack[clr][Chess::Piece::KNIGHT] = \
+        @attack[clr][Chess::Piece::KNIGHT] |= \
           calculate_knight_attack(get_coord_for_bv(bv))
       end
     end
@@ -898,7 +900,7 @@ false
     0.upto(63) do |i|
       bv = 0x1 << i
       if bv & bishop_bv == bv
-        @attack[clr][Chess::Piece::BISHOP] = \
+        @attack[clr][Chess::Piece::BISHOP] |= \
           calculate_bishop_attack(get_coord_for_bv(bv))
       end
     end
@@ -907,7 +909,7 @@ false
     0.upto(63) do |i|
       bv = 0x1 << i
       if bv & rook_bv == bv
-        @attack[clr][Chess::Piece::ROOK] = \
+        @attack[clr][Chess::Piece::ROOK] |= \
           calculate_rook_attack(get_coord_for_bv(bv))
       end
     end
@@ -916,7 +918,7 @@ false
     0.upto(63) do |i|
       bv = 0x1 << i
       if bv & queen_bv == bv
-        @attack[clr][Chess::Piece::QUEEN] = \
+        @attack[clr][Chess::Piece::QUEEN] |= \
           calculate_queen_attack(get_coord_for_bv(bv))
       end
     end
