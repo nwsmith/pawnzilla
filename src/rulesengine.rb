@@ -1145,7 +1145,19 @@ false
     return false if src.x > 7 or src.y > 7
     return false if dest.x > 7 or dest.y > 7
     pc = sq_at(src).piece
-    pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
+    can_move = pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
+    
+    if (can_move) 
+      dest_pc = sq_at(dest).piece
+      move_piece(src, dest)
+      if (check?(pc.colour))
+        can_move = false
+      end
+      move_piece(dest, src)
+      place_piece(dest, dest_pc) unless dest_pc.nil?
+    end
+    
+    can_move
   end
   
   def chk_mv_pawn(src, dest)

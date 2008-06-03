@@ -62,19 +62,19 @@ puts
   runner = GameRunner.new(white_move_engine, black_move_engine)
   monitor = GameMonitor.new(runner)
   err_cnt = 0
-  max_run = 1
-  verbose = true
+  max_run = 100
+  verbose = false
   tr = Translator::PieceTranslator.new
 
 # Main Game Loop
 1.upto(max_run) do |run_count|
-  puts "start game #{run_count+1}"
+  puts "start game #{run_count}"
   loop do
     puts monitor.gamerunner.rules_engine.to_txt if verbose
     puts if verbose
     begin
       if (monitor.gamerunner.game_is_over)
-        puts "#{runner.winner.colour} wins!"
+        puts "#{runner.winner.colour} wins!" if verbose
         white_move_engine = RandomMoveEngine.new
         black_move_engine = RandomMoveEngine.new
         monitor.gamerunner = GameRunner.new(white_move_engine, black_move_engine)

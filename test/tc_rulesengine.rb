@@ -2586,6 +2586,21 @@ class TestGameState < Test::Unit::TestCase
     assert(!e.chk_mv(B1, Coord.new(-1, 1))) 
   end
   
+  def test_bug_knight_should_not_be_able_leave_king_in_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - R B Q K - N R
+      P P P N - - B P
+      - - - P P - - -
+      - b - - - p P -
+      - p - - - - - -
+      p - n - - n - -
+      - b p p - p p p
+      r - - q k - - r
+    ")
+    assert(!e.chk_mv(D7, C5))
+  end
+  
   #--------
   # Bishop
   #--------
