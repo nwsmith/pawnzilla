@@ -27,69 +27,6 @@ require "tr"
 require "test_game_runner"
 require "test_move_engine"
 
-class TestPieceInfo < Test::Unit::TestCase
-  def test_should_get_correct_colour
-    pc_info = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    assert_equal(Colour::WHITE, pc_info.colour)
-  end  
-
-  def test_equal_piece_info_should_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    assert_equal(lhs, rhs)
-  end
-
-  def test_piece_info_with_different_colour_should_not_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP), A1)
-    assert_not_equal(lhs, rhs)
-  end
-
-  def test_piece_info_with_different_piece_type_should_not_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::QUEEN), A1)
-    assert_not_equal(lhs, rhs)
-  end
-
-  def test_piece_info_with_different_coord_should_not_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A2)
-    assert_not_equal(lhs, rhs)
-  end
-
-  def test_piece_info_with_different_attack_should_not_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1)
-    assert_not_equal(lhs, rhs)
-  end
-
-  def test_piece_info_with_different_move_should_not_be_equal
-    lhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1, 0x2)
-    rhs = PieceInfo::new(Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP), A1, 0x1, 0x1)
-    assert_not_equal(lhs, rhs)
-  end
-end
-
-class TestPieceInfoBag < Test::Unit::TestCase
-  def setup
-    @piece_info_bag = PieceInfoBag.new
-  end
-
-  def test_should_return_white_rook_for_A1
-    expected = PieceInfo.new(Chess::Piece.new(Colour::WHITE, Chess::Piece::ROOK), A1)
-    assert_equal(expected, @piece_info_bag.pcfcoord(A1))
-  end
-
-  def test_should_return_black_rook_for_A8
-    expected = PieceInfo.new(Chess::Piece.new(Colour::BLACK, Chess::Piece::ROOK), A8)
-    assert_equal(expected, @piece_info_bag.pcfcoord(A8))
-  end
-
-  def test_should_return_nil_for_A3
-    assert_nil(@piece_info_bag.pcfcoord(A3))
-  end
-end
-
 class TestGameState < Test::Unit::TestCase
   def setup 
     @board = RulesEngine.new
@@ -657,13 +594,6 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
     "
     assert_state(expected, e) 
-  end
-  
-  def test_should_modify_piece_info_after_move
-    board = RulesEngine.new
-    board.move_piece(E2, E4)
-    #assert_nil(board.piece_info_bag.pcfcoord(E2))
-    assert_equal(Chess::Piece.new(Colour::WHITE, Chess::Piece::PAWN), board.piece_info_bag.pcfcoord(E4).piece)
   end
   
   def test_place_piece_should_place_proper_peice_and_colour
@@ -1733,57 +1663,55 @@ class TestGameState < Test::Unit::TestCase
   #--------
   # Pawn
   #--------  
-# TODO: unbreak this
-#  def test_check_calculate_white_pawn_move
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - p - - - - 
-#      - - - - - - - - 
-#      - - - - - - - -
-#    ")
-#    expected = "
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - -
-#      - - - @ - - - -   
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#    "
-#    assert_move_state(e, expected, D3);
-#  end
+  def test_check_calculate_white_pawn_move
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - - 
+      - - - - - k - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - p - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+      - - - @ - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D3);
+  end
 
-# TODO: unbreak this
-#  def test_check_calculate_black_pawn_move
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - P - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - -
-#    ")
-#    expected = "
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - @ - - - -
-#      - - - - - - - -   
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - 
-#    "
-#    assert_move_state(e, expected, D6);
-#  end
+  def test_check_calculate_black_pawn_move
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - K - 
+      - - - - - - - - 
+      - - - P - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -
+    ")
+    expected = "
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - @ - - - -
+      - - - - - - - -   
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+    "
+    assert_move_state(e, expected, D6);
+  end
   
   def test_check_calculate_blocked_white_pawn_move
     e = RulesEngine.new
@@ -1928,53 +1856,51 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, B1)    
   end
  
-# TODO: unbreak this  
-#  def test_calculate_white_knight_moves_should_work_from_mid_board
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - n - - - -
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - k - - ")
-#    expected = "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - @ - @ - - - 
-#      - @ - - - @ - -
-#      - - - - - - - - 
-#      - @ - - - @ - - 
-#      - - @ - @ - - -
-#      - - - - - - - -"
-#    assert_move_state(e, expected, D4)        
-#  end
+  def test_calculate_white_knight_moves_should_work_from_mid_board
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - n - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - k - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
  
-# TODO: unbreak this  
-#  def test_calculate_white_knight_moves_should_work_from_board_edge
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      n - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - ")
-#    expected = "
-#      - - - - - - - -
-#      - @ - - - - - -
-#      - - @ - - - - - 
-#      - - - - - - - -
-#      - - @ - - - - - 
-#      - @ - - - - - - 
-#      - - - - - - - -
-#      - - - - - - - -"
-#    assert_move_state(e, expected, A5)    
-#  end
+  def test_calculate_white_knight_moves_should_work_from_board_edge
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - k - -
+      n - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
+  end
   
   def test_calculate_black_knight_moves_should_work_for_start_square
     e = RulesEngine.new
@@ -1999,53 +1925,51 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, B8)    
   end
  
-# TODO: unbreak this  
-#  def test_calculate_black_knight_moves_should_work_from_mid_board
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - N - - - -
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - ")
-#    expected = "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - @ - @ - - - 
-#      - @ - - - @ - -
-#      - - - - - - - - 
-#      - @ - - - @ - - 
-#      - - @ - @ - - -
-#      - - - - - - - -"
-#    assert_move_state(e, expected, D4)        
-#  end
+  def test_calculate_black_knight_moves_should_work_from_mid_board
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - K -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - N - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - @ - @ - - - 
+      - @ - - - @ - -
+      - - - - - - - - 
+      - @ - - - @ - - 
+      - - @ - @ - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)        
+  end
  
-# TODO: unbreak this  
-#  def test_calculate_black_knight_moves_should_work_from_board_edge
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      N - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - ")
-#    expected = "
-#      - - - - - - - -
-#      - @ - - - - - -
-#      - - @ - - - - - 
-#      - - - - - - - -
-#      - - @ - - - - - 
-#      - @ - - - - - - 
-#      - - - - - - - -
-#      - - - - - - - -"
-#    assert_move_state(e, expected, A5)    
-#  end
+  def test_calculate_black_knight_moves_should_work_from_board_edge
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - K -
+      - - - - - - - -
+      - - - - - - - -
+      N - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - @ - - - - - -
+      - - @ - - - - - 
+      - - - - - - - -
+      - - @ - - - - - 
+      - @ - - - - - - 
+      - - - - - - - -
+      - - - - - - - -"
+    assert_move_state(e, expected, A5)    
+  end
   
   #--------
   # Bishop
@@ -2312,29 +2236,28 @@ class TestGameState < Test::Unit::TestCase
     assert_move_state(e, expected, E1)    
   end 
 
-# TODO: unbreak this  
-#  def test_calculate_king_move_should_work_for_center_king
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - k - - - -
-#      - - - - - - - - 
-#      - - - - - - - - 
-#      - - - - - - - - ")
-#    expected = "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - @ @ @ - - -
-#      - - @ - @ - - -
-#      - - @ @ @ - - - 
-#      - - - - - - - - 
-#      - - - - - - - -"
-#    assert_move_state(e, expected, D4)    
-#  end
+  def test_calculate_king_move_should_work_for_center_king
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - k - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - @ @ @ - - -
+      - - @ - @ - - -
+      - - @ @ @ - - - 
+      - - - - - - - - 
+      - - - - - - - -"
+    assert_move_state(e, expected, D4)    
+  end
   
   def test_calculate_king_move_should_not_allow_moving_into_check
     e = RulesEngine.new
@@ -2424,40 +2347,38 @@ class TestGameState < Test::Unit::TestCase
     assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)           
   end
 
-# TODO: unbreak this
-#  def test_white_pawn_should_have_en_passant_available_NW
-#    e = RulesEngine.new
-#
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - P p - - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - - - - - -
-#      - - - - - - - -
-#    ")
-#    e.move_list = [Move.new(D7, D5)]
-#    assert(e.chk_mv(E5, D6)) 
-#  end
+  def test_white_pawn_should_have_en_passant_available_NW
+    e = RulesEngine.new
 
-# TODO: unbreak this  
-#  def test_white_pawn_should_have_en_passant_available_NE
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - - p P - -
-#      - - - - - - - -
-#      - - - - - - - - 
-#      - - - - - - - -
-#      - - - - - - - -
-#    ")
-#    e.move_list = [Move.new(F7, F5)]
-#    assert(e.chk_mv(E5, F6)) 
-#  end
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - P p - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - k -
+    ")
+    e.move_list = [Move.new(D7, D5)]
+    assert(e.chk_mv(E5, D6)) 
+  end
+
+  def test_white_pawn_should_have_en_passant_available_NE
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - p P - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - -
+      - - - - - - k -
+    ")
+    e.move_list = [Move.new(F7, F5)]
+    assert(e.chk_mv(E5, F6)) 
+  end
 
   def test_white_pawn_should_not_have_en_passant_available_if_not_pawn
     e = RulesEngine.new
@@ -2493,39 +2414,37 @@ class TestGameState < Test::Unit::TestCase
     assert(!e.chk_mv(E5, D6)) 
   end
 
-# TODO: unbreak this
-#  def test_black_pawn_should_have_en_passant_available_SW
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - p P - - 
-#      - - - - - - - - 
-#      - - - - - - - -   
-#      - - - - - - - - 
-#    ")
-#    e.move_list = [Move.new(E2, E4)]
-#    assert(e.chk_mv(F4, E3)) 
-#  end
+  def test_black_pawn_should_have_en_passant_available_SW
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - K - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - p P - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - - 
+    ")
+    e.move_list = [Move.new(E2, E4)]
+    assert(e.chk_mv(F4, E3)) 
+  end
 
-# TODO: unbreak this
-#  def test_black_pawn_should_have_en_passant_available_SE
-#    e = RulesEngine.new
-#    place_pieces(e, "
-#      - - - - K - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - - - -
-#      - - - - - P p - 
-#      - - - - - - - - 
-#      - - - - - - - -   
-#      - - - k - - - - 
-#    ")
-#    e.move_list = [Move.new(G2, G4)]
-#    assert(e.chk_mv(F4, G3)) 
-#  end
+  def test_black_pawn_should_have_en_passant_available_SE
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - P p - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - - 
+    ")
+    e.move_list = [Move.new(G2, G4)]
+    assert(e.chk_mv(F4, G3)) 
+  end
 
   def test_black_pawn_should_not_have_en_passant_available_if_not_pawn
     e = RulesEngine.new
