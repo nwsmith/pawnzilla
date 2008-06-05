@@ -293,9 +293,18 @@ class RulesEngine
   end  
 
   # Is the given coord attacked by any piece of the given colour
+  # Make sure that calculate_colour_attack is called before this method
   def attacked?(clr, coord)
-    (1 << get_sw(coord)) & calculate_colour_attack(clr) != 0
+    attacked?(clr, coord, true)
   end    
+  
+  def attacked?(clr, coord, calculate) 
+    if (calculate) 
+      calculate_colour_attack(clr)
+    end
+    attack_bv = @attack[clr].values.inject(0) {|bv, val| bv | val}
+    ((0x01 << get_sw(coord)) & attack_bv) > 0
+  end
 
   #
   # TODO: This is a placeholder implementation based on sq_at, 
@@ -597,9 +606,10 @@ false
     bv_piece = (1 << get_sw(coord))
     clr = sq_at(coord).piece.colour
 
-    
+    cnt = 0
     0.upto(63) do |i|
-      if (1 << i & bv_piece != 0)
+      cnt += 1
+      if ((0x01 << i & bv_piece) > 0)
         bv |= calculate_diagonal_attack(clr, i)
       end
     end
@@ -668,8 +678,6 @@ false
   end
   
   def calculate_colour_attack(clr)
-    all_attack = 0
-    
     #TODO: This could be refactored to be a lot nicer...
     pawn_bv = @clr_pos[clr] & @pos[Chess::Piece::PAWN]
     0.upto(63) do |i|
@@ -717,7 +725,8 @@ false
     end
     
     @attack[clr][Chess::Piece::KING] = calculate_king_attack(clr)
-    @attack[clr].values.inject(0) {|bv, val| bv | val}
+    
+    false
   end
   
   def calculate_file_attack(clr, coord)
@@ -821,6 +830,7 @@ false
       edge_mask = params[0]
       shift_width = params[1]
 
+      src = get_coord_for_bv(1 << sq)
       chk_sq = sq
       next_sq = chk_sq + shift_width
 
@@ -831,7 +841,9 @@ false
         chk_sq = next_sq
         next_sq = chk_sq + shift_width
         if ((1 << chk_sq) & all_pieces) == 0 || ((1 << chk_sq) & opp_pieces) > 0 
-          bv |= (1 << chk_sq)
+          if (chk_mv_calc(src, get_coord_for_bv(1 << chk_sq), false))
+            bv |= (1 << chk_sq)
+          end
         end
 
         next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
@@ -910,14 +922,14 @@ false
   def calc_all_mv_king(src) 
     mv_bv = 0x0
     
-    mv_bv |= get_bv src.west if chk_mv src, src.west
-    mv_bv |= get_bv src.northwest if chk_mv src, src.northwest
-    mv_bv |= get_bv src.north if chk_mv src, src.north
-    mv_bv |= get_bv src.northeast if chk_mv src, src.northeast
-    mv_bv |= get_bv src.east if chk_mv src, src.east
-    mv_bv |= get_bv src.southeast if chk_mv src, src.southeast
-    mv_bv |= get_bv src.south if chk_mv src, src.south
-    mv_bv |= get_bv src.southwest if chk_mv src, src.southwest
+    mv_bv |= get_bv src.west if chk_mv(src, src.west)
+    mv_bv |= get_bv src.northwest if chk_mv(src, src.northwest)
+    mv_bv |= get_bv src.north if chk_mv(src, src.north)
+    mv_bv |= get_bv src.northeast if chk_mv(src, src.northeast)
+    mv_bv |= get_bv src.east if chk_mv(src, src.east)
+    mv_bv |= get_bv src.southeast if chk_mv(src, src.southeast)
+    mv_bv |= get_bv src.south if chk_mv(src, src.south)
+    mv_bv |= get_bv src.southwest if chk_mv(src, src.southwest)
 
     mv_bv
   end
@@ -928,12 +940,22 @@ false
   # Start legal move checks
   #---------------------------------------------------------------------------- 
   def chk_mv(src, dest) 
+    chk_mv_calc(src, dest, true)
+  end
+  
+  def chk_mv_calc(src, dest, calculate)    
     return false if src.x < 0 or src.y < 0
     return false if dest.x < 0 or dest.y < 0
     return false if src.x > 7 or src.y > 7
     return false if dest.x > 7 or dest.y > 7
     pc = sq_at(src).piece
+    
+    
+    
     can_move = pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
+    if (calculate && !pc.nil?) 
+      calculate_colour_attack(pc.colour.flip)
+    end
     
     if (can_move) 
       dest_pc = sq_at(dest).piece
@@ -1036,13 +1058,13 @@ false
       return false unless src.on_rank?(dest)      
       
       l.each_coord do |coord|
-        return false if attacked?(king.colour.flip, coord)
+        return false if attacked?(king.colour.flip, coord, false)
       end
       
       return true
     end 
 
-    return false unless l.len == 2 and not attacked? king.colour.flip, dest
+    return false unless l.len == 2 and not attacked?(king.colour.flip, dest, false)
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
@@ -1066,12 +1088,12 @@ false
   # Start checkmate detection
   #---------------------------------------------------------------------------- 
   def checkmate?(clr)
+    calculate_colour_attack(clr.flip)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
     # The king blocks attacks, so removing him calculates properly
     remove_piece(src)
-    calculate_colour_attack(clr.flip)
-    checkmate = (calc_all_mv_king(src) == 0) && (attacked? clr.flip, src)
+    checkmate = (calc_all_mv_king(src) == 0) && (attacked? clr.flip, src, false)
     place_piece(src, king)
     checkmate
   end
@@ -1085,7 +1107,7 @@ false
   def check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
-    attacked? clr.flip, src
+    attacked? clr.flip, src, false
   end
   #----------------------------------------------------------------------------
   # End checkmate detection
