@@ -295,10 +295,10 @@ class RulesEngine
   # Is the given coord attacked by any piece of the given colour
   # Make sure that calculate_colour_attack is called before this method
   def attacked?(clr, coord)
-    attacked?(clr, coord, true)
+    attacked_calc?(clr, coord, true)
   end    
   
-  def attacked?(clr, coord, calculate) 
+  def attacked_calc?(clr, coord, calculate) 
     if (calculate) 
       calculate_colour_attack(clr)
     end
@@ -726,7 +726,7 @@ false
     
     @attack[clr][Chess::Piece::KING] = calculate_king_attack(clr)
     
-    false
+    #false
   end
   
   def calculate_file_attack(clr, coord)
@@ -950,21 +950,21 @@ false
     return false if dest.x > 7 or dest.y > 7
     pc = sq_at(src).piece
     
-    
-    
-    can_move = pc.nil? ? false : @chk_lookup[pc.name].call(src, dest)
-    if (calculate && !pc.nil?) 
-      calculate_colour_attack(pc.colour.flip)
-    end
-    
-    if (can_move) 
-      dest_pc = sq_at(dest).piece
-      move_piece(src, dest)
-      if (check?(pc.colour))
-        can_move = false
+    can_move = !pc.nil?
+    if (can_move)
+      if (calculate)
+        calculate_colour_attack(pc.colour.flip)
       end
-      move_piece(dest, src)
-      place_piece(dest, dest_pc) unless dest_pc.nil?
+      can_move = @chk_lookup[pc.name].call(src, dest)
+      if (can_move)
+        dest_pc = sq_at(dest).piece
+        move_piece(src, dest)
+        if (check?(pc.colour))
+          can_move = false
+        end
+        move_piece(dest, src)
+        place_piece(dest, dest_pc) unless dest_pc.nil?
+      end
     end
     
     can_move
@@ -1058,13 +1058,13 @@ false
       return false unless src.on_rank?(dest)      
       
       l.each_coord do |coord|
-        return false if attacked?(king.colour.flip, coord, false)
+        return false if attacked_calc?(king.colour.flip, coord, false)
       end
       
       return true
     end 
 
-    return false unless l.len == 2 and not attacked?(king.colour.flip, dest, false)
+    return false unless l.len == 2 and not attacked_calc?(king.colour.flip, dest, false)
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
@@ -1093,7 +1093,7 @@ false
     king = sq_at(src).piece
     # The king blocks attacks, so removing him calculates properly
     remove_piece(src)
-    checkmate = (calc_all_mv_king(src) == 0) && (attacked? clr.flip, src, false)
+    checkmate = (calc_all_mv_king(src) == 0) && (attacked_calc?(clr.flip, src, false))
     place_piece(src, king)
     checkmate
   end
@@ -1107,7 +1107,7 @@ false
   def check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
-    attacked? clr.flip, src, false
+    attacked_calc?(clr.flip, src, false)
   end
   #----------------------------------------------------------------------------
   # End checkmate detection

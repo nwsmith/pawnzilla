@@ -27,7 +27,7 @@ require "tr"
 require "test_game_runner"
 require "test_move_engine"
 
-class TestGameState < Test::Unit::TestCase
+class RulesEngineTest < Test::Unit::TestCase
   def setup 
     @board = RulesEngine.new
   end
@@ -896,21 +896,8 @@ class TestGameState < Test::Unit::TestCase
       - - - q - - - -
     ")
     bv = e.calculate_pawn_attack(F5)
-    expected = "
-      - - - - - - - -
-      - - - - - - - -
-      - - - - * - * -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
-    "
-    assert_bv_equals(expected, bv)
-    e6_bv = e.get_bv(E6)
-    assert((e6_bv & bv) == e6_bv)
-    bv = e.calculate_colour_attack(Colour::WHITE)
-    assert((e6_bv & bv) == e6_bv)
+    e.calculate_colour_attack(Colour::WHITE)
+    assert(e.check?(Colour::BLACK))
   end
   
   #--------
@@ -983,7 +970,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
+      k-K-----
       --------
       --------
       --------
@@ -995,8 +982,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(A1)
 
     expected = "
-      -------*
-      ------*-
+      -*-----*
+      **----*-
       -----*--
       ----*---
       ---*----
@@ -1011,9 +998,9 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
+      -------k
       --------
-      --------
-      --------
+      -------K
       --------
       --------
       --------
@@ -1023,8 +1010,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(H1)
 
     expected = "
-      *-------
-      -*------
+      *-----*-
+      -*----**
       --*-----
       ---*----
       ----*---
@@ -1039,7 +1026,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      b-------
+      b---K--k
       --------
       --------
       --------
@@ -1051,8 +1038,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(A8)
 
     expected = "
-      --------
-      -*------
+      ------*-
+      -*----**
       --*-----
       ---*----
       ----*---
@@ -1067,7 +1054,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      -------b
+      --k-K--b
       --------
       --------
       --------
@@ -1079,8 +1066,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(H8)
 
     expected = "
-      --------
-      ------*-
+      -*-*----
+      -***--*-
       -----*--
       ----*---
       ---*----
@@ -1095,7 +1082,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
+      k-K-----
       --------
       --------
       --------
@@ -1107,8 +1094,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(D4)
 
     expected = "
-      -------*
-      *-----*-
+      -*-----*
+      **----*-
       -*---*--
       --*-*---
       --------
@@ -1123,8 +1110,8 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
-      --------
+      -------K
+      ---k----
       -Q---Q--
       --------
       ---b----
@@ -1135,9 +1122,9 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(D4)
 
     expected = "
-      --------
-      --------
-      -*---*--
+      --***---
+      --*-*---
+      -*****--
       --*-*---
       --------
       --*-*---
@@ -1151,7 +1138,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
+      k------K
       --------
       --------
       --------
@@ -1163,8 +1150,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_bishop_attack(C1)
 
     expected = "
-      --------
-      --------
+      -*------
+      **------
       --------
       --------
       --------
@@ -1187,11 +1174,7 @@ class TestGameState < Test::Unit::TestCase
       q - - - p p - -
       P - - k - b - r
     ")
-    f8_bv = e.get_bv(F8)
-    bv = e.calculate_bishop_attack(H6)
-    assert((f8_bv & bv) == f8_bv)
-    bv = e.calculate_colour_attack(Colour::WHITE)
-    assert((f8_bv & bv) == f8_bv)
+    e.calculate_colour_attack(Colour::WHITE)
     assert(e.check?(Colour::BLACK))
   end
   
@@ -1403,12 +1386,12 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
+      ---K----
       --------
       --------
       --------
       --------
-      --------
-      --------
+      -------k
       --------
       q-------
     ")
@@ -1419,9 +1402,9 @@ class TestGameState < Test::Unit::TestCase
       *-----*-
       *----*--
       *---*---
-      *--*----
-      *-*-----
-      **------
+      *--*--**
+      *-*---*-
+      **----**
       -*******
     "
     assert_attack_state(expected, b, Colour::WHITE)
@@ -1431,7 +1414,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
+      k------K
       --------
       --------
       --------
@@ -1443,8 +1426,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_queen_attack(D1)
 
     expected = "
-      ---*----
-      ---*----
+      -*-*----
+      **-*----
       ---*----
       ---*---*
       *--*--*-
@@ -1462,19 +1445,19 @@ class TestGameState < Test::Unit::TestCase
       --------
       --------
       --------
-      --------
+      -------k
       ---q----
       --------
       --------
-      --------
+      -------K
     ")
     b.calculate_queen_attack(D4)
 
     expected = "
       ---*---*
       *--*--*-
-      -*-*-*--
-      --***---
+      -*-*-***
+      --***-*-
       ***-****
       --***---
       -*-*-*--
@@ -1487,7 +1470,7 @@ class TestGameState < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
-      --------
+      -----K-k
       --------
       ---P-P--
       --------
@@ -1499,8 +1482,8 @@ class TestGameState < Test::Unit::TestCase
     b.calculate_queen_attack(D4)
 
     expected = "
-      --------
-      *-------
+      ------*-
+      *-----**
       -*-*-*--
       --***---
       ***-****
@@ -1792,7 +1775,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
-      - - B - - - - - 
+      - - B - - - - K 
       - - - p - - - - 
       - - - - - - k - ")
     expected = "
@@ -1817,7 +1800,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - - 
       - - - - - - - - 
-      - - - - - - - - ")
+      - k - - - - - - ")
     expected = "
       - - - - - - - -
       - - - - - - - -
@@ -1977,7 +1960,7 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_bishop_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      k - K - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2000,7 +1983,7 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_bishop_move_should_stop_with_opposing_pieces
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      k - K - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2024,8 +2007,8 @@ class TestGameState < Test::Unit::TestCase
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      - - - - K - - -
+      - - k - - - - -
       - - - - - - - -
       - - - - - n - -
       P - - - - - - - 
@@ -2046,11 +2029,11 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_bishop_move_should_stop_with_same_colour_bishops
     e = RulesEngine.new
     place_pieces(e, "
+      - k - - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
-      - - - - - - - -
-      - - - - - b - -
+      K - - - - b - -
       P - - - - - - - 
       - b - - - - - - 
       - - b - - - - - ")
@@ -2121,7 +2104,7 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_queen_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - k - - - K - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2146,7 +2129,7 @@ class TestGameState < Test::Unit::TestCase
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
-      - - - - - - - -
+      - k - K - - - -
       - - - - - - - -
       - - - - - - - -
       - P - P - P - - 
@@ -2167,7 +2150,7 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_queen_move_should_be_stopped_by_friendly_pieces
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - k - K - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2190,7 +2173,7 @@ class TestGameState < Test::Unit::TestCase
   def test_calculate_queen_move_should_be_stopped_by_friendly_queens
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - K - k - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2675,7 +2658,7 @@ class TestGameState < Test::Unit::TestCase
   def test_white_king_cannot_castle_kingside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - K - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - R - -
@@ -2705,7 +2688,7 @@ class TestGameState < Test::Unit::TestCase
   def test_white_king_cannot_castle_kingside_through_diagaonal_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - K - -
       - - - - - - - -
       - - - - - - - -
       - - B - - - - -
@@ -2750,7 +2733,7 @@ class TestGameState < Test::Unit::TestCase
   def test_white_king_cannot_castle_queenside_through_diagonal_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - K - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2787,7 +2770,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
-      - - - - - - - - 
+      - - - - - - k - 
     ")
     assert(!e.chk_mv(E8, G8))
   end  
@@ -2817,7 +2800,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
-      - - - - - - - - 
+      - k - - - - - - 
     ")
     assert(!e.chk_mv(E8, C8))    
   end
@@ -2873,6 +2856,21 @@ class TestGameState < Test::Unit::TestCase
       ")
     assert(e.checkmate?(Colour::WHITE))    
   end  
+  
+  def test_should_calculate_checkmate_from_game_part_one
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - B - - R - - 
+      - - K P - - - - 
+      - P - p - P - - 
+      - - P - P p n P 
+      n - p - - - - - 
+      p q - p - - - r 
+      - - - b - - b - 
+      r - - - k - - -      
+    ")
+    assert(e.checkmate?(Colour::BLACK))
+  end
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #---------------------------------------------------------------------------- 
@@ -2891,6 +2889,7 @@ class TestGameState < Test::Unit::TestCase
       - - - - - - - -   
       - - - k - - - - 
     ")
+    e.calculate_colour_attack(Colour::BLACK)
     assert(e.check?(Colour::WHITE))
   end
   
@@ -2913,14 +2912,15 @@ class TestGameState < Test::Unit::TestCase
     e = RulesEngine.new
     place_pieces(e, "
       R - N - - K R -
-      N Q - - - - - -
-      P - p - B P p b
+      N Q - - - - p -
+      P - p - B P - b
       - n - P - - - p
       - - - P - - - n
       - r p - - - - -
       q - - - p p - -
       P - - k - b - r
     ")
+    e.calculate_colour_attack(Colour::WHITE)
     assert(e.check?(Colour::BLACK))
   end
   
