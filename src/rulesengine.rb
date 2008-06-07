@@ -944,10 +944,11 @@ false
   end
   
   def chk_mv_calc(src, dest, calculate)    
-    return false if src.x < 0 or src.y < 0
-    return false if dest.x < 0 or dest.y < 0
-    return false if src.x > 7 or src.y > 7
-    return false if dest.x > 7 or dest.y > 7
+    return false unless src.x.between?(0, 7)
+    return false unless src.y.between?(0, 7)
+    return false unless dest.x.between?(0, 7)
+    return false unless dest.y.between?(0, 7)
+
     pc = sq_at(src).piece
     
     can_move = !pc.nil?
