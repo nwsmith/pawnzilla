@@ -212,4 +212,148 @@ class TestCoord < Test::Unit::TestCase
     line = Line.new(C2, C3);
     assert_equal(2, line.len)
   end
+  
+  def test_north_of_should_return_true_for_south_coordinate
+    assert(A2.north_of?(A1))
+  end
+
+  def test_north_of_should_return_true_for_farther_south_coordinate
+    assert(A8.north_of?(A1))
+  end
+
+  def test_north_of_should_return_false_for_north_coordinate
+    assert(!A1.north_of?(A2))
+  end
+  
+  def test_north_of_should_return_true_for_southeast_coordinate
+    assert(E4.north_of?(D3))
+  end
+  
+  def test_due_north_of_should_return_true_for_south_coordinate
+    assert(A2.due_north_of?(A1))
+  end
+  
+  def test_due_north_of_should_return_true_for_farther_south_coordinate
+    assert(A8.due_north_of?(A1))
+  end
+  
+  def test_due_north_of_should_return_false_for_north_coordinate
+    assert(!A1.due_north_of?(A8))
+  end
+  
+  def test_due_north_of_should_return_false_for_northwest_coordinate
+    assert(!B2.due_north_of?(A1))
+  end
+  
+  def test_south_of_should_return_true_for_due_north_coordinate
+    assert(A1.south_of?(A2))
+  end
+  
+  def test_south_of_should_return_true_for_farther_due_north_coordinate
+    assert(A1.south_of?(A8))
+  end
+  
+  def test_south_of_should_return_true_for_northeast_coordinate
+    assert(A1.south_of?(H8))
+  end
+  
+  def test_south_of_should_return_false_for_southwest_coordinate
+    assert(!H8.south_of?(A1))
+  end
+  
+  def test_due_south_of_should_return_true_for_due_north_coordinate
+    assert(A1.due_south_of?(A2))
+  end
+  
+  def test_due_south_of_should_return_true_for_farther_due_north_coordinate
+    assert(A1.due_south_of?(A8))
+  end
+  
+  def test_due_south_of_should_return_false_for_northeast_coordinate
+    assert(!A1.due_south_of?(B2))
+  end
+  
+  def test_due_south_of_should_return_false_for_due_north_coordinate
+    assert(!A2.due_south_of?(A1))
+  end
+  
+  def test_due_west_of_should_return_true_for_due_east_coordinate
+    assert(A1.due_west_of?(B1))
+  end
+  
+  def test_due_west_of_should_return_true_for_farther_due_east_coordiate
+    assert(A1.due_west_of?(H1))
+  end
+  
+  def test_due_west_of_should_return_false_for_north_east_coordinate
+    assert(!A2.due_west_of?(B3))
+  end
+  
+  def test_due_west_of_should_return_false_for_west_coordinate
+    assert(!B1.due_west_of?(A1))
+  end
+  
+  def test_due_east_of_should_return_true_for_due_west_coordinate
+    assert(B1.due_east_of?(A1))
+  end
+  
+  def test_due_east_of_should_return_true_for_farther_due_west_coordinate
+    assert(H1.due_east_of?(A1))
+  end
+  
+  def test_due_east_of_should_return_false_for_northwest_coordinate
+    assert(!B1.due_east_of?(A2))
+  end
+  
+  def test_due_east_of_should_return_false_for_west_coordinate
+    assert(!A1.due_east_of?(B1))
+  end
+  
+  def test_northwest_of_should_return_true_for_southeast_coordinate
+    assert(G2.northwest_of?(H1))
+  end
+  
+  def test_northwest_of_should_return_true_for_farther_southeast_coordinate
+    assert(A8.northwest_of?(H1))
+  end
+  
+  def test_northwest_of_should_return_true_for_northwest_coordinate
+    assert(!H1.northwest_of?(G2))
+  end
+  
+  def test_northeast_of_should_return_true_for_southeast_coordinate
+    assert(B2.northeast_of?(A1))
+  end
+  
+  def test_northeast_of_should_return_true_for_farther_southeast_coordinate
+    assert(H8.northeast_of?(A1))
+  end
+  
+  def test_northeast_of_should_return_false_for_northeast_coordinate
+    assert(!A1.northeast_of?(B2))
+  end
+  
+  def test_southwest_of_should_return_true_for_northeast_coordinate
+    assert(A1.southwest_of?(B2))
+  end
+  
+  def test_southwest_of_should_return_true_for_farther_northeast_coordinate
+    assert(A1.southwest_of?(H8))
+  end
+  
+  def test_southwest_of_should_return_false_for_southwest_coordinate
+    assert(!B2.southwest_of?(A1))
+  end
+  
+  def test_southeast_of_should_return_true_for_northwest_coordinate
+    assert(H1.southeast_of?(G2))
+  end
+  
+  def test_southeast_of_should_return_true_for_farther_northwest_coordinate
+    assert(H1.southeast_of?(A8))
+  end
+  
+  def test_southeast_of_should_return_false_for_northeast_coordinate
+    assert(!A8.southeast_of?(H1))
+  end
 end

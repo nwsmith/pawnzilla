@@ -43,6 +43,17 @@ class Coord
     @y += 1
   end
   
+  # Is the specified coord north of this coord, regardless of east/west
+  def north_of?(coord)
+    @y > coord.y
+  end
+  
+  # Is the specified coord DUE north of this coord.
+  # this means that a coordinate northeast or northwest will return false. 
+  def due_north_of?(coord)
+    @x == coord.x && @y > coord.y
+  end
+  
   #Returns the coordinate directly south of this one
   def south
     return Coord.new(@x, @y-1)
@@ -53,8 +64,12 @@ class Coord
     @y -= 1
   end
   
-  def west_of?(coord)
-    return @x < coord.x
+  def south_of?(coord)
+    @y < coord.y
+  end
+  
+  def due_south_of?(coord)
+    @x == coord.x && @y < coord.y 
   end
   
   # Returns the coordinate west of this one
@@ -67,8 +82,12 @@ class Coord
     @x -= 1
   end
   
-  def east_of?(coord)
-    return @x > coord.x
+  def west_of?(coord)
+    @x < coord.x
+  end
+  
+  def due_west_of?(coord)
+    @y == coord.y && @x < coord.x
   end
   
   # Returns the coordinate east of this one
@@ -79,6 +98,14 @@ class Coord
   # Modifies the current coordinate to be the one directly east
   def east!
     @x += 1
+  end
+  
+  def east_of?(coord)
+    @x > coord.x
+  end
+  
+  def due_east_of?(coord)
+    @y == coord.y && @x > coord.x
   end
   
   # Returns the coordinate northwest of this one
@@ -92,6 +119,10 @@ class Coord
     west!
   end
   
+  def northwest_of?(coord)
+    @x < coord.x && @y > coord.y
+  end
+  
   # Returns the coordinate northeast of this one
   def northeast
     return Coord.new(@x+1, @y+1)
@@ -101,6 +132,10 @@ class Coord
   def northeast!
     north!
     east!
+  end
+  
+  def northeast_of?(coord) 
+    @x > coord.x && @y > coord.y
   end
   
   # Returns the coordinate southwest from this one
@@ -114,6 +149,10 @@ class Coord
     west!
   end
   
+  def southwest_of?(coord) 
+    @x < coord.x && @y < coord.y 
+  end
+  
   # Returns the coordinate southeast of this one
   def southeast
     return Coord.new(@x+1, @y-1)
@@ -123,6 +162,10 @@ class Coord
   def southeast!
     south!
     east!
+  end
+  
+  def southeast_of?(coord)
+    @x > coord.x && @y < coord.y
   end
   
   # Checks if the specified coordinate is on the same diagonal as this object
@@ -154,7 +197,7 @@ class Coord
   def Coord.same_rank?(c0, c1) 
     c0.y == c1.y
   end
-
+  
   def Coord.from_alg(alg) 
     return nil unless alg[0].chr.between?('a', 'h')
     return nil unless alg[1].chr.to_i.between?(1, 8)
