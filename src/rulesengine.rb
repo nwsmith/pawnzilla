@@ -291,6 +291,36 @@ class RulesEngine
   def self.on_board?(bv)
     bv.between?(1, 0xFF_FF_FF_FF_FF_FF_FF_FF)
   end  
+  
+  def self.calc_board_vector(coord, direction) 
+    end_point = Coord.new(coord.x, coord.y)
+    loop do
+      if (direction == Coord::NORTH && coord_on_board?(end_point.north))
+        end_point.north!        
+      elsif (direction == Coord::SOUTH && coord_on_board?(end_point.south))
+        end_point.south!
+      elsif (direction == Coord::EAST && coord_on_board?(end_point.east))
+        end_point.east!
+      elsif (direction == Coord::WEST && coord_on_board?(end_point.west))
+        end_point.west!
+      elsif (direction == Coord::NORTHEAST && coord_on_board?(end_point.northeast))
+        end_point.northeast!
+      elsif (direction == Coord::NORTHWEST && coord_on_board?(end_point.northwest))
+        end_point.northwest!
+      elsif (direction == Coord::SOUTHEAST && coord_on_board?(end_point.southeast))
+        end_point.southeast!
+      elsif (direction == Coord::SOUTHWEST && coord_on_board?(end_point.southwest))
+        end_point.southwest!
+      else
+        break;
+      end
+    end
+   Line.new(coord, end_point)
+  end
+  
+  def self.coord_on_board?(coord) 
+    coord.x.between?(0,7) && coord.y.between?(0,7)
+  end
 
   # Is the given coord attacked by any piece of the given colour
   # Make sure that calculate_colour_attack is called before this method
@@ -437,7 +467,7 @@ false
     dest_sq = sq_at(dest)
     piece = src_sq.piece
     
-    if src_sq.piece.name == Chess::Piece::KING and Line.new(src, dest).len == 3
+    if !src_sq.piece.nil? && src_sq.piece.name == Chess::Piece::KING and Line.new(src, dest).len == 3
       # Castling
       # Move the king
       move_piece(src, dest)
@@ -544,6 +574,8 @@ false
   end
   
   def calculate_rook_attack(coord)
+    return 0 if sq_at(coord).piece.nil?
+    
     clr = sq_at(coord).piece.colour
     
     bv = 0x0
@@ -948,6 +980,9 @@ false
     return false unless src.y.between?(0, 7)
     return false unless dest.x.between?(0, 7)
     return false unless dest.y.between?(0, 7)
+    
+    diagonal_directions = Coord::NORTHWEST | Coord::NORTHEAST | Coord::SOUTHEAST | Coord::SOUTHWEST
+    straight_directions = Coord::NORTH | Coord::SOUTH | Coord::EAST | Coord::WEST
 
     pc = sq_at(src).piece
     
@@ -958,13 +993,41 @@ false
       end
       can_move = @chk_lookup[pc.name].call(src, dest)
       if (can_move)
-        dest_pc = sq_at(dest).piece
-        move_piece(src, dest)
-        if (check?(pc.colour))
-          can_move = false
+        king_bv = @clr_pos[pc.colour] & @pos[Chess::Piece::KING]
+        king_coord = get_coord_for_bv(king_bv)
+
+        if (Line.same_line?(king_coord, src))         
+          dest_pc = sq_at(dest).piece
+          move_piece(src, dest)
+
+          direction = Line.line_direction(king_coord, src)
+
+          line = RulesEngine.calc_board_vector(src, direction)
+          line.each_coord do |coord|
+            piece = sq_at(coord).piece
+            if (!piece.nil?)
+              if (piece.colour.opposite?(pc.colour))
+                if ((direction & diagonal_directions) == direction)
+                  if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::BISHOP)
+                    can_move = false
+                    break
+                  end
+                end
+                if ((direction & straight_directions) == direction)
+                  if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::ROOK)
+                    can_move = false
+                    break
+                  end
+                end
+              else
+                can_move = true
+                break
+              end
+            end
+          end
+          move_piece(dest, src)
+          place_piece(dest, dest_pc) unless dest_pc.nil?          
         end
-        move_piece(dest, src)
-        place_piece(dest, dest_pc) unless dest_pc.nil?
       end
     end
     
@@ -1107,7 +1170,6 @@ false
   #---------------------------------------------------------------------------- 
   def check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
-    king = sq_at(src).piece
     attacked_calc?(clr.flip, src, false)
   end
   #----------------------------------------------------------------------------

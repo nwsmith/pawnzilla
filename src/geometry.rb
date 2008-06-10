@@ -16,6 +16,15 @@
 # limitations under the License.
 #
 class Coord
+  NORTH = 0x01
+  SOUTH = 0x02
+  EAST = 0x04
+  WEST = 0x08
+  NORTHWEST = 0x10
+  NORTHEAST = 0x20
+  SOUTHWEST = 0x40
+  SOUTHEAST = 0x80
+  
   attr_reader :x
   attr_reader :y
   
@@ -256,5 +265,18 @@ class Line
   
   def Line.same_line?(c0, c1) 
     Coord.same_diag?(c0, c1) || Coord.same_rank?(c0, c1) || Coord.same_file?(c0, c1)
+  end
+  
+  def self.line_direction(c0, c1)
+    raise ArgumentError, "Points not on same line." unless self.same_line?(c0, c1)
+    
+    return Coord::NORTH if c1.due_north_of?(c0)
+    return Coord::SOUTH if c1.due_south_of?(c0)
+    return Coord::WEST if c1.due_west_of?(c0)
+    return Coord::EAST if c1.due_east_of?(c0)
+    return Coord::NORTHEAST if c1.northeast_of?(c0)
+    return Coord::NORTHWEST if c1.northwest_of?(c0)
+    return Coord::SOUTHEAST if c1.southeast_of?(c0)
+    return Coord::SOUTHWEST if c1.southwest_of?(c0)
   end
 end

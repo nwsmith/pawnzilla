@@ -356,4 +356,8 @@ class TestCoord < Test::Unit::TestCase
   def test_southeast_of_should_return_false_for_northeast_coordinate
     assert(!A8.southeast_of?(H1))
   end
+  
+  def test_line_direction_should_not_work_for_non_line
+    assert_raise(ArgumentError) {Line.line_direction(Line.new(A1, C3))}
+  end
 end

@@ -379,6 +379,55 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(7, 8))))
     assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(8, 7))))
   end  
+  
+  def test_calc_board_vector_should_do_full_board_north
+    line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::NORTH)
+    assert_equal(A1, line.c0)
+    assert_equal(A8, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_south
+    line = RulesEngine.calc_board_vector(Coord.from_alg("a8"), Coord::SOUTH)
+    assert_equal(A8, line.c0)
+    assert_equal(A1, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_east
+    line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::EAST)
+    assert_equal(A1, line.c0)
+    assert_equal(H1, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_west
+    line = RulesEngine.calc_board_vector(Coord.from_alg("h1"), Coord::WEST)
+    assert_equal(H1, line.c0)
+    assert_equal(A1, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_north_east
+    line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::NORTHEAST)
+    assert_equal(A1, line.c0)
+    assert_equal(H8, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_north_west
+    line = RulesEngine.calc_board_vector(Coord.from_alg("h1"), Coord::NORTHWEST)
+    assert_equal(H1, line.c0)
+    assert_equal(A8, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_south_east
+    line = RulesEngine.calc_board_vector(Coord.from_alg("a8"), Coord::SOUTHEAST)
+    assert_equal(A8, line.c0)
+    assert_equal(H1, line.c1)
+  end
+  
+  def test_calc_board_vector_should_do_full_board_south_west
+    line = RulesEngine.calc_board_vector(Coord.from_alg("h8"), Coord::SOUTHWEST)
+    assert_equal(H8, line.c0)
+    assert_equal(A1, line.c1)
+  end
+  
   #----------------------------------------------------------------------------
   # End board helper tests
   #----------------------------------------------------------------------------  
