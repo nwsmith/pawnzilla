@@ -1152,13 +1152,17 @@ false
   # Start checkmate detection
   #---------------------------------------------------------------------------- 
   def checkmate?(clr)
-    calculate_colour_attack(clr.flip)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
     # The king blocks attacks, so removing him calculates properly
-    remove_piece(src)
-    checkmate = (calc_all_mv_king(src) == 0) && (attacked_calc?(clr.flip, src, false))
-    place_piece(src, king)
+    calculate_colour_attack(clr.flip)
+    checkmate = check?(clr)
+    if (checkmate)
+      remove_piece(src)
+      calculate_colour_attack(clr.flip)
+      place_piece(src, king)
+      checkmate = (calc_all_mv_king(src) == 0)
+    end
     checkmate
   end
   

@@ -2336,6 +2336,31 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -"
     assert_move_state(e, expected, H1)    
   end
+  
+  def test_calculate_king_move_should_allow_moves_from_game_one
+    e = RulesEngine.new
+    place_pieces(e, "
+      R N B - K - R - 
+      - P P P - - P - 
+      - - - - - Q - P 
+      P - B - P P - - 
+      - - - - - N p p 
+      p p - p p n - - 
+      n - p - k p - - 
+      - r b q - b - r 
+    ")
+    expected = "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - @ - - - - 
+      - - - - @ - - -"
+    assert_move_state(e, expected, E2)    
+  end
+  
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  
@@ -2918,8 +2943,24 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - b - - b - 
       r - - - k - - -      
     ")
-    assert(e.checkmate?(Colour::BLACK))
+    assert(!e.checkmate?(Colour::BLACK))
   end
+  
+  def test_should_calculate_checkmake_from_game_part_two
+    e = RulesEngine.new
+    place_pieces(e, "
+      R N B - K - R - 
+      - P P P - - P - 
+      - - - - - Q - P 
+      P - B - P P - - 
+      - - - - - N p p 
+      p p - p p n - - 
+      n - p - k p - - 
+      - r b q - b - r 
+    ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+  
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #---------------------------------------------------------------------------- 
