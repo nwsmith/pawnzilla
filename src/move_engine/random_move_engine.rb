@@ -9,7 +9,12 @@ class RandomMoveEngine < MoveEngine
     
     # select random piece
     loop do
-      bv = 0x01 << rand(64)
+      if (gamestate.check?(clr)) 
+        # Have to move out of check
+        bv = gamestate.clr_pos[clr] & gamestate.pos[Chess::Piece::KING]
+      else
+        bv = 0x01 << rand(64)
+      end
       coord = gamestate.get_coord_for_bv(bv)
       piece = gamestate.sq_at(coord).piece
       if (!piece.nil? && piece.colour == clr) 

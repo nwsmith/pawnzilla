@@ -988,6 +988,12 @@ false
     
     can_move = !pc.nil?
     if (can_move)
+      if (check?(pc.colour) && pc.name != Chess::Piece::KING)
+        # Have to move out of check
+        can_move = false
+      end
+    end
+    if (can_move)
       if (calculate)
         calculate_colour_attack(pc.colour.flip)
       end
