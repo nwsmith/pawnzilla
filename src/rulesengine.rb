@@ -1001,12 +1001,18 @@ false
       if (can_move)
         king_bv = @clr_pos[pc.colour] & @pos[Chess::Piece::KING]
         king_coord = get_coord_for_bv(king_bv)
-
-        if (Line.same_line?(king_coord, src))         
+                
+        if (Line.same_line?(king_coord, src) || king_coord == src)                   
+          direction = 0
+          
+          if (king_coord == src)
+            direction = Line.line_direction(dest, src)
+          else
+            direction = Line.line_direction(king_coord, src)
+          end
+          
           dest_pc = sq_at(dest).piece
           move_piece(src, dest)
-
-          direction = Line.line_direction(king_coord, src)
 
           line = RulesEngine.calc_board_vector(src, direction)
           line.each_coord do |coord|
@@ -1133,7 +1139,7 @@ false
       
       return true
     end 
-
+    
     return false unless l.len == 2 and not attacked_calc?(king.colour.flip, dest, false)
     
     # Can only capture opposite coloured pieces

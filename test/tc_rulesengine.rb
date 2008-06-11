@@ -1748,10 +1748,10 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_check_calculate_blocked_white_pawn_move
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - k
       - - - - - - - - 
       - - - - - - - - 
-      - - - - - - - - 
+      - - - - - - - K 
       - - - - - - - - 
       - - b - - - - - 
       - - p - - - - - 
@@ -1761,7 +1761,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - - 
       - - - - - - - - 
-      - - - - - - - - 
+      - - - - - - - -
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
@@ -2361,6 +2361,30 @@ class RulesEngineTest < Test::Unit::TestCase
     assert_move_state(e, expected, E2)    
   end
   
+  def test_calculate_king_move_should_allow_moves_from_game_two
+    e = RulesEngine.new
+    place_pieces(e, "
+      p q - K - - - R
+      - - P Q - - - -
+      - - - - - - p -
+      - - N - n - - -
+      - - P n B - - - 
+      - - - - - - - P
+      - - - - - r r -
+      - - - k - b - -
+    ")
+    expected = "
+      - - - - - - - -
+      - - - - @ - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -"
+    assert_move_state(e, expected, D8)    
+  end
+  
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  
@@ -2441,9 +2465,9 @@ class RulesEngineTest < Test::Unit::TestCase
     e = RulesEngine.new
     
     place_pieces(e, "
-      - - - - - - - - 
+      - - - - - - - k 
       - - - - - - - -   
-      - - - - - - - -
+      - - - - - - - K
       - - - R p - - - 
       - - - - - - - - 
       - - - - - - - - 
@@ -2458,9 +2482,9 @@ class RulesEngineTest < Test::Unit::TestCase
     e = RulesEngine.new
 
     place_pieces(e, "
+      - - - - - - - k
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - - 
+      - - - - - - - K 
       - - - P p - - -
       - - - - - - - -
       - - - - - - - - 
@@ -2506,14 +2530,14 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_black_pawn_should_not_have_en_passant_available_if_not_pawn
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      k - - - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - r P - - 
       - - - - - - - - 
       - - - - - - - -   
-      - - - - - - - - 
+      - K - - - - - - 
     ")
     e.move_list = [Move.new(E2, E4)]
     assert(!e.chk_mv(F4, E3)) 
@@ -2522,9 +2546,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_black_pawn_should_not_have_en_passant_available_if_one_square_moved 
     e = RulesEngine.new
     place_pieces(e, "
+      k - - - - - - -
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      K - - - - - - -
       - - - - - - - -
       - - - - p P - - 
       - - - - - - - - 
@@ -2877,6 +2901,21 @@ class RulesEngineTest < Test::Unit::TestCase
       - k - - - - - - 
     ")
     assert(!e.chk_mv(E8, C8))    
+  end
+  
+  def test_king_cannot_stay_in_check_from_game_one 
+    e = RulesEngine.new
+    place_pieces(e, "
+      p q - K - - - R
+      - - P Q - - - -
+      - - - - - - p -
+      - - N - n - - -
+      - - P n B - - - 
+      - - - - - - - P
+      - - - - - r r -
+      - - - k - b - -
+    ")
+    assert(!e.chk_mv(E8, F8))
   end
 
   #----------------------------------------------------------------------------
