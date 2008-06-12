@@ -1,0 +1,10 @@
+<project name="Pawnzilla_JIN_Plugin" default="dist" basedir=".">
+    <description>
+        A plugin that allows JIN chess to talk to pawnzilla
+    </description>
+
+    <target name="dist">
+        <echo message="Nothing here yet." />
+    </target>
+
+</project>
