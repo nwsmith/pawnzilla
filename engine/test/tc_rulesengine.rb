@@ -1522,23 +1522,22 @@ class RulesEngineTest < Test::Unit::TestCase
       -----K-k
       --------
       ---P-P--
+      -----q--
       --------
-      ---q----
       --------
       --------
       --------
     ")
-    b.calculate_queen_attack(D4)
-
+    b.calculate_colour_attack(Colour::WHITE)
     expected = "
-      ------*-
-      *-----**
-      -*-*-*--
-      --***---
-      ***-****
-      --***---
-      -*-*-*--
-      *--*--*-
+      --*---*-
+      ---*--**
+      ----***-
+      *****-**
+      ----***-
+      ---*-*-*
+      --*--*--
+      -*---*--
     "
     assert_attack_state(expected, b, Colour::WHITE)
   end
@@ -2894,7 +2893,7 @@ class RulesEngineTest < Test::Unit::TestCase
       R - - - K - - -
       - - - - - - - -
       - - - - - - - -
-      - - - - - b - -
+      - - - - - - b -
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
@@ -2918,6 +2917,35 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!e.chk_mv(E8, F8))
   end
 
+  def test_king_should_have_escapes_from_game_two
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - R - - - N - 
+      - - - - K - B R 
+      p - - - - p - - 
+      - P - - - p - - 
+      - - - - - - - p 
+      - - - - - - - - 
+      p P - - n - b - 
+      - - P q r - - k   
+    ")
+    assert(e.chk_mv(E7, E8))
+  end
+  
+  def test_king_should_have_escapes_from_game_three
+    e = RulesEngine.new
+    place_pieces(e, "
+      p q - K - - - R
+      - - P Q - - - -
+      - - - - - - p -
+      - - N - n - - -
+      - - P n B - - - 
+      - - - - - - - P
+      - - - - - r r -
+      - - - k - b - -
+    ")
+    assert(!e.chk_mv(D8, E8))
+  end
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 

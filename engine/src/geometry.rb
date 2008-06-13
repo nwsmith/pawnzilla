@@ -42,6 +42,17 @@ class Coord
     "(#{x}, #{y})"
   end
   
+  def go(direction)
+    return north if (Coord::NORTH == direction)
+    return south if (Coord::SOUTH == direction)
+    return east if (Coord::EAST == direction)
+    return west if (Coord::WEST == direction)
+    return northeast if (Coord::NORTHEAST == direction)
+    return northwest if (Coord::NORTHWEST == direction)
+    return southeast if (Coord::SOUTHEAST == direction)
+    return southwest if (Coord::SOUTHWEST == direction)
+  end
+  
   # Returns the coordinate directly in north of this one
   def north
     return Coord.new(@x, @y+1)
@@ -256,7 +267,7 @@ class Line
       end
     end
   end
-  
+    
   def len
     len = 0
     self.each_coord {|x| len += 1}
@@ -278,5 +289,30 @@ class Line
     return Coord::NORTHWEST if c1.northwest_of?(c0)
     return Coord::SOUTHEAST if c1.southeast_of?(c0)
     return Coord::SOUTHWEST if c1.southwest_of?(c0)
+  end
+end
+
+# A Vector is a line with an associated direction
+class Vector < Line
+  attr_accessor :direction
+  
+  def initialize(c0, c1)
+    raise ArgumentError, "coords not on same line" unless Line.same_line?(c0, c1)
+    @c0, @c1 = c0, c1
+    @direction = Line.line_direction(c0, c1)
+  end
+  
+  def each_coord
+    start = c0
+    
+    yield c0
+    
+    return if c0 == c1
+    
+    loop do 
+      start = start.go(@direction)
+      yield start
+      break if start == c1
+    end
   end
 end

@@ -315,7 +315,7 @@ class RulesEngine
         break;
       end
     end
-   Line.new(coord, end_point)
+   Vector.new(coord, end_point)
   end
   
   def self.coord_on_board?(coord) 
@@ -750,12 +750,11 @@ false
     queen_bv = @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
     0.upto(63) do |i|
       bv = 0x1 << i
-      if bv & queen_bv == bv
-        @attack[clr][Chess::Piece::QUEEN] |= \
-          calculate_queen_attack(get_coord_for_bv(bv))
+      if ((bv & queen_bv) == bv) 
+        @attack[clr][Chess::Piece::QUEEN] |= calculate_queen_attack(get_coord_for_bv(bv))
       end
     end
-    
+        
     @attack[clr][Chess::Piece::KING] = calculate_king_attack(clr)
     
     #false
@@ -1014,27 +1013,30 @@ false
           dest_pc = sq_at(dest).piece
           move_piece(src, dest)
 
-          line = RulesEngine.calc_board_vector(src, direction)
-          line.each_coord do |coord|
+          vector = RulesEngine.calc_board_vector(src, direction)
+          vector.each_coord do |coord|
             piece = sq_at(coord).piece
             if (!piece.nil?)
               if (piece.colour.opposite?(pc.colour))
                 if ((direction & diagonal_directions) == direction)
                   if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::BISHOP)
                     can_move = false
-                    break
+                  else
+                    can_move = true
                   end
                 end
                 if ((direction & straight_directions) == direction)
                   if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::ROOK)
                     can_move = false
-                    break
+                  else
+                    can_move = true
                   end
                 end
               else
                 can_move = true
-                break
               end
+              
+              break
             end
           end
           move_piece(dest, src)
@@ -1122,7 +1124,7 @@ false
   end
   
   def chk_mv_king(src, dest) 
-    l = Line.new(src, dest)
+    l = Vector.new(src, dest)
     
     king = sq_at(src).piece
 

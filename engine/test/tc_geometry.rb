@@ -32,6 +32,37 @@ class TestLine < Test::Unit::TestCase
   end
 end
 
+class TestVector < Test::Unit::TestCase
+  def test_vector_should_throw_exception_if_coords_not_on_same_line
+    assert_raise(ArgumentError) {Vector.new(A1, B3)}
+  end
+  
+  def test_vector_should_initialize_with_correct_direction
+    vector = Vector.new(A1, H1)
+    assert_equal(Coord::EAST, vector.direction)
+  end
+  
+  def test_each_coord_should_go_east_west_instead_of_normalize
+    vector = Vector.new(E1, A1)
+    coords = []
+    vector.each_coord {|coord| coords.push(coord)}
+    assert_equal(5, coords.length)
+    assert_equal(E1, coords[0])
+    assert_equal(D1, coords[1])
+    assert_equal(C1, coords[2])
+    assert_equal(B1, coords[3])
+    assert_equal(A1, coords[4])
+  end
+  
+  def test_each_coord_should_return_one_coord_and_not_crash_for_one_point
+    vector = Vector.new(A1, A1)
+    coords = []
+    vector.each_coord {|coord| coords.push(coord)}
+    assert_equal(1, coords.length)
+    assert_equal(A1, coords[0])
+  end
+end
+
 class TestCoord < Test::Unit::TestCase
   def test_should_detect_SW_to_NE_diagonal
     assert(Coord.same_diag?(A1, B2))
