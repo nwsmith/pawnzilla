@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+$:.unshift File.join(File.dirname(__FILE__), "..", "test")
 require "geometry"
 require "rulesengine"
 require "move"
