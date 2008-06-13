@@ -46,6 +46,16 @@ class GameMonitor
       raise ArgumentError, err_ms
     end
     
+    # Check two: make sure the piece moved where it was supposed to move.
+    dest_pc = @gamerunner.rules_engine.sq_at(move.dest).piece
+    if (src_pc != dest_pc)
+      err_ms = "#{src_pc.name} was the source piece, "
+      err_ms += " but #{dest_pc.name} was the destination piece.\n"
+      err_ms += "Before move:\n#{prev_pos}\n"
+      err_ms += "After move:\n#{curr_pos}\n"
+      raise ArgumentError, err_ms
+    end
+    
     # Check two: kings just disappear sometimes, usually to illegal captures
     e = @gamerunner.rules_engine
     if ((e.clr_pos[Colour::WHITE] & e.pos[Chess::Piece::KING]) == 0 || \
