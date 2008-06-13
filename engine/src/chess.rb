@@ -38,7 +38,30 @@ module Chess
     def ==(piece)
       @colour == piece.colour && @name == piece.name
     end
+    
+    def king?
+      @name == KING;
+    end
+    
+    def queen?
+      @name == QUEEN;
+    end
+    
+    def rook?
+      @name == ROOK;
+    end
+    
+    def bishop?
+      @name == BISHOP;
+    end
+    
+    def knight?
+      @name == KNIGHT;
+    end
 
+    def pawn?
+      @name == PAWN;
+    end
   end    
   
   class Square 
