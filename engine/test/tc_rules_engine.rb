@@ -20,7 +20,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 require "test/unit"
 require "pz_unit"
 require "colour"
-require "rulesengine"
+require "rules_engine"
 require "chess/piece"
 require "chess/square"
 require "geometry"

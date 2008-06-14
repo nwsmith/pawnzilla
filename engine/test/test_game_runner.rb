@@ -16,7 +16,7 @@
 #   limitations under the License.
 #
 require "move_engine"
-require "rulesengine"
+require "rules_engine"
 require "game_runner"
 
 class TestGameRunner < GameRunner

@@ -20,7 +20,7 @@ require "test/unit"
 require "pz_unit"
 require "move_engine"
 require "game_runner"
-require "rulesengine"
+require "rules_engine"
 require "test_move_engine"
 
 class GameRunnerTest < Test::Unit::TestCase
