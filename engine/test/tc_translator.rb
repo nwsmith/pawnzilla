@@ -19,7 +19,8 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 require "test/unit"
 require "pz_unit"
 require "colour"
-require "chess"
+require "chess/piece"
+require "chess/square"
 require "tr"
 
 class TestTranslator < Test::Unit::TestCase

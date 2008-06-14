@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "chess"
+require "chess/piece"
+require "chess/square"
 require "colour"
 require "move"
 require "tr"

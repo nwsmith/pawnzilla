@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: chess.rb 324 2008-06-13 04:35:32Z nwsmith $
 #
 # Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
@@ -19,51 +19,6 @@ require "geometry"
 require "colour"
 
 module Chess
-  class Piece
-    BISHOP = "Bishop";
-    KING = "King";
-    KNIGHT = "Knight";
-    PAWN = "Pawn";
-    QUEEN = "Queen";
-    ROOK = "Rook";
-    
-    attr_reader :colour
-    attr_reader :name
-
-    def initialize(colour, name)
-      @colour = colour
-      @name = name
-    end
-
-    def ==(piece)
-      @colour == piece.colour && @name == piece.name
-    end
-    
-    def king?
-      @name == KING;
-    end
-    
-    def queen?
-      @name == QUEEN;
-    end
-    
-    def rook?
-      @name == ROOK;
-    end
-    
-    def bishop?
-      @name == BISHOP;
-    end
-    
-    def knight?
-      @name == KNIGHT;
-    end
-
-    def pawn?
-      @name == PAWN;
-    end
-  end    
-  
   class Square 
     attr_reader :coord
     attr_reader :colour
