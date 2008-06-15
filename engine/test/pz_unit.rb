@@ -16,9 +16,9 @@
 #
 require 'test/unit'
 
-require "geometry"
+require "geometry/coord"
 require "colour"
-require "tr"
+require "piece_translator"
 
 # Redtag: I did try extending this, but test case does some mojo
 # on autorunning classes. Best not to mess it up and put a kludge in
@@ -107,7 +107,7 @@ H8 = Coord.from_alg("h8")
 
 class Test::Unit::TestCase
   def assert_state(expected, gamestate, message = nil) 
-    tr = Translator::PieceTranslator.new
+    tr = PieceTranslator.new
     processed_expected = expected.gsub(/\s+/, "")
     
     gamestate_state = ""
@@ -183,7 +183,7 @@ class Test::Unit::TestCase
   end
 
   def place_pieces(gamestate, board_string)
-    pt = Translator::PieceTranslator.new()
+    pt = PieceTranslator.new()
     board_string = process_board_string(board_string)
     puts "error: given board malformed!" if board_string.length != 64
     gamestate.clear()

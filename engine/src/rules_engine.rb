@@ -17,9 +17,12 @@
 #
 require "chess/piece"
 require "chess/square"
+require "geometry/coord"
+require "geometry/line"
+require "geometry/vector"
 require "colour"
 require "move"
-require "tr"
+require "piece_translator"
 
 class RulesEngine
   DEFAULT_SEPARATOR = ' '
@@ -122,7 +125,7 @@ class RulesEngine
   # If no separator is defined, the default separator is used.
   
   def to_txt(sep = DEFAULT_SEPARATOR)
-    tr = Translator::PieceTranslator.new()
+    tr = PieceTranslator.new()
     txt, row = '', 8;
 
     # Because we store the board in a standard orientation, in order to make the board
@@ -1020,18 +1023,10 @@ false
             if (!piece.nil?)
               if (piece.colour.opposite?(pc.colour))
                 if ((direction & diagonal_directions) == direction)
-                  if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::BISHOP)
-                    can_move = false
-                  else
-                    can_move = true
-                  end
+                  can_move = !(piece.queen? || piece.bishop?)
                 end
                 if ((direction & straight_directions) == direction)
-                  if (piece.name == Chess::Piece::QUEEN || piece.name == Chess::Piece::ROOK)
-                    can_move = false
-                  else
-                    can_move = true
-                  end
+                  can_move = !(piece.queen? || piece.rook?)
                 end
               else
                 can_move = true

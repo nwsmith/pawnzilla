@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "geometry"
 require "colour"
 
 module Chess
@@ -36,7 +35,12 @@ module Chess
     end
 
     def ==(piece)
+      return false if piece.nil?
       @colour == piece.colour && @name == piece.name
+    end
+    
+    def to_s
+      "#{@colour} #{@name}"
     end
     
     def king?

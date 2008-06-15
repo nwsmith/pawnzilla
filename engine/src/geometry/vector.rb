@@ -1,5 +1,5 @@
 #
-# $Id: chess.rb 324 2008-06-13 04:35:32Z nwsmith $
+# $Id: geometry.rb 323 2008-06-13 04:31:34Z nwsmith $
 #
 # Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
@@ -15,26 +15,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-require "geometry/coord"
-require "colour"
+require "geometry/line"
 
-module Chess
-  class Square 
-    attr_reader :coord
-    attr_reader :colour
-    attr_accessor :piece
-
-    def initialize(coord, colour) 
-      @coord = coord
-      @colour = colour
-    end
+# A Vector is a line with an associated direction
+class Vector < Line
+  attr_accessor :direction
+  
+  def initialize(c0, c1)
+    raise ArgumentError, "coords not on same line" unless Line.same_line?(c0, c1)
+    @c0, @c1 = c0, c1
+    @direction = Line.line_direction(c0, c1)
+  end
+  
+  def each_coord
+    start = c0
     
-    def ==(square)
-      @coord == square.coord && @piece == square.piece
-    end
+    yield c0
     
-    def to_s
-      "#{@coord.to_alg}" + (@piece.nil? ? "" : "(#{piece})")
+    return if c0 == c1
+    
+    loop do 
+      start = start.go(@direction)
+      yield start
+      break if start == c1
     end
   end
 end

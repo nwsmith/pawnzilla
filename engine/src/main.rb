@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 $:.unshift File.join(File.dirname(__FILE__), "..", "test")
-require "geometry"
-require "rulesengine"
+require "geometry/coord"
+require "rules_engine"
 require "move"
 require "move_engine/human_move_engine"
 require "move_engine/random_move_engine"
@@ -65,7 +65,7 @@ puts
   err_cnt = 0
   max_run = 1
   verbose = true
-  tr = Translator::PieceTranslator.new
+  tr = PieceTranslator.new
 
 # Main Game Loop
 1.upto(max_run) do |run_count|

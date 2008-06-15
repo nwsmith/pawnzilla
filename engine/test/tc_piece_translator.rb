@@ -21,11 +21,11 @@ require "pz_unit"
 require "colour"
 require "chess/piece"
 require "chess/square"
-require "tr"
+require "piece_translator"
 
 class TestTranslator < Test::Unit::TestCase
   def setup
-    @tr = Translator::PieceTranslator.new
+    @tr = PieceTranslator.new
   end
 
   def test_white_pawn_should_translate

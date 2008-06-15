@@ -1,5 +1,5 @@
 #
-# $Id: chess.rb 324 2008-06-13 04:35:32Z nwsmith $
+# $Id: tc_geometry.rb 323 2008-06-13 04:31:34Z nwsmith $
 #
 # Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
@@ -14,27 +14,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-require "geometry/coord"
-require "colour"
+$:.unshift File.join(File.dirname(__FILE__), "..", "src")
+$:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
-module Chess
-  class Square 
-    attr_reader :coord
-    attr_reader :colour
-    attr_accessor :piece
+require "test/unit"
+require "pz_unit"
+require "geometry"
 
-    def initialize(coord, colour) 
-      @coord = coord
-      @colour = colour
-    end
-    
-    def ==(square)
-      @coord == square.coord && @piece == square.piece
-    end
-    
-    def to_s
-      "#{@coord.to_alg}" + (@piece.nil? ? "" : "(#{piece})")
-    end
+class TestLine < Test::Unit::TestCase
+  def test_line_e1_to_c1_should_work_bugfix
+    line = Line.new(E1, C1)
+    coords = []
+    line.each_coord {|coord| coords.push coord}
+    assert_equal(C1, coords[0])
+    assert_equal(D1, coords[1])
+    assert_equal(E1, coords[2])
   end
 end

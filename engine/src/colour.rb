@@ -55,8 +55,12 @@ class Colour
   def ==(cmp)
     cmp.class == String ? @colour == cmp : @colour == cmp.colour
   end
-
+  
   def hash
     @colour == STR_WHITE ? 0 : 1
+  end
+  
+  def to_s
+    @colour
   end
 end
