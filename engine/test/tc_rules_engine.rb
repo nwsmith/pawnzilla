@@ -2947,6 +2947,21 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(D8, E8))
   end
+  
+  def test_king_should_have_capture_escape_from_game_four
+    e = RulesEngine.new
+    place_pieces(e, "
+      p - - p R - - K 
+      B - - - R - - - 
+      - - - - - - b p 
+      - - - - - - p - 
+      - P - - - - - - 
+      - - - - - - P - 
+      - - - P - - B - 
+      - - - r - - k -
+    ")
+    assert(e.chk_mv(G1, G2))
+  end
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 
@@ -3025,6 +3040,21 @@ class RulesEngineTest < Test::Unit::TestCase
       p p - p p n - - 
       n - p - k p - - 
       - r b q - b - r 
+    ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+  
+  def test_should_not_be_checkmate_from_game_part_one
+    e = RulesEngine.new
+    place_pieces(e, "
+      p - - p R - - K 
+      B - - - R - - - 
+      - - - - - - b p 
+      - - - - - - p - 
+      - P - - - - - - 
+      - - - - - - P - 
+      - - - P - - B - 
+      - - - r - - k -
     ")
     assert(!e.checkmate?(Colour::WHITE))
   end

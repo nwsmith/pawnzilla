@@ -57,13 +57,12 @@ class GameMonitor
       if (!(square == src_sq || square == dest_sq))
         if (square != all_pieces_curr[i])
           err_ms = "square == src: #{square == src_sq}\n"
-          err_ms += "square == dest: #{square == src_dest}"
+          err_ms += "square == dest: #{square == dest_sq}"
           err_ms += "previous: #{square}"
           err_ms += "current: #{all_pieces_curr[i]}"
           err_ms += "move from: #{src_sq}"
           err_ms += "move to: #{dest_sq}"
-
-          err_ms = "#{src_pc.name} has drifted!\n";
+          err_ms += "#{src_pc.name} has drifted!\n";
           err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
           err_ms += "Before move:\n#{prev_pos}\n"
           err_ms += "After move:\n#{curr_pos}\n"
