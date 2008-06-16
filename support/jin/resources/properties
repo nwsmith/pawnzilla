@@ -1,0 +1,8 @@
+defaultHost = localhost
+hosts = localhost
+ports = 5000
+id = local
+shortNameKey = localhost
+longNameKey = localhost
+website = https://sourceforge.net/projects/pawnzilla
+registrationPage = https://sourceforge.net/projects/pawnzilla
