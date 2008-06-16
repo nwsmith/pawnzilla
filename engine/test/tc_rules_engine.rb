@@ -682,6 +682,148 @@ class RulesEngineTest < Test::Unit::TestCase
     square = board.sq_at(coord)
     assert(square.piece.nil?)
   end
+  
+  def test_promote_should_raise_argument_error_if_not_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - B - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ")   
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
+  end
+  
+  def test_promote_should_raise_argument_error_if_no_piece_present
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ")   
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
+  end  
+  
+  def test_promote_should_raise_argument_error_if_white_instead_of_black
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - P - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ")   
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
+  end
+  
+  def test_promote_should_raise_argument_error_if_black_instead_of_white
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - p - - - -
+    ")   
+    assert_raise(ArgumentError) {e.promote!(D1, Chess::Piece::QUEEN)}    
+  end
+  
+  def test_promote_should_raise_argument_error_in_middle_of_board
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - p - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert_raise(ArgumentError) {e.promote!(D4, Chess::Piece::QUEEN)}
+  end
+  
+  def test_promote_should_raise_argument_error_promoting_to_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - p - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::PAWN)}    
+  end
+  
+  def test_promote_should_raise_argument_error_promoting_to_king
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - p - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::KING)}        
+  end
+  
+  def test_promote_will_promote_white_pawn_to_queen
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - p - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    e.promote!(D8, Chess::Piece::QUEEN)
+    new_piece = e.sq_at(D8).piece
+    assert(new_piece.colour.white?)
+    assert(new_piece.queen?)
+  end
+  
+  def test_promote_will_promote_black_pawn_to_white
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - P - - - -
+    ") 
+    e.promote!(D1, Chess::Piece::QUEEN)
+    new_piece = e.sq_at(D1).piece
+    assert(new_piece.colour.black?)
+    assert(new_piece.queen?)   
+  end
+  
   #----------------------------------------------------------------------------
   # End piece helper tests
   #----------------------------------------------------------------------------  

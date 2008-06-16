@@ -554,6 +554,28 @@ false
     @clr_pos[piece.colour] ^= pc_bv
     @pos[piece.name] ^= pc_bv
   end
+  
+  def promote!(coord, new_piece_name)
+    old_piece = sq_at(coord).piece
+    
+    if (coord.y != 0 && coord.y != 7)
+      raise ArgumentError, "Can only promote from first or eighth rank."
+    end
+    if (new_piece_name == Chess::Piece::PAWN || new_piece_name == Chess::Piece::KING)
+      raise ArgumentError, "Cannot promote to pawn or king."
+    end
+    raise ArgumentError, "No piece to promote." if old_piece.nil?
+    raise ArgumentError, "Only pawns can be promoted." unless old_piece.pawn?
+    if (coord.y == 7 && old_piece.colour.black?)
+      raise ArgumentError, "Black pawn at 8th rank cannot promote."
+    end
+    if (coord.y == 0 && old_piece.colour.white?)
+      raise ArgumentError, "While pawn at 1st rank cannot promote."
+    end
+    
+    new_piece = Chess::Piece.new(old_piece.colour, new_piece_name)
+    place_piece(coord, new_piece)
+  end
   #----------------------------------------------------------------------------
   # End piece helpers
   #----------------------------------------------------------------------------
