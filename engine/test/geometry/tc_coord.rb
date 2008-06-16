@@ -19,7 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pz_unit"
-require "geometry"
+require "geometry/coord"
 
 class TestCoord < Test::Unit::TestCase
   def test_should_detect_SW_to_NE_diagonal

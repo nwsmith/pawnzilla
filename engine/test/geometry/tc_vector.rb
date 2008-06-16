@@ -19,7 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pz_unit"
-require "geometry"
+require "geometry/vector"
 
 class TestVector < Test::Unit::TestCase
   def test_vector_should_throw_exception_if_coords_not_on_same_line

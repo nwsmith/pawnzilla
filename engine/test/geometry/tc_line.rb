@@ -19,7 +19,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
 require "pz_unit"
-require "geometry"
+require "geometry/line"
 
 class TestLine < Test::Unit::TestCase
   def test_line_e1_to_c1_should_work_bugfix
