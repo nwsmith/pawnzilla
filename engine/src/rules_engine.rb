@@ -576,6 +576,19 @@ false
     new_piece = Chess::Piece.new(old_piece.colour, new_piece_name)
     place_piece(coord, new_piece)
   end
+  
+  def can_promote?(colour)
+    y = colour.white? ? 7 : 0
+    
+    0.upto(7) do |x|
+      piece = sq_at(Coord.new(x, y)).piece
+      if (!piece.nil? && piece.pawn? && piece.colour == colour)
+        return true
+      end
+    end
+    
+    false
+  end
   #----------------------------------------------------------------------------
   # End piece helpers
   #----------------------------------------------------------------------------

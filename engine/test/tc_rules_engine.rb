@@ -824,6 +824,119 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(new_piece.queen?)   
   end
   
+  def test_can_promote_should_return_false_when_nothing_to_promote
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - p - - - -   
+      - - - - - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))
+  end
+  
+  def test_can_promote_should_return_true_for_promotable_white_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - p - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert(e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))    
+  end
+  
+  def test_can_promote_should_return_true_for_promotable_black_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - P - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(e.can_promote?(Colour::BLACK))        
+  end
+  
+  def test_can_promote_should_return_false_for_non_promotable_white_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - p - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))            
+  end
+  
+  def test_can_promote_should_return_false_for_non_promotable_black_pawn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - P - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))            
+  end
+  
+  def test_can_promote_should_return_false_for_non_promotable_white_piece
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - q - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - - - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))            
+  end
+  
+  def test_can_promote_should_return_false_for_non_promotable_black_piece
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - Q - - - -
+    ") 
+    assert(!e.can_promote?(Colour::WHITE))
+    assert(!e.can_promote?(Colour::BLACK))        
+    
+  end
+  
   #----------------------------------------------------------------------------
   # End piece helper tests
   #----------------------------------------------------------------------------  
