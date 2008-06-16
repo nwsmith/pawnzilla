@@ -77,11 +77,11 @@ class GameMonitor
       if (!(square == src_sq || square == dest_sq))
         if (square != all_pieces_curr[i])
           err_ms = "square == src: #{square == src_sq}\n"
-          err_ms += "square == dest: #{square == dest_sq}"
-          err_ms += "previous: #{square}"
-          err_ms += "current: #{all_pieces_curr[i]}"
-          err_ms += "move from: #{src_sq}"
-          err_ms += "move to: #{dest_sq}"
+          err_ms += "square == dest: #{square == dest_sq}\n"
+          err_ms += "previous: #{square}\n"
+          err_ms += "current: #{all_pieces_curr[i]}\n"
+          err_ms += "move from: #{src_sq}\n"
+          err_ms += "move to: #{dest_sq}\n"
           err_ms += "#{src_pc.name} has drifted!\n";
           err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
           err_ms += "Before move:\n#{prev_pos}\n"
@@ -97,16 +97,6 @@ class GameMonitor
     if (dest_pc.nil?)
       err_ms = "#{src_pc.name} has disappeared!\n"
       err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
-      err_ms += "Before move:\n#{prev_pos}\n"
-      err_ms += "After move:\n#{curr_pos}\n"
-      raise ArgumentError, err_ms
-    end
-    
-    # Make sure the piece moved where it was supposed to move.
-    dest_pc = @gamerunner.rules_engine.sq_at(move.dest).piece
-    if (src_pc != dest_pc)
-      err_ms = "#{src_pc.name} was the source piece, "
-      err_ms += " but #{dest_pc.name} was the destination piece.\n"
       err_ms += "Before move:\n#{prev_pos}\n"
       err_ms += "After move:\n#{curr_pos}\n"
       raise ArgumentError, err_ms

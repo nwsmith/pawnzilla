@@ -1,6 +1,19 @@
 require "move_engine"
 
 class RandomMoveEngine < MoveEngine
+  def get_promotion_piece
+    num = rand(4)
+    case num
+    when 0:
+        return Chess::Piece::QUEEN
+    when 1: 
+        return Chess::Piece::ROOK
+    when 2:
+        return Chess::Piece::BISHOP
+    end
+    return Chess::Piece::KNIGHT
+  end
+  
   def get_move(clr, gamestate) 
     f = false
     src = nil
