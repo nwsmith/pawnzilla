@@ -1,0 +1,14 @@
+The position at the end of the first almost win of one random move engine over
+another:
+
+8 - R K - - - - - 
+7 - - - - p - - - 
+6 - b B N - - - - 
+5 - b p - - - - p 
+4 - n - - - Q - - 
+3 q - - - - - - - 
+2 - - P r - p - P 
+1 P - - - - n k - 
+  a b c d e f g h 
+
+Black wins, except that the knight @ F1 could capture the h2 pawn.

@@ -51,7 +51,27 @@ class GameMonitor
     
     curr_pos = @gamerunner.rules_engine.to_txt
     
-    # Check one: make sure pieces aren't drifting
+    # Double check checkmate
+    if (@gamerunner.game_is_over) 
+      error = false
+      if (@gamerunner.winner.white?)
+        if (!@gamerunner.rules_engine.checkmate?(Colour::BLACK)) 
+          error = true
+        end
+      else
+        if (!@gamerunner.rules_engine.checkmate?(Colour::WHITE))
+          error = true
+        end
+      end
+      
+      if (error)
+        raise ArgumentError, "Game Runner thinks game is over, but it's not!"
+      end
+    end
+    
+    
+    
+    # Make sure pieces aren't drifting
     all_pieces_prev.each_index do |i|
       square = all_pieces_prev[i]
       if (!(square == src_sq || square == dest_sq))
@@ -71,7 +91,7 @@ class GameMonitor
       end
     end
     
-    # Check two: make sure that the piece moving didn't disappear.  This 
+    # Make sure that the piece moving didn't disappear.  This 
     # generally happens with bugs in chk_mv
     dest_pc = @gamerunner.rules_engine.sq_at(move.dest).piece
     if (dest_pc.nil?)
@@ -82,7 +102,7 @@ class GameMonitor
       raise ArgumentError, err_ms
     end
     
-    # Check three: make sure the piece moved where it was supposed to move.
+    # Make sure the piece moved where it was supposed to move.
     dest_pc = @gamerunner.rules_engine.sq_at(move.dest).piece
     if (src_pc != dest_pc)
       err_ms = "#{src_pc.name} was the source piece, "
@@ -92,7 +112,7 @@ class GameMonitor
       raise ArgumentError, err_ms
     end
     
-    # Check four: kings just disappear sometimes, usually to illegal captures
+    # Kings just disappear sometimes, usually to illegal captures
     e = @gamerunner.rules_engine
     if ((e.clr_pos[Colour::WHITE] & e.pos[Chess::Piece::KING]) == 0 || \
         (e.clr_pos[Colour::BLACK] & e.pos[Chess::Piece::KING]) == 0) 
@@ -103,7 +123,7 @@ class GameMonitor
       raise ArgumentError, err_ms
     end
     
-    #Check five: king did not get out of check
+    # King did not get out of check
     white_is_in_check = e.check?(Colour::WHITE)
     black_is_in_check = e.check?(Colour::BLACK)
 
@@ -116,7 +136,7 @@ class GameMonitor
       raise ArgumentError, err_ms
     end
     
-    #Check six: move did not result in king being in check
+    # Move did not result in king being in check
     to_move = @gamerunner.to_move
     
     if ((to_move == Colour::BLACK && (!white_was_in_check && white_is_in_check)) || \
