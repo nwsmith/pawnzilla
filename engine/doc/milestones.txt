@@ -1,3 +1,5 @@
+June 15, 2008
+
 The position at the end of the first almost win of one random move engine over
 another:
 
@@ -12,3 +14,15 @@ another:
   a b c d e f g h 
 
 Black wins, except that the knight @ F1 could capture the h2 pawn.
+
+The first true win between two random move engines.  Black wins!
+
+8 R - K - - - - R 
+7 - - - - - p - - 
+6 - - p Q p - - - 
+5 - - - n - - - - 
+4 - b p - - - P - 
+3 N - - - n B p - 
+2 r - - - - - - k 
+1 - - - - - - r - 
+  a b c d e f g h 
