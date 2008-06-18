@@ -959,7 +959,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(C4)
+    bv = b.calc_attk_pawn(C4)
 
     expected = "
       --------
@@ -986,7 +986,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(C4)
+    bv = b.calc_attk_pawn(C4)
 
     expected = "
       --------
@@ -1014,7 +1014,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(A4)
+    bv = b.calc_attk_pawn(A4)
 
     expected = "
       --------
@@ -1042,7 +1042,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(A4)
+    bv = b.calc_attk_pawn(A4)
 
     expected = "
       --------
@@ -1071,7 +1071,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
     ")
 
-    bv = b.calculate_pawn_attack(H4)
+    bv = b.calc_attk_pawn(H4)
 
     expected = "
       --------
@@ -1099,7 +1099,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(H4)
+    bv = b.calc_attk_pawn(H4)
 
     expected = "
       --------
@@ -1127,7 +1127,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_pawn_attack(D8)
+    bv = b.calc_attk_pawn(D8)
 
     expected = "
       --------
@@ -1173,7 +1173,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       ---P----
     ")
-    bv = b.calculate_pawn_attack(D1)
+    bv = b.calc_attk_pawn(D1)
 
     expected = "
       --------
@@ -1200,9 +1200,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - b N - - k r -
       - - - q - - - -
     ")
-    bv = e.calculate_pawn_attack(F5)
-    e.calculate_colour_attack(Colour::WHITE)
-    assert(e.check?(Colour::BLACK))
+    #bv = e.calculate_pawn_attack(F5)
+    #e.calculate_colour_attack(Colour::WHITE)
+    assert(e.in_check?(Colour::BLACK))
   end
   
   #--------
@@ -1221,10 +1221,10 @@ class RulesEngineTest < Test::Unit::TestCase
       n------n
     ")
 
-    bv = b.calculate_knight_attack(A1) \
-       | b.calculate_knight_attack(A8) \
-       | b.calculate_knight_attack(H1) \
-       | b.calculate_knight_attack(H8)
+    bv = b.calc_attk_knight(A1) \
+       | b.calc_attk_knight(A8) \
+       | b.calc_attk_knight(H1) \
+       | b.calc_attk_knight(H8)
 
     expected = "
       --------
@@ -1253,7 +1253,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    bv = b.calculate_knight_attack(D4)
+    bv = b.calc_attk_knight(D4)
 
     expected = "
       --------
@@ -1284,11 +1284,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       b-------
     ")
-    b.calculate_bishop_attack(A1)
+    b.calc_attk_bishop(A1)
 
     expected = "
-      -*-----*
-      **----*-
+      -------*
+      ------*-
       -----*--
       ----*---
       ---*----
@@ -1296,7 +1296,7 @@ class RulesEngineTest < Test::Unit::TestCase
       -*------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, A1)
   end
 
   def test_lower_right_corner_bishop_should_attack_diagonally()
@@ -1312,11 +1312,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       -------b
     ")
-    b.calculate_bishop_attack(H1)
+    b.calc_attk_bishop(H1)
 
     expected = "
-      *-----*-
-      -*----**
+      *-------
+      -*------
       --*-----
       ---*----
       ----*---
@@ -1324,7 +1324,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ------*-
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, H1)
   end
 
   def test_upper_left_corner_bishop_should_attack_diagonally()
@@ -1340,11 +1340,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(A8)
+    b.calc_attk_bishop(A8)
 
     expected = "
-      ------*-
-      -*----**
+      --------
+      -*------
       --*-----
       ---*----
       ----*---
@@ -1352,7 +1352,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ------*-
       -------*
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, A8)
   end
 
   def test_upper_right_corner_bishop_should_attack_diagonally()
@@ -1368,11 +1368,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(H8)
+    b.calc_attk_bishop(H8)
 
     expected = "
-      -*-*----
-      -***--*-
+      --------
+      ------*-
       -----*--
       ----*---
       ---*----
@@ -1380,7 +1380,7 @@ class RulesEngineTest < Test::Unit::TestCase
       -*------
       *-------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, H8)
   end
 
   def test_centre_bishop_should_attack_outwards()
@@ -1396,11 +1396,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_bishop_attack(D4)
+    b.calc_attk_bishop(D4)
 
     expected = "
-      -*-----*
-      **----*-
+      -------*
+      *-----*-
       -*---*--
       --*-*---
       --------
@@ -1408,7 +1408,7 @@ class RulesEngineTest < Test::Unit::TestCase
       -*---*--
       *-----*-
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D4)
   end
   
   def test_centre_bishop_attacks_should_be_blockable()
@@ -1424,19 +1424,19 @@ class RulesEngineTest < Test::Unit::TestCase
       -Q---Q--
       --------
     ")
-    b.calculate_bishop_attack(D4)
+    b.calc_attk_bishop(D4)
 
     expected = "
-      --***---
-      --*-*---
-      -*****--
+      --------
+      --------
+      -*---*--
       --*-*---
       --------
       --*-*---
       -*---*--
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D4)
   end
   
   def test_bottom_bishop_should_attack_diagonally_adjacent_opposing_piece()
@@ -1452,11 +1452,11 @@ class RulesEngineTest < Test::Unit::TestCase
       -P-P----
       --b-----
     ")
-    b.calculate_bishop_attack(C1)
+    b.calc_attk_bishop(C1)
 
     expected = "
-      -*------
-      **------
+      --------
+      --------
       --------
       --------
       --------
@@ -1464,7 +1464,7 @@ class RulesEngineTest < Test::Unit::TestCase
       -*-*----
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, C1)
   end  
 
   def test_bishop_should_be_attacking_king
@@ -1479,8 +1479,7 @@ class RulesEngineTest < Test::Unit::TestCase
       q - - - p p - -
       P - - k - b - r
     ")
-    e.calculate_colour_attack(Colour::WHITE)
-    assert(e.check?(Colour::BLACK))
+    assert(e.in_check?(Colour::BLACK))
   end
   
   #------
@@ -1498,7 +1497,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       R-------
     ")
-    bv = b.calculate_rook_attack(A1)
+    bv = b.calc_attk_rook(A1)
 
     expected = "
       *-------
@@ -1527,7 +1526,7 @@ class RulesEngineTest < Test::Unit::TestCase
       R-------
     ")
 
-    bv = b.calculate_rook_attack(A1)
+    bv = b.calc_attk_rook(A1)
 
     expected = "
       *-------
@@ -1556,7 +1555,7 @@ class RulesEngineTest < Test::Unit::TestCase
       R-------
     ")
 
-    bv = b.calculate_rook_attack(A1)
+    bv = b.calc_attk_rook(A1)
 
     expected = "
       *-------
@@ -1584,7 +1583,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       r----r--
     ")
-    bv = b.calculate_rook_attack(A1)
+    bv = b.calc_attk_rook(A1)
 
     expected = "
       --------
@@ -1612,7 +1611,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ---P----
       --------
     ")
-    bv = b.calculate_rook_attack(D5)
+    bv = b.calc_attk_rook(D5)
 
     expected = "
       --------
@@ -1640,7 +1639,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ---P----
       --------
     ")
-    bv = b.calculate_rook_attack(D5)
+    bv = b.calc_attk_rook(D5)
 
     expected = "
       --------
@@ -1669,7 +1668,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       r - r - - - - - 
     ")
-    bv = b.calculate_rook_attack(A1)
+    bv = b.calc_attk_rook(A1)
 
     expected = "
       - - - - - - - -
@@ -1700,19 +1699,19 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       q-------
     ")
-    b.calculate_queen_attack(A1)
+    b.calc_attk_queen(A1)
 
     expected = "
       *------*
       *-----*-
       *----*--
       *---*---
-      *--*--**
-      *-*---*-
-      **----**
+      *--*----
+      *-*-----
+      **------
       -*******
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, A1)
   end
 
   def test_bottom_queen_should_attack()
@@ -1728,11 +1727,11 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       ---q----
     ")
-    b.calculate_queen_attack(D1)
+    b.calc_attk_queen(D1)
 
     expected = "
-      -*-*----
-      **-*----
+      ---*----
+      ---*----
       ---*----
       ---*---*
       *--*--*-
@@ -1740,7 +1739,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --***---
       ***-****
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D1)
   end
   
   def test_centre_queen_should_attack_outwards()
@@ -1756,19 +1755,19 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       -------K
     ")
-    b.calculate_queen_attack(D4)
+    b.calc_attk_queen(D4)
 
     expected = "
       ---*---*
       *--*--*-
-      -*-*-***
-      --***-*-
+      -*-*-*--
+      --***---
       ***-****
       --***---
       -*-*-*--
       *--*--*-
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D4)
   end
 
   def test_centre_queen_attack_should_be_blockable()
@@ -1784,10 +1783,10 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_colour_attack(Colour::WHITE)
+    b.calc_attk_queen(F5)
     expected = "
-      --*---*-
-      ---*--**
+      --*-----
+      ---*---*
       ----***-
       *****-**
       ----***-
@@ -1795,7 +1794,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --*--*--
       -*---*--
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, F5)
   end
   
   #------
@@ -1814,7 +1813,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_king_attack(Colour::WHITE)
+    b.calc_attk_king(D4)
 
     expected = "
       --------
@@ -1826,7 +1825,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D4)
   end
 
   def test_left_king_should_attack()
@@ -1842,7 +1841,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_king_attack(Colour::WHITE)
+    b.calc_attk_king(A4)
 
     expected = "
       --------
@@ -1854,7 +1853,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, A4)
   end
 
   def test_right_king_should_attack_outwards()
@@ -1870,7 +1869,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_king_attack(Colour::WHITE)
+    b.calc_attk_king(H4)
 
     expected = "
       --------
@@ -1882,7 +1881,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, H4)
   end
 
   def test_top_king_should_attack_outwards()
@@ -1898,7 +1897,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     ")
-    b.calculate_king_attack(Colour::WHITE)
+    b.calc_attk_king(D8)
 
     expected = "
       --*-*---
@@ -1910,7 +1909,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       --------
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D8)
   end
 
   def test_bottom_king_should_attack_outwards()
@@ -1926,7 +1925,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
       ---k----
     ")
-    b.calculate_king_attack(Colour::WHITE)
+    b.calc_attk_king(D1)
 
     expected = "
       --------
@@ -1938,7 +1937,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --***---
       --*-*---
     "
-    assert_attack_state(expected, b, Colour::WHITE)
+    assert_attack_state(expected, b, D1)
   end
   #----------------------------------------------------------------------------
   # End attack calculation testing
@@ -2079,9 +2078,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
-      - - B - - - - K 
+      - - B - - - - - 
       - - - p - - - - 
-      - - - - - - k - ")
+      - - - - - - - k ")
     expected = "
       - - - - - - - -
       - - - - - - - -
@@ -2097,14 +2096,14 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_calculate_black_pawn_move_should_include_captures
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - K - -
+      - - - - - - - K
       - - - P - - - -
-      - - b - - - - -
+      - - q - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - - 
       - - - - - - - - 
-      - k - - - - - - ")
+      - - - - - - - - ")
     expected = "
       - - - - - - - -
       - - - - - - - -
@@ -2114,6 +2113,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -
       - - - - - - - -"
+
     assert_move_state(e, expected, D7)    
   end
   
@@ -3333,7 +3333,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - k - - - - 
     ")
     e.calculate_colour_attack(Colour::BLACK)
-    assert(e.check?(Colour::WHITE))
+    assert(e.in_check?(Colour::WHITE))
   end
   
   def test_pawn_should_give_check
@@ -3348,7 +3348,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - b N - - k r -
       - - - q - - - -
     ")
-    assert(e.check?(Colour::BLACK))
+    assert(e.in_check?(Colour::BLACK))
   end
   
   def test_pawn_should_give_check
@@ -3364,7 +3364,7 @@ class RulesEngineTest < Test::Unit::TestCase
       P - - k - b - r
     ")
     e.calculate_colour_attack(Colour::WHITE)
-    assert(e.check?(Colour::BLACK))
+    assert(e.in_check?(Colour::BLACK))
   end
   
   #----------------------------------------------------------------------------

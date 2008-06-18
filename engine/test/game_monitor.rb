@@ -33,8 +33,8 @@ class GameMonitor
       end      
     end
     
-    white_was_in_check = @gamerunner.rules_engine.check?(Colour::WHITE)
-    black_was_in_check = @gamerunner.rules_engine.check?(Colour::BLACK)
+    white_was_in_check = @gamerunner.rules_engine.in_check?(Colour::WHITE)
+    black_was_in_check = @gamerunner.rules_engine.in_check?(Colour::BLACK)
     
     move = @gamerunner.next_move
     src_sq = @gamerunner.rules_engine.sq_at(move.src)
@@ -114,8 +114,8 @@ class GameMonitor
     end
     
     # King did not get out of check
-    white_is_in_check = e.check?(Colour::WHITE)
-    black_is_in_check = e.check?(Colour::BLACK)
+    white_is_in_check = e.in_check?(Colour::WHITE)
+    black_is_in_check = e.in_check?(Colour::BLACK)
 
     if ((white_was_in_check && white_is_in_check) || \
           (black_was_in_check && black_is_in_check)) 

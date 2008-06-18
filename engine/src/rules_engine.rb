@@ -77,6 +77,15 @@ class RulesEngine
       Chess::Piece::QUEEN => method(:calc_all_mv_queen),
       Chess::Piece::KING => method(:calc_all_mv_king)
     }
+    
+    @calc_attk_lookup = {
+      Chess::Piece::PAWN => method(:calc_attk_pawn),
+      Chess::Piece::KNIGHT => method(:calc_attk_knight),
+      Chess::Piece::BISHOP => method(:calc_attk_bishop),
+      Chess::Piece::ROOK => method(:calc_attk_rook),
+      Chess::Piece::QUEEN => method(:calc_attk_queen),
+      Chess::Piece::KING => method(:calc_attk_king)
+    }
 
     @clr_pos = {
       Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
@@ -89,37 +98,13 @@ class RulesEngine
       Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
       Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
       Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
-      Chess::Piece::KING => 0x08_00_00_00_00_00_00_08 
-    }
-
-    @attack = {
-      Colour::BLACK => {
-        Chess::Piece::PAWN => 0x00_00_00_00_00_FF_00_00,
-        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KNIGHT => 0x00_00_00_00_00_A5_18_00,
-        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KING => 0x00_00_00_00_00_00_1C_14
-      },
-      Colour::WHITE => {
-        Chess::Piece::PAWN => 0x00_00_FF_00_00_00_00_00,
-        Chess::Piece::ROOK => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KNIGHT => 0x00_18_A5_00_00_00_00_00,
-        Chess::Piece::BISHOP => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::QUEEN => 0x00_00_00_00_00_00_00_00,
-        Chess::Piece::KING => 0x14_1C_00_00_00_00_00_00
-      }
+      Chess::Piece::KING => 0x08_00_00_00_00_00_00_08
     }
   end
 
   def clear()    
     @clr_pos.each_key {|key| @clr_pos[key] = 0}
     @pos.each_key {|key| @pos[key] = 0}
-    @attack.each_key do |clr|
-      @attack[clr].each_key do |pc|
-        @attack[clr][pc] = 0
-      end
-    end    
   end
   # Output a text representation of the current board state using the specified separator
   # If no separator is defined, the default separator is used.
@@ -329,15 +314,12 @@ class RulesEngine
   # Is the given coord attacked by any piece of the given colour
   # Make sure that calculate_colour_attack is called before this method
   def attacked?(clr, coord)
-    attacked_calc?(clr, coord, true)
+    attacked_calc?(coord, calculate_colour_attack(clr))
   end    
   
-  def attacked_calc?(clr, coord, calculate) 
-    if (calculate) 
-      calculate_colour_attack(clr)
-    end
-    attack_bv = @attack[clr].values.inject(0) {|bv, val| bv | val}
-    ((0x01 << get_sw(coord)) & attack_bv) > 0
+  def attacked_calc?(coord, attk_bv) 
+    sq_bv = (0x01 << get_sw(coord))
+    (sq_bv & attk_bv) == sq_bv
   end
 
   #
@@ -596,12 +578,18 @@ false
   #----------------------------------------------------------------------------
   # Start attack calculation
   #----------------------------------------------------------------------------
-  def calculate_pawn_attack(coord)
+  def calc_attk(src) 
+    pc = sq_at(src).piece
+    return 0 if pc.nil?
+    @calc_attk_lookup[pc.name].call(src)
+  end
+
+  def calc_attk_pawn(src)
     mask_left  = 0x7F_7F_7F_7F_7F_7F_7F_7F
     mask_right = 0xFE_FE_FE_FE_FE_FE_FE_FE
 
-    bv_p = (0x01 << get_sw(coord))
-    clr = sq_at(coord).piece.colour
+    bv_p = (0x01 << get_sw(src))
+    clr = sq_at(src).piece.colour
 
     # right attack
     bv = mask_right & (clr.white? ? bv_p >> 7 : bv_p << 9)
@@ -612,22 +600,20 @@ false
     bv
   end
   
-  def calculate_rook_attack(coord)
-    return 0 if sq_at(coord).piece.nil?
-    
-    clr = sq_at(coord).piece.colour
+  def calc_attk_rook(src)
+    clr = sq_at(src).piece.colour
     
     bv = 0x0
     
-    bv |= calculate_file_attack(clr, coord)    
-    bv |= calculate_rank_attack(clr, coord)
+    bv |= calculate_file_attack(clr, src)    
+    bv |= calculate_rank_attack(clr, src)
     
     bv
   end
   
-  def calculate_knight_attack(coord)
+  def calc_attk_knight(src)
     
-    bv_piece = (1 << get_sw(coord))
+    bv_piece = (1 << get_sw(src))
     bv = 0
     
     # knight attack position legend for below (k == knight)
@@ -672,10 +658,10 @@ false
     bv
   end
   
-  def calculate_bishop_attack(coord)
+  def calc_attk_bishop(src)
     bv = 0
-    bv_piece = (1 << get_sw(coord))
-    clr = sq_at(coord).piece.colour
+    bv_piece = (1 << get_sw(src))
+    clr = sq_at(src).piece.colour
 
     cnt = 0
     0.upto(63) do |i|
@@ -685,13 +671,13 @@ false
       end
     end
     
-    @attack[clr][Chess::Piece::BISHOP] = bv
+    bv
   end
   
-  def calculate_queen_attack(coord)
+  def calc_attk_queen(src)
     bv = 0x0 
-    bv_piece = (1 << get_sw(coord))
-    clr = sq_at(coord).piece.colour
+    bv_piece = (1 << get_sw(src))
+    clr = sq_at(src).piece.colour
     
     0.upto(63) do |i|
       if (0x01 << i & bv_piece != 0) 
@@ -699,14 +685,14 @@ false
       end
     end
 
-    bv |= calculate_rook_attack(coord);
-    
-    @attack[clr][Chess::Piece::QUEEN] = bv
+    bv |= calc_attk_rook(src);
+
+    bv
   end
 
-  def calculate_king_attack(clr)
+  def calc_attk_king(src)
     bv = 0
-    bv_piece = @clr_pos[clr] & @pos[Chess::Piece::KING]
+    bv_piece = (1 << get_sw(src))
 
     # Move list. k == king.
     # ABC
@@ -744,59 +730,25 @@ false
     # H
     bv_board_mask = 0xFE_FE_FE_FE_FE_FE_FE_00
     bv |= (bv_piece & bv_board_mask) >> 9
-     
-    @attack[clr][Chess::Piece::KING] = bv  
+
+    bv
   end
   
   def calculate_colour_attack(clr)
-    #TODO: This could be refactored to be a lot nicer...
-    pawn_bv = @clr_pos[clr] & @pos[Chess::Piece::PAWN]
-    0.upto(63) do |i|
-      bv = 0x1 << i
-      if bv & pawn_bv == bv
-        @attack[clr][Chess::Piece::PAWN] |= \
-          calculate_pawn_attack(get_coord_for_bv(bv))
-      end
-    end
+    attk_bv = 0
     
-    knight_bv = @clr_pos[clr] & @pos[Chess::Piece::KNIGHT]
-    0.upto(63) do |i|
-      bv = 0x1 << i
-      if bv & knight_bv == bv
-        @attack[clr][Chess::Piece::KNIGHT] |= \
-          calculate_knight_attack(get_coord_for_bv(bv))
-      end
-    end
-    
-    bishop_bv = @clr_pos[clr] & @pos[Chess::Piece::BISHOP]
-    0.upto(63) do |i|
-      bv = 0x1 << i
-      if bv & bishop_bv == bv
-        @attack[clr][Chess::Piece::BISHOP] |= \
-          calculate_bishop_attack(get_coord_for_bv(bv))
-      end
-    end
-    
-    rook_bv = @clr_pos[clr] & @pos[Chess::Piece::ROOK]
-    0.upto(63) do |i|
-      bv = 0x1 << i
-      if bv & rook_bv == bv
-        @attack[clr][Chess::Piece::ROOK] |= \
-          calculate_rook_attack(get_coord_for_bv(bv))
-      end
-    end
-    
-    queen_bv = @clr_pos[clr] & @pos[Chess::Piece::QUEEN]
-    0.upto(63) do |i|
-      bv = 0x1 << i
-      if ((bv & queen_bv) == bv) 
-        @attack[clr][Chess::Piece::QUEEN] |= calculate_queen_attack(get_coord_for_bv(bv))
-      end
-    end
+    0.upto(7) do |x|
+      0.upto(7) do |y|
+        coord = Coord.new(x, y)
+        piece = sq_at(coord).piece
         
-    @attack[clr][Chess::Piece::KING] = calculate_king_attack(clr)
+        if (!piece.nil? && (piece.colour == clr)) 
+          attk_bv |= calc_attk(coord)
+        end
+      end
+    end
     
-    #false
+    attk_bv
   end
   
   def calculate_file_attack(clr, coord)
@@ -911,9 +863,7 @@ false
         chk_sq = next_sq
         next_sq = chk_sq + shift_width
         if ((1 << chk_sq) & all_pieces) == 0 || ((1 << chk_sq) & opp_pieces) > 0 
-          if (chk_mv_calc(src, get_coord_for_bv(1 << chk_sq), false))
             bv |= (1 << chk_sq)
-          end
         end
 
         next_sq_off_edge = ((1 << next_sq) & edge_mask != 0) || next_sq < 0 || next_sq >= 64
@@ -946,7 +896,7 @@ false
     # Note: We can't just bitwise OR the mv_bv with the result of 
     # calculate pawn attack, because that method calculates all squares 
     # attacked by pawns, regardless whether or not there is something to attack
-    if sq_at(src).piece.colour == Colour::WHITE then
+    if sq_at(src).piece.colour.white? then
       mv_bv |= get_bv(src.north) if chk_mv(src, src.north)
       mv_bv |= get_bv(src.north.north) if chk_mv(src, src.north.north)
       mv_bv |= get_bv(src.northwest) if chk_mv(src, src.northwest)
@@ -978,15 +928,15 @@ false
   end
   
   def calc_all_mv_bishop(src)
-    return calculate_bishop_attack(src)
+    return calc_attk_bishop(src)
   end
   
   def calc_all_mv_rook(src)
-    return calculate_rook_attack(src)
+    return calc_attk_rook(src)
   end
   
   def calc_all_mv_queen(src)
-    return calculate_queen_attack(src)
+    return calc_attk_queen(src)
   end
   
   def calc_all_mv_king(src) 
@@ -1010,10 +960,12 @@ false
   # Start legal move checks
   #---------------------------------------------------------------------------- 
   def chk_mv(src, dest) 
-    chk_mv_calc(src, dest, true)
+    piece = sq_at(src).piece
+    return false if piece.nil?
+    chk_mv_calc(src, dest, calculate_colour_attack(piece.colour.flip))
   end
   
-  def chk_mv_calc(src, dest, calculate)    
+  def chk_mv_calc(src, dest, attk_bv)    
     return false unless src.x.between?(0, 7)
     return false unless src.y.between?(0, 7)
     return false unless dest.x.between?(0, 7)
@@ -1025,16 +977,14 @@ false
     pc = sq_at(src).piece
     
     can_move = !pc.nil?
+    
     if (can_move)
-      if (check?(pc.colour) && pc.name != Chess::Piece::KING)
+      if (in_check?(pc.colour) && !pc.king?)
         # Have to move out of check
         can_move = false
       end
     end
     if (can_move)
-      if (calculate)
-        calculate_colour_attack(pc.colour.flip)
-      end
       can_move = @chk_lookup[pc.name].call(src, dest)
       if (can_move)
         king_bv = @clr_pos[pc.colour] & @pos[Chess::Piece::KING]
@@ -1088,8 +1038,8 @@ false
     
     # in the coordinate system, a forward move is a reduction in y for black
     dst = -dst if pc_src.colour.black?
-     
-    return false unless dst > 0       
+    
+    return false unless dst > 0      
 
     # no matter what, the pawn can only stay on the same rank or ONE either way        
     return false unless ((src.x - 1)..(src.x + 1)) === dest.x
@@ -1158,6 +1108,8 @@ false
     l = Vector.new(src, dest)
     
     king = sq_at(src).piece
+    
+    attk_bv = calculate_colour_attack(king.colour.flip)
 
     # King can only move one square unless castling
     if (l.len == 3) 
@@ -1167,13 +1119,13 @@ false
       return false unless src.on_rank?(dest)      
       
       l.each_coord do |coord|
-        return false if attacked_calc?(king.colour.flip, coord, false)
+        return false if attacked_calc?(coord, attk_bv)
       end
       
       return true
     end 
     
-    return false unless l.len == 2 and not attacked_calc?(king.colour.flip, dest, false)
+    return false unless l.len == 2 and not attacked_calc?(dest, attk_bv)
     
     # Can only capture opposite coloured pieces
     dest_pc = sq_at(dest).piece
@@ -1200,13 +1152,11 @@ false
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
     # The king blocks attacks, so removing him calculates properly
-    calculate_colour_attack(clr.flip)
-    checkmate = check?(clr)
+    checkmate = in_check?(clr)
     if (checkmate)
-      remove_piece(src)
-      calculate_colour_attack(clr.flip)
-      place_piece(src, king)
+      #remove_piece(src)
       checkmate = (calc_all_mv_king(src) == 0)
+      place_piece(src, king)
     end
     checkmate
   end
@@ -1216,10 +1166,15 @@ false
   #---------------------------------------------------------------------------- 
   #----------------------------------------------------------------------------
   # Start checkmate detection
-  #---------------------------------------------------------------------------- 
-  def check?(clr)
+  #----------------------------------------------------------------------------
+  def in_check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
-    attacked_calc?(clr.flip, src, false)
+    attk_bv = calculate_colour_attack(clr.flip)
+    return check?(src, attk_bv)
+  end
+  
+  def check?(src, attk_bv)
+    attacked_calc?(src, attk_bv)
   end
   #----------------------------------------------------------------------------
   # End checkmate detection

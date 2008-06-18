@@ -22,7 +22,7 @@ class RandomMoveEngine < MoveEngine
     
     # select random piece
     loop do
-      if (gamestate.check?(clr)) 
+      if (gamestate.in_check?(clr)) 
         # Have to move out of check
         bv = gamestate.clr_pos[clr] & gamestate.pos[Chess::Piece::KING]
       else

@@ -120,21 +120,19 @@ class Test::Unit::TestCase
     assert_block(full_message) {processed_expected == gamestate_state}
   end
   
-  def assert_attack_state(expected, gamestate, clr, message = nil)
+  def assert_attack_state(expected, gamestate, coord, message = nil)
     processed_expected = expected.gsub(/\s+/, "")
  
- 
-    # Generate the gamestates attack board into our format
-    gamestate_attack_board = ""
+    attk_bv = gamestate.calc_attk(coord)
+    actual = ""
+    
     0.upto(63) do |i|
-      coord = Coord.from_alg(get_alg_coord_notation(i))
-      gamestate_attack_board += gamestate.attacked?(clr, coord) ? "*" : "-"
+      i_bv = RulesEngine.get_bv(Coord.from_alg(get_alg_coord_notation(i)))
+      actual += i_bv & attk_bv == i_bv ? "*" : "-"
     end
-
-    # Create a nicely formatted message
-    full_message = create_pretty_message(message, processed_expected, gamestate_attack_board, gamestate)
- 
-    assert_block(full_message) { processed_expected == gamestate_attack_board }
+    
+    full_message = create_pretty_message(message, processed_expected, actual, gamestate)
+    assert_block(full_message) { processed_expected == actual }
   end
   
   def assert_move_state(gamestate, expected, coord, message = nil) 
