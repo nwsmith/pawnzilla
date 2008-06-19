@@ -1169,8 +1169,48 @@ false
   #----------------------------------------------------------------------------
   def in_check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
-    attk_bv = calculate_colour_attack(clr.flip)
-    return check?(src, attk_bv)
+    all_dir = [
+        Coord::NORTH, Coord::SOUTH, Coord::EAST, Coord::WEST,
+        Coord::NORTHWEST, Coord::NORTHEAST, Coord::SOUTHWEST, Coord::SOUTHEAST
+    ]
+    cardinal = Coord::NORTH | Coord::SOUTH | Coord::EAST | Coord::WEST
+    diagonal = Coord::NORTHEAST | Coord::NORTHWEST | Coord::SOUTHEAST | Coord::SOUTHWEST
+    
+    # check for pawns
+    pawn_dir = clr.white? ? [Coord::NORTHEAST, Coord::NORTHWEST] : [Coord::SOUTHEAST, Coord::SOUTHWEST]
+    
+    pawn_dir.each do |dir|
+      pc = sq_at(src.go(dir)).piece
+      return true if !pc.nil? && pc.colour.opposite?(clr) && pc.pawn?
+    end    
+    
+    #TODO: check for knightws
+    
+    all_dir.each do |dir|
+      vector = RulesEngine.calc_board_vector(src, dir)
+      catch :DIRECTION do 
+        vector.each_coord do |coord|
+          next if coord == src
+          pc = sq_at(coord).piece
+          next if pc.nil?
+          if (!pc.nil?)
+            if (pc.colour.opposite?(clr))
+              if ((dir & cardinal == dir) && (pc.queen? || pc.rook?))
+                return true
+              elsif ((dir & diagonal == dir) && (pc.queen? || pc.bishop?))
+                return true
+              else
+                throw :DIRECTION
+              end
+            else 
+              throw :DIRECTION
+            end
+          end
+        end
+      end
+    end
+    
+    false
   end
   
   def check?(src, attk_bv)
