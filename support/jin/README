@@ -1,0 +1,13 @@
+JIN plugin class for Pawnzilla
+
+JIN Chess engine: https://sourceforge.net/projects/jin
+
+Make this project by running ant from this directory.
+A jar file will be created in the dist directory
+
+Copy this jar into the servers directory of jin.
+
+On Mac computers it is located here:
+ /Applications/Jin.app/Contents/Resources/Java/servers
+
+ Launch JIN and it should be available on the server selection dialog
