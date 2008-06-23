@@ -3367,6 +3367,126 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.in_check?(Colour::BLACK))
   end
   
+  def test_northnorthwest_black_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - N - - - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::WHITE))
+  end
+  
+  def test_northnortheast_black_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - N - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::WHITE))
+  end
+  
+  def test_northwestwest_black_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - N - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::WHITE))
+  end
+  
+  def test_northeasteast_black_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - N - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::WHITE))
+  end
+  
+  def test_southsouthwest_white_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - n - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::BLACK))
+  end
+  
+  def test_southsoutheast_white_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - - -
+      - - - - - n - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::BLACK))
+  end
+  
+  def test_southwestwest_white_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - n - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::BLACK))
+  end
+  
+  def test_southeasteast_white_knight_should_give_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - K - - -
+      - - - - - - n -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - -   
+      - - - k - - - -
+    ")
+    assert(e.in_check?(Colour::BLACK))
+  end
+  
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------

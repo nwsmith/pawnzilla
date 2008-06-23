@@ -1184,6 +1184,40 @@ false
       return true if !pc.nil? && pc.colour.opposite?(clr) && pc.pawn?
     end    
     
+    # check for knights
+    pc = sq_at(src.north.north.west).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?) 
+      return true
+    end
+    pc = sq_at(src.north.north.east).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.north.west.west).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.north.east.east).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.south.south.west).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.south.south.east).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.south.west.west).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+      return true
+    end
+    pc = sq_at(src.south.east.east).piece
+    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?) 
+      return true
+    end
+    
     #TODO: check for knightws
     
     all_dir.each do |dir|
