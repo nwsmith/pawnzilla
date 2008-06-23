@@ -50,7 +50,7 @@ public class JinPlugin implements Server {
     
 
     public Connection createConnection(ConnectionDetails connDetails) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new PawnzillaConnection();
     }
 
     public void setGuestUser(User user) {
@@ -63,23 +63,23 @@ public class JinPlugin implements Server {
     }
 
     public String getDefaultHost() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getHosts()[0];
     }
 
     public String[] getHosts() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new String[] {"localhost.localdomain"};
     }
 
     public void setHost(String arg0) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // don't have any real hosts... so we don't need to implement anything
     }
 
     public int[] getPorts() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new int[] {12345};
     }
 
     public void setPort(int arg0) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // don't have any real posts... so we don't need to implement anything
     }
 
     public String getId() {
