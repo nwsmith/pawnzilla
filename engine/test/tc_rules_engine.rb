@@ -1953,9 +1953,9 @@ class RulesEngineTest < Test::Unit::TestCase
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - - 
-      - - - - - k - - 
+      - - - - - K - -
       - - - - - - - - 
-      - - - - - - - - 
+      k - - - - - - - 
       - - - - - - - - 
       - - - p - - - - 
       - - - - - - - - 
