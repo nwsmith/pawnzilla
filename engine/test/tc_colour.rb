@@ -17,7 +17,7 @@
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"
-require "pz_unit"
+require "lib/pz_unit"
 require "colour"
 
 class TestColour < Test::Unit::TestCase

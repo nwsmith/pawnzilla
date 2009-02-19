@@ -18,7 +18,7 @@ $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
-require "pz_unit"
+require "lib/pz_unit"
 require "colour"
 require "rules_engine"
 require "chess/piece"

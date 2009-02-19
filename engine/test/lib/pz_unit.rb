@@ -16,6 +16,8 @@
 #
 require 'test/unit'
 
+$:.unshift File.join(File.dirname(__FILE__), "..", "src")
+
 require "geometry/coord"
 require "colour"
 require "piece_translator"

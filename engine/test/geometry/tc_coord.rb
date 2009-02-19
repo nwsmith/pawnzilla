@@ -14,11 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-$:.unshift File.join(File.dirname(__FILE__), "..", "src")
+$:.unshift File.join(File.dirname(__FILE__), "..", "..", "src")
 $:.unshift File.join(File.dirname(__FILE__), "..", "test")
 
 require "test/unit"
-require "pz_unit"
+require "lib/pz_unit"
 require "geometry/coord"
 
 class TestCoord < Test::Unit::TestCase
