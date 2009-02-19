@@ -52,4 +52,19 @@ p - - n P - - -
 ")
     assert(!e.chk_mv(G7, F8), "This move should be illegal")
   end
+
+  def test_bishop_should_not_be_able_to_leave_king_in_check
+    e = RulesEngine.new
+    place_pieces(e, "
+- - q - - - - -
+- - - B - - - -
+- - - - K - - -
+- - - - P - - p
+P - r - - - n -
+p - P k - r - -
+- - - - - - - -
+- R - - R - - -
+")
+    assert(!e.chk_mv(D7, B5), "This move should be illegal")
+  end
 end
