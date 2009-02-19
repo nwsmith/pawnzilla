@@ -1,7 +1,5 @@
 #
-#   $Id$
-#
-#   Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
+#   Copyright 2005-2009 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
