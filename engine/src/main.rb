@@ -52,9 +52,9 @@ require "game_monitor"
 
 
 puts "Pawnzilla game."
-puts
+puts ""
 puts "Copyright 2005 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
-puts
+puts ""
 
 #e = RulesEngine.new
 #move_list = []
@@ -70,9 +70,10 @@ puts
 # Main Game Loop
 1.upto(max_run) do |run_count|
   puts "start game #{run_count}"
+  move_count = 0;
   loop do
     puts monitor.gamerunner.rules_engine.to_txt if verbose
-    puts if verbose
+    puts "" if verbose
     begin
       if (monitor.gamerunner.game_is_over)
         puts "#{runner.winner.colour} wins!" if verbose
@@ -82,7 +83,8 @@ puts
         break
       end  
       move = monitor.move
-      puts "#{move.src.to_alg}-#{move.dest.to_alg}" if verbose
+      move_count += 1
+      puts "#{move_count}: #{move.src.to_alg}-#{move.dest.to_alg}" if verbose
     rescue Exception => e
       puts "Crash on run #{run_count}"
       trace = "caught #{e.class} : #{e.message}\n"
