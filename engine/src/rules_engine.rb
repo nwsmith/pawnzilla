@@ -971,8 +971,8 @@ false
     return false unless dest.x.between?(0, 7)
     return false unless dest.y.between?(0, 7)
     
-    diagonal_directions = Coord::NORTHWEST | Coord::NORTHEAST | Coord::SOUTHEAST | Coord::SOUTHWEST
-    straight_directions = Coord::NORTH | Coord::SOUTH | Coord::EAST | Coord::WEST
+    intermediate_directions = Coord::NORTHWEST | Coord::NORTHEAST | Coord::SOUTHEAST | Coord::SOUTHWEST
+    cardinal_directions = Coord::NORTH | Coord::SOUTH | Coord::EAST | Coord::WEST
 
     pc = sq_at(src).piece
     
@@ -990,36 +990,20 @@ false
         king_bv = @clr_pos[pc.colour] & @pos[Chess::Piece::KING]
         king_coord = get_coord_for_bv(king_bv)
                 
-        if (Line.same_line?(king_coord, src) || king_coord == src)                   
-          direction = 0
-          
-          if (king_coord == src)
-            direction = Line.line_direction(dest, src)
-          else
-            direction = Line.line_direction(king_coord, src)
-          end
-          
+        if (Line.same_line?(king_coord, src) || king_coord == src)
+          direction = (king_coord == src) ? Line.line_direction(dest, src) : Line.line_direction(king_coord, src)
+
           dest_pc = sq_at(dest).piece
+
+          # In order to see if the king is in check, easier to just simulate the move
           move_piece(src, dest)
 
-          vector = RulesEngine.calc_board_vector(src, direction)
-          vector.each_coord do |coord|
-            piece = sq_at(coord).piece
-            if (!piece.nil?)
-              if (piece.colour.opposite?(pc.colour))
-                if ((direction & diagonal_directions) == direction)
-                  can_move = !(piece.queen? || piece.bishop?)
-                end
-                if ((direction & straight_directions) == direction)
-                  can_move = !(piece.queen? || piece.rook?)
-                end
-              else
-                can_move = true
-              end
-              
-              break
-            end
+          # perhaps hopelessly naive
+          if (in_check?(pc.colour))
+            can_move = false;
           end
+
+          # correct the simulated move
           move_piece(dest, src)
           place_piece(dest, dest_pc) unless dest_pc.nil?          
         end
