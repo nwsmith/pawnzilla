@@ -1147,9 +1147,23 @@ false
   
   #----------------------------------------------------------------------------
   # End checkmate detection
-  #---------------------------------------------------------------------------- 
   #----------------------------------------------------------------------------
-  # Start checkmate detection
+  #----------------------------------------------------------------------------
+  # Start draw detection
+  #----------------------------------------------------------------------------
+  def draw?
+    # Check for only two kings.
+    if (@pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
+      return true      
+    end
+
+    false
+  end
+  #----------------------------------------------------------------------------
+  # End draw detection
+  #----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Start check detection
   #----------------------------------------------------------------------------
   def in_check?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
@@ -1201,9 +1215,7 @@ false
     if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?) 
       return true
     end
-    
-    #TODO: check for knightws
-    
+
     all_dir.each do |dir|
       vector = RulesEngine.calc_board_vector(src, dir)
       catch :DIRECTION do 
@@ -1235,7 +1247,7 @@ false
     attacked_calc?(src, attk_bv)
   end
   #----------------------------------------------------------------------------
-  # End checkmate detection
+  # End check detection
   #---------------------------------------------------------------------------- 
 
 end

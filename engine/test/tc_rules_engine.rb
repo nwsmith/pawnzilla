@@ -1145,7 +1145,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_black_pawn_on_bottem_edge_should_not_attack()
     b = RulesEngine.new()
     b.clear()
-    bv = b.calculate_pawn_attack(D1)
+    bv = b.calc_attk_pawn(D1)
 
     expected = "
       --------
@@ -3316,7 +3316,45 @@ class RulesEngineTest < Test::Unit::TestCase
   
   #----------------------------------------------------------------------------
   # End checkmate detection testing
-  #---------------------------------------------------------------------------- 
+  #----------------------------------------------------------------------------
+
+    #----------------------------------------------------------------------------
+  # Start checkmate detection testing
+  #----------------------------------------------------------------------------
+  def test_only_two_kings_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?)
+  end
+
+  def test_two_kings_with_a_queen_is_not_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - q - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(!e.draw?)
+  end
+
+  #----------------------------------------------------------------------------
+  # End checkmate detection testing
+  #----------------------------------------------------------------------------
+
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------
