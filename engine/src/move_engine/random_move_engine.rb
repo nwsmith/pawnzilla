@@ -20,43 +20,46 @@ class RandomMoveEngine < MoveEngine
     dest = nil
     all_mv = 0
 
-    # select random piece
-    loop do
-      if (gamestate.in_check?(clr))
-        # Have to move out of check
-        bv = gamestate.clr_pos[clr] & gamestate.pos[Chess::Piece::KING]
-      else
+    catch :CHOOSE_PIECE do
+      # select random piece
+      loop do
+        if (gamestate.in_check?(clr))
+          # Have to move out of check
+          bv = gamestate.clr_pos[clr] & gamestate.pos[Chess::Piece::KING]
+        else
+          bv = 0x01 << rand(64)
+        end
+        coord = gamestate.get_coord_for_bv(bv)
+        piece = gamestate.sq_at(coord).piece
+        if (!piece.nil? && piece.colour == clr)
+          mv_bv = gamestate.calculate_all_moves(coord)
+          if (mv_bv > 0)
+            src = coord
+            all_mv = mv_bv
+            f = true
+          end
+        end
+        break if f
+      end
+
+      f = false
+
+      # select random move                                       ?
+      loop do
         bv = 0x01 << rand(64)
-      end
-      coord = gamestate.get_coord_for_bv(bv)
-      piece = gamestate.sq_at(coord).piece
-      if (!piece.nil? && piece.colour == clr)
-        mv_bv = gamestate.calculate_all_moves(coord)
-        if (mv_bv > 0)
-          src = coord
-          all_mv = mv_bv
-          f = true
+        if (bv & all_mv == bv)
+          dest = gamestate.get_coord_for_bv(bv)
+          if (gamestate.chk_mv(src, dest))
+            f = true
+          else
+            # not the most elegant way, but if we choose a piece that
+            # can't move, this should beat deadlocks
+            throw :CHOOSE_PIECE
+          end
         end
+        break if f
       end
-      break if f
-    end
 
-    f = false
-
-    # select random move                                       ?
-    # TODO: cache rejected illegal moves to prevent lockups
-    tried_moves = []
-    loop do
-      bv = 0x01 << rand(64)
-      next if tried_moves.include?(bv)
-      tried_moves.push(bv)
-      if (bv & all_mv == bv)
-        dest = gamestate.get_coord_for_bv(bv)
-        if (gamestate.chk_mv(src, dest))
-          f = true
-        end
-      end
-      break if f
     end
 
     return Move.new(src, dest)
