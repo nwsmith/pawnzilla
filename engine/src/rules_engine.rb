@@ -1044,8 +1044,10 @@ class RulesEngine
   end
 
   def chk_mv_pawn(src, dest)
-    pc_src = sq_at(src).piece
-    pc_dest = sq_at(dest).piece
+    sq_src = sq_at(src)
+    sq_dest = sq_at(dest)
+    pc_src = sq_src.piece
+    pc_dest = sq_dest.piece
 
     # no matter what, the pawn has to move forward
     dst = dest.y - src.y
