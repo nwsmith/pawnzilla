@@ -29,31 +29,34 @@ require "test_game_runner"
 require "test_move_engine"
 
 class RulesEngineTest < Test::Unit::TestCase
-  def setup 
+  def setup
     @board = RulesEngine.new
   end
+
   #----------------------------------------------------------------------------
   # Start bit-vector helper tests
   #----------------------------------------------------------------------------
+
   def test_get_coord_from_bv_should_fail_when_more_than_one_bit_set
-    assert_raises(ArgumentError) {RulesEngine.get_coord_for_bv(0x03)}    
+    assert_raises(ArgumentError) {RulesEngine.get_coord_for_bv(0x03)}
   end
-  
+
   def test_get_coord_from_bv_should_not_faile_when_one_bit_set
-    assert_nothing_raised {RulesEngine.get_coord_for_bv(0x02)} 
+    assert_nothing_raised {RulesEngine.get_coord_for_bv(0x02)}
   end
-  
+
   def test_get_coord_from_bv_should_return_H8
-    assert_equal H8, RulesEngine.get_coord_for_bv(0x00_00_00_00_00_00_00_01) 
+    assert_equal H8, RulesEngine.get_coord_for_bv(0x00_00_00_00_00_00_00_01)
   end
-  
+
   def test_get_coord_from_bv_should_return_A1
     assert_equal A1, RulesEngine.get_coord_for_bv(0x80_00_00_00_00_00_00_00)
   end
-  
+
   def test_get_sw_should_get_correct_value_for_H8
     assert_equal RulesEngine.get_sw(H8), 0
   end
+
   #----------------------------------------------------------------------------
   # End bit-vector helper tests
   #----------------------------------------------------------------------------
@@ -61,6 +64,7 @@ class RulesEngineTest < Test::Unit::TestCase
   #----------------------------------------------------------------------------
   # Start board helper tests
   #----------------------------------------------------------------------------  
+
   def test_should_get_white_piece_on_black_square_from_initial_setup
     square = @board.sq_at(A1)
     assert_not_nil(square)
@@ -85,7 +89,7 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(square.piece.colour.black?)
     assert_equal(Chess::Piece::BISHOP, square.piece.name)
   end
-  
+
   def test_attacked_should_work_for_simple_file_attack
     e = RulesEngine.new
     place_pieces(e, "
@@ -97,10 +101,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - - 
-    ")  
+    ")
     assert(e.attacked?(Colour::BLACK, F1))
   end
-  
+
   def test_attacked_should_work_for_simple_file_attack_on_C1_bug
     e = RulesEngine.new
     place_pieces(e, "
@@ -112,11 +116,12 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - - 
-    ")  
+    ")
     assert(e.attacked?(Colour::BLACK, C1))
   end
- 
+
   # TODO: Fix assert_blocked_state
+
   def test_blocked
     b = RulesEngine.new()
     place_pieces(b, "
@@ -223,10 +228,10 @@ class RulesEngineTest < Test::Unit::TestCase
       -------*
       -------*
     "
-    
+
     #assert_blocked_state(expected, b, H8)
   end
- 
+
   def test_bishop_should_not_be_blocked_by_capturable_pawn
     e = RulesEngine.new
     place_pieces(e, "      
@@ -242,119 +247,119 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!e.blocked?(C1, G5))
     assert(e.chk_mv(C1, G5))
   end
-  
+
   def test_on_diagonal_nw_se
     b = RulesEngine.new
-    
+
     bv1_6 = 0x1 << RulesEngine.get_sw(Coord.new(1, 6))
     bv2_5 = 0x1 << RulesEngine.get_sw(Coord.new(2, 5))
     bv5_2 = 0x1 << RulesEngine.get_sw(Coord.new(5, 2))
-    
+
     assert(b.on_diagonal?(bv1_6, bv2_5))
     assert(b.on_diagonal?(bv2_5, bv5_2))
     assert(b.on_diagonal?(bv1_6, bv5_2))
-    
+
     assert(b.on_diagonal?(bv2_5, bv1_6))
     assert(b.on_diagonal?(bv5_2, bv2_5))
-    assert(b.on_diagonal?(bv5_2, bv1_6))    
+    assert(b.on_diagonal?(bv5_2, bv1_6))
   end
-  
+
   def test_on_diagonal_sw_ne
     b = RulesEngine.new
-    
+
     bv1_3 = 0x1 << RulesEngine.get_sw(Coord.new(1, 3))
     bv2_4 = 0x1 << RulesEngine.get_sw(Coord.new(2, 4))
     bv3_5 = 0x1 << RulesEngine.get_sw(Coord.new(3, 5))
-    
+
     assert(b.on_diagonal?(bv1_3, bv2_4))
     assert(b.on_diagonal?(bv1_3, bv3_5))
     assert(b.on_diagonal?(bv2_4, bv3_5))
-    
+
     assert(b.on_diagonal?(bv2_4, bv1_3))
     assert(b.on_diagonal?(bv3_5, bv1_3))
-    assert(b.on_diagonal?(bv3_5, bv2_4))    
+    assert(b.on_diagonal?(bv3_5, bv2_4))
   end
 
-  def test_on_file? 
+  def test_on_file?
     b = RulesEngine.new;
-    
+
     bv0_7 = 0x01 << RulesEngine.get_sw(Coord.new(0, 7))
     bv0_4 = 0x01 << RulesEngine.get_sw(Coord.new(0, 4))
     bv4_7 = 0x01 << RulesEngine.get_sw(Coord.new(4, 7))
-    
+
     assert(b.on_file?(bv0_7, bv0_4))
     assert(b.on_file?(bv0_4, bv0_7))
-    
+
     assert(b.on_file?(bv0_7, bv0_7))
-    
+
     assert(!b.on_file?(bv0_7, bv4_7))
-    assert(!b.on_file?(bv4_7, bv0_7))    
+    assert(!b.on_file?(bv4_7, bv0_7))
   end
-  
+
   def test_on_rank_on_bottom_should_be_true_both_directions
     b = RulesEngine.new
     a1_bv = 0x01 << RulesEngine.get_sw(A1)
     h1_bv = 0x01 << RulesEngine.get_sw(H1)
-    
+
     assert(b.on_rank?(a1_bv, h1_bv))
     assert(b.on_rank?(h1_bv, a1_bv))
-  end  
-  
+  end
+
   def test_on_rank_on_top_should_be_true_both_directions
     b = RulesEngine.new
     a8_bv = 0x01 << RulesEngine.get_sw(A8)
     h8_bv = 0x01 << RulesEngine.get_sw(H8)
-    
+
     assert(b.on_rank?(a8_bv, h8_bv))
     assert(b.on_rank?(h8_bv, a8_bv))
   end
-  
+
   def test_on_rank_in_centre_should_be_true_both_directions
     b = RulesEngine.new
     a4_bv = 0x01 << RulesEngine.get_sw(A4)
     h4_bv = 0x01 << RulesEngine.get_sw(H4)
-    
+
     assert(b.on_rank?(a4_bv, h4_bv))
     assert(b.on_rank?(h4_bv, a4_bv))
   end
-  
+
   def test_on_rank_should_not_be_true_for_same_file
     b = RulesEngine.new
     a1_bv = 0x01 << RulesEngine.get_sw(A1)
     a8_bv = 0x01 << RulesEngine.get_sw(A8)
-    
+
     assert(!b.on_rank?(a1_bv, a8_bv))
     assert(!b.on_rank?(a8_bv, a1_bv))
   end
-  
+
   def test_on_rank_shold_not_be_true_for_same_diagonal
     b = RulesEngine.new
     a1_bv = 0x01 << RulesEngine.get_sw(A1)
     h8_bv = 0x01 << RulesEngine.get_sw(H8)
-    
+
     assert(!b.on_rank?(a1_bv, h8_bv))
     assert(!b.on_rank?(h8_bv, a1_bv))
   end
-  
+
   def test_find_east_edge
-    assert_equal(RulesEngine.get_bv(Coord.new(7, 7)), 
-           RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(3, 7))))
+    assert_equal(RulesEngine.get_bv(Coord.new(7, 7)),
+            RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(3, 7))))
     assert_equal(RulesEngine.get_bv(Coord.new(7, 0)),
-           RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(4, 0))))           
-  end    
-  
+            RulesEngine.find_east_edge(RulesEngine.get_bv(Coord.new(4, 0))))
+  end
+
   def test_find_west_edge
     assert_equal(RulesEngine.get_bv(Coord.new(0, 7)),
-           RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(3, 7))))
+            RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(3, 7))))
     assert_equal(RulesEngine.get_bv(Coord.new(0, 0)),
-           RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(4, 0))))           
-  end           
-  
+            RulesEngine.find_west_edge(RulesEngine.get_bv(Coord.new(4, 0))))
+  end
+
   def test_get_file
     assert_equal(7, RulesEngine.get_file(RulesEngine.get_bv(Coord.new(7, 7))))
     assert_equal(3, RulesEngine.get_file(RulesEngine.get_bv(Coord.new(3, 4))))
   end
-  
+
   def test_get_file_mask
     assert_equal(RulesEngine::FILE_MASKS[7], RulesEngine.get_file_mask(RulesEngine.get_bv(Coord.new(7, 7))))
     assert_equal(RulesEngine::FILE_MASKS[3], RulesEngine.get_file_mask(RulesEngine.get_bv(Coord.new(3, 4))))
@@ -362,80 +367,81 @@ class RulesEngineTest < Test::Unit::TestCase
 
   def test_get_bv
     assert_equal(RulesEngine.get_bv(Coord.new(7, 7)), (0x1 << RulesEngine.get_sw(Coord.new(7, 7))))
-  end      
-  
+  end
+
   def test_get_rank
     assert_equal(7, RulesEngine.get_rank(RulesEngine.get_bv(Coord.new(7, 7))))
     assert_equal(4, RulesEngine.get_rank(RulesEngine.get_bv(Coord.new(3, 4))))
   end
-  
+
   def test_get_rank_mask
     assert_equal(RulesEngine::RANK_MASKS[7], RulesEngine.get_rank_mask(RulesEngine.get_bv(Coord.new(7, 7))))
     assert_equal(RulesEngine::RANK_MASKS[4], RulesEngine.get_rank_mask(RulesEngine.get_bv(Coord.new(3, 4))))
-  end    
-  
+  end
+
   def test_on_board
     assert(RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(7, 7))))
     assert(RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(0, 0))))
     assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(7, 8))))
     assert(!RulesEngine.on_board?(RulesEngine.get_bv(Coord.new(8, 7))))
-  end  
-  
+  end
+
   def test_calc_board_vector_should_do_full_board_north
     line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::NORTH)
     assert_equal(A1, line.c0)
     assert_equal(A8, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_south
     line = RulesEngine.calc_board_vector(Coord.from_alg("a8"), Coord::SOUTH)
     assert_equal(A8, line.c0)
     assert_equal(A1, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_east
     line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::EAST)
     assert_equal(A1, line.c0)
     assert_equal(H1, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_west
     line = RulesEngine.calc_board_vector(Coord.from_alg("h1"), Coord::WEST)
     assert_equal(H1, line.c0)
     assert_equal(A1, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_north_east
     line = RulesEngine.calc_board_vector(Coord.from_alg("a1"), Coord::NORTHEAST)
     assert_equal(A1, line.c0)
     assert_equal(H8, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_north_west
     line = RulesEngine.calc_board_vector(Coord.from_alg("h1"), Coord::NORTHWEST)
     assert_equal(H1, line.c0)
     assert_equal(A8, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_south_east
     line = RulesEngine.calc_board_vector(Coord.from_alg("a8"), Coord::SOUTHEAST)
     assert_equal(A8, line.c0)
     assert_equal(H1, line.c1)
   end
-  
+
   def test_calc_board_vector_should_do_full_board_south_west
     line = RulesEngine.calc_board_vector(Coord.from_alg("h8"), Coord::SOUTHWEST)
     assert_equal(H8, line.c0)
     assert_equal(A1, line.c1)
   end
-  
+
   #----------------------------------------------------------------------------
   # End board helper tests
   #----------------------------------------------------------------------------  
-  
+
   #----------------------------------------------------------------------------
   # Start piece helper tests
   #----------------------------------------------------------------------------
+
   def test_move_should_not_change_peice_properties
     board = RulesEngine.new()
     src = A2
@@ -446,20 +452,20 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(board.sq_at(dest).piece.colour.white?)
     assert(board.sq_at(dest).piece.name == Chess::Piece::PAWN)
   end
-  
+
   def test_move_should_not_chance_peice_colour
     board = RulesEngine.new()
     src = D7
     dest = D5
     board.move_piece(src, dest);
     assert(board.sq_at(dest).piece.colour.black?);
-    
+
     src = D2
     dest = D3
     board.move_piece(src, dest);
     assert(board.sq_at(dest).piece.colour.white?);
   end
-  
+
   def test_piece_should_move
     e = RulesEngine.new
     place_pieces(e, "
@@ -483,9 +489,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     "
-    assert_state(expected, e)     
+    assert_state(expected, e)
   end
-  
+
   def test_pawn_should_not_disappear_when_capturing
     white_move_engine = TestMoveEngine.new
     black_move_engine = TestMoveEngine.new
@@ -524,9 +530,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - p - p k p b p
       r - b q - - r -
     "
-    assert_state(expected, e)     
+    assert_state(expected, e)
   end
-  
+
   def test_knight_cannot_capture_own_piece
     e = RulesEngine.new
     place_pieces(e, "
@@ -565,7 +571,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - r k - 
     "
-    assert_state(expected, e) 
+    assert_state(expected, e)
   end
 
   def test_white_should_be_able_to_castle_queenside
@@ -591,7 +597,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - k r - - - - 
     "
-    assert_state(expected, e) 
+    assert_state(expected, e)
   end
 
   def test_black_should_be_able_to_castle_kingside
@@ -617,9 +623,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     "
-    assert_state(expected, e) 
+    assert_state(expected, e)
   end
-  
+
   def test_black_should_be_able_to_castle_queenside
     e = RulesEngine.new
     place_pieces(e, "
@@ -643,9 +649,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     "
-    assert_state(expected, e) 
+    assert_state(expected, e)
   end
-  
+
   def test_place_piece_should_place_proper_peice_and_colour
     board = RulesEngine.new()
     coord = A6
@@ -653,7 +659,7 @@ class RulesEngineTest < Test::Unit::TestCase
     board.place_piece(coord, piece)
     square = board.sq_at(coord)
     assert(!square.piece.nil?)
-    assert(square.piece.colour.black?) 
+    assert(square.piece.colour.black?)
     assert(square.piece.name == Chess::Piece::ROOK)
   end
 
@@ -668,21 +674,21 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(square.piece.colour.black?)
     assert_equal(piece.name, square.piece.name)
   end
-  
+
   def test_remove_piece
     board = RulesEngine.new()
     coord = A1
     board.remove_piece(coord)
     square = board.sq_at(coord)
     assert(square.piece.nil?)
-    
+
     # Make sure an empty square stays that way
     coord = A6
     board.remove_piece(coord)
     square = board.sq_at(coord)
     assert(square.piece.nil?)
   end
-  
+
   def test_promote_should_raise_argument_error_if_not_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -694,10 +700,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ")   
+    ")
     assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
   end
-  
+
   def test_promote_should_raise_argument_error_if_no_piece_present
     e = RulesEngine.new
     place_pieces(e, "
@@ -709,10 +715,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ")   
+    ")
     assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
-  end  
-  
+  end
+
   def test_promote_should_raise_argument_error_if_white_instead_of_black
     e = RulesEngine.new
     place_pieces(e, "
@@ -724,10 +730,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ")   
+    ")
     assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::QUEEN)}
   end
-  
+
   def test_promote_should_raise_argument_error_if_black_instead_of_white
     e = RulesEngine.new
     place_pieces(e, "
@@ -739,10 +745,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - p - - - -
-    ")   
-    assert_raise(ArgumentError) {e.promote!(D1, Chess::Piece::QUEEN)}    
+    ")
+    assert_raise(ArgumentError) {e.promote!(D1, Chess::Piece::QUEEN)}
   end
-  
+
   def test_promote_should_raise_argument_error_in_middle_of_board
     e = RulesEngine.new
     place_pieces(e, "
@@ -754,10 +760,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
+    ")
     assert_raise(ArgumentError) {e.promote!(D4, Chess::Piece::QUEEN)}
   end
-  
+
   def test_promote_should_raise_argument_error_promoting_to_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -769,10 +775,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
-    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::PAWN)}    
+    ")
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::PAWN)}
   end
-  
+
   def test_promote_should_raise_argument_error_promoting_to_king
     e = RulesEngine.new
     place_pieces(e, "
@@ -784,10 +790,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
-    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::KING)}        
+    ")
+    assert_raise(ArgumentError) {e.promote!(D8, Chess::Piece::KING)}
   end
-  
+
   def test_promote_will_promote_white_pawn_to_queen
     e = RulesEngine.new
     place_pieces(e, "
@@ -799,13 +805,13 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
+    ")
     e.promote!(D8, Chess::Piece::QUEEN)
     new_piece = e.sq_at(D8).piece
     assert(new_piece.colour.white?)
     assert(new_piece.queen?)
   end
-  
+
   def test_promote_will_promote_black_pawn_to_white
     e = RulesEngine.new
     place_pieces(e, "
@@ -817,13 +823,13 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - P - - - -
-    ") 
+    ")
     e.promote!(D1, Chess::Piece::QUEEN)
     new_piece = e.sq_at(D1).piece
     assert(new_piece.colour.black?)
-    assert(new_piece.queen?)   
+    assert(new_piece.queen?)
   end
-  
+
   def test_can_promote_should_return_false_when_nothing_to_promote
     e = RulesEngine.new
     place_pieces(e, "
@@ -835,11 +841,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - p - - - -   
       - - - - - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
     assert(!e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_true_for_promotable_white_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -851,11 +857,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
+    ")
     assert(e.can_promote?(Colour::WHITE))
-    assert(!e.can_promote?(Colour::BLACK))    
+    assert(!e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_true_for_promotable_black_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -867,11 +873,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - P - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
-    assert(e.can_promote?(Colour::BLACK))        
+    assert(e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_false_for_non_promotable_white_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -883,11 +889,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - p - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
-    assert(!e.can_promote?(Colour::BLACK))            
+    assert(!e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_false_for_non_promotable_black_pawn
     e = RulesEngine.new
     place_pieces(e, "
@@ -899,11 +905,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
-    assert(!e.can_promote?(Colour::BLACK))            
+    assert(!e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_false_for_non_promotable_white_piece
     e = RulesEngine.new
     place_pieces(e, "
@@ -915,11 +921,11 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - - - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
-    assert(!e.can_promote?(Colour::BLACK))            
+    assert(!e.can_promote?(Colour::BLACK))
   end
-  
+
   def test_can_promote_should_return_false_for_non_promotable_black_piece
     e = RulesEngine.new
     place_pieces(e, "
@@ -931,22 +937,23 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -   
       - - - Q - - - -
-    ") 
+    ")
     assert(!e.can_promote?(Colour::WHITE))
-    assert(!e.can_promote?(Colour::BLACK))        
-    
+    assert(!e.can_promote?(Colour::BLACK))
+
   end
-  
+
   #----------------------------------------------------------------------------
   # End piece helper tests
   #----------------------------------------------------------------------------  
-  
+
   #----------------------------------------------------------------------------
   # Start attack calculation testing
   #----------------------------------------------------------------------------
   #------
   # Pawn
   #------
+
   def test_white_pawn_in_centre_should_attack_upwards()
     b = RulesEngine.new()
     place_pieces(b, "
@@ -1187,7 +1194,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_bv_equals(expected, bv)
   end
-  
+
   def test_pawn_should_attack_king
     e = RulesEngine.new
     place_pieces(e, "
@@ -1204,10 +1211,11 @@ class RulesEngineTest < Test::Unit::TestCase
     #e.calculate_colour_attack(Colour::WHITE)
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   #--------
   # Knight 
   #--------
+
   def test_corner_knights_should_attack_middle()
     b = RulesEngine.new()
     place_pieces(b, "
@@ -1267,10 +1275,11 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_bv_equals(expected, bv)
   end
-  
+
   #--------
   # Bishop 
   #--------
+
   def test_lower_left_corner_bishop_should_attack_diagonally()
     b = RulesEngine.new()
 
@@ -1410,7 +1419,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, D4)
   end
-  
+
   def test_centre_bishop_attacks_should_be_blockable()
     b = RulesEngine.new()
 
@@ -1438,7 +1447,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, D4)
   end
-  
+
   def test_bottom_bishop_should_attack_diagonally_adjacent_opposing_piece()
     b = RulesEngine.new()
 
@@ -1465,7 +1474,7 @@ class RulesEngineTest < Test::Unit::TestCase
       --------
     "
     assert_attack_state(expected, b, C1)
-  end  
+  end
 
   def test_bishop_should_be_attacking_king
     e = RulesEngine.new
@@ -1481,10 +1490,11 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   #------
   # Rook
   #------
+
   def test_rook_attack_in_corner_should_attack_like_an_l
     b = RulesEngine.new()
     place_pieces(b, "
@@ -1541,7 +1551,7 @@ class RulesEngineTest < Test::Unit::TestCase
 
     assert_bv_equals(expected, bv)
   end
-  
+
   def test_rook_should_not_attack_diagonally_bugfix
     b = RulesEngine.new()
     place_pieces(b, "
@@ -1568,7 +1578,7 @@ class RulesEngineTest < Test::Unit::TestCase
       -*******
     "
 
-    assert_bv_equals(expected, bv)    
+    assert_bv_equals(expected, bv)
   end
 
   def test_center_rook_should_attack_file_and_rank
@@ -1626,7 +1636,7 @@ class RulesEngineTest < Test::Unit::TestCase
 
     assert_bv_equals(expected, bv)
   end
-  
+
   def test_own_pieces_should_block_rook_attack
     b = RulesEngine.new()
     place_pieces(b, "
@@ -1654,7 +1664,7 @@ class RulesEngineTest < Test::Unit::TestCase
 
     assert_bv_equals(expected, bv)
   end
-  
+
   def test_rook_of_own_colour_should_block_on_rank_and_file()
     b = RulesEngine.new()
 
@@ -1682,10 +1692,11 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_bv_equals(expected, bv)
   end
-  
+
   #-------
   # Queen 
   #-------
+
   def test_corner_queen_should_attack()
     b = RulesEngine.new()
 
@@ -1741,7 +1752,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, D1)
   end
-  
+
   def test_centre_queen_should_attack_outwards()
     b = RulesEngine.new()
 
@@ -1796,10 +1807,11 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, F5)
   end
-  
+
   #------
   # King 
   #------
+
   def test_centre_king_should_attack_outwards()
     b = RulesEngine.new()
 
@@ -1939,6 +1951,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_attack_state(expected, b, D1)
   end
+
   #----------------------------------------------------------------------------
   # End attack calculation testing
   #----------------------------------------------------------------------------
@@ -1949,6 +1962,7 @@ class RulesEngineTest < Test::Unit::TestCase
   #--------
   # Pawn
   #--------  
+
   def test_check_calculate_white_pawn_move
     e = RulesEngine.new
     place_pieces(e, "
@@ -1998,7 +2012,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_move_state(e, expected, D6);
   end
-  
+
   def test_check_calculate_blocked_white_pawn_move
     e = RulesEngine.new
     place_pieces(e, "
@@ -2023,7 +2037,7 @@ class RulesEngineTest < Test::Unit::TestCase
     "
     assert_move_state(e, expected, C2)
   end
-  
+
   def test_calculate_white_pawn_move_should_work_for_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2069,7 +2083,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -"
     assert_move_state(e, expected, D7)
   end
-  
+
   def test_calculate_white_pawn_move_should_include_captures
     e = RulesEngine.new
     place_pieces(e, "
@@ -2090,9 +2104,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - @ @ - - - - 
       - - - - - - - -
       - - - - - - - -"
-    assert_move_state(e, expected, D2)    
+    assert_move_state(e, expected, D2)
   end
-  
+
   def test_calculate_black_pawn_move_should_include_captures
     e = RulesEngine.new
     place_pieces(e, "
@@ -2114,12 +2128,13 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - - - - - -"
 
-    assert_move_state(e, expected, D7)    
+    assert_move_state(e, expected, D7)
   end
-  
+
   #--------
   # Knight
   #--------
+
   def test_calculate_white_knight_moves_should_work_for_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2140,9 +2155,9 @@ class RulesEngineTest < Test::Unit::TestCase
       @ - @ - - - - - 
       - - - @ - - - -
       - - - - - - - -"
-    assert_move_state(e, expected, B1)    
+    assert_move_state(e, expected, B1)
   end
- 
+
   def test_calculate_white_knight_moves_should_work_from_mid_board
     e = RulesEngine.new
     place_pieces(e, "
@@ -2163,9 +2178,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - @ - - - @ - - 
       - - @ - @ - - -
       - - - - - - - -"
-    assert_move_state(e, expected, D4)        
+    assert_move_state(e, expected, D4)
   end
- 
+
   def test_calculate_white_knight_moves_should_work_from_board_edge
     e = RulesEngine.new
     place_pieces(e, "
@@ -2186,9 +2201,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - @ - - - - - - 
       - - - - - - - -
       - - - - - - - -"
-    assert_move_state(e, expected, A5)    
+    assert_move_state(e, expected, A5)
   end
-  
+
   def test_calculate_black_knight_moves_should_work_for_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2209,9 +2224,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - -
       - - - - - - - -"
-    assert_move_state(e, expected, B8)    
+    assert_move_state(e, expected, B8)
   end
- 
+
   def test_calculate_black_knight_moves_should_work_from_mid_board
     e = RulesEngine.new
     place_pieces(e, "
@@ -2232,9 +2247,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - @ - - - @ - - 
       - - @ - @ - - -
       - - - - - - - -"
-    assert_move_state(e, expected, D4)        
+    assert_move_state(e, expected, D4)
   end
- 
+
   def test_calculate_black_knight_moves_should_work_from_board_edge
     e = RulesEngine.new
     place_pieces(e, "
@@ -2255,12 +2270,13 @@ class RulesEngineTest < Test::Unit::TestCase
       - @ - - - - - - 
       - - - - - - - -
       - - - - - - - -"
-    assert_move_state(e, expected, A5)    
+    assert_move_state(e, expected, A5)
   end
-  
+
   #--------
   # Bishop
   #--------
+
   def test_calculate_bishop_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2281,9 +2297,9 @@ class RulesEngineTest < Test::Unit::TestCase
     @ - - - @ - - - 
     - @ - @ - - - - 
     - - - - - - - -"
-    assert_move_state(e, expected, C1)        
+    assert_move_state(e, expected, C1)
   end
-  
+
   def test_calculate_bishop_move_should_stop_with_opposing_pieces
     e = RulesEngine.new
     place_pieces(e, "
@@ -2304,7 +2320,7 @@ class RulesEngineTest < Test::Unit::TestCase
     - - - - @ - - - 
     - @ - @ - - - - 
     - - - - - - - -"
-    assert_move_state(e, expected, C1)        
+    assert_move_state(e, expected, C1)
   end
 
   def test_calculate_bishop_move_should_stop_with_same_colour_pieces
@@ -2327,7 +2343,7 @@ class RulesEngineTest < Test::Unit::TestCase
     - - - - @ - - - 
     - - - @ - - - - 
     - - - - - - - -"
-    assert_move_state(e, expected, C1)        
+    assert_move_state(e, expected, C1)
   end
 
   def test_calculate_bishop_move_should_stop_with_same_colour_bishops
@@ -2350,12 +2366,13 @@ class RulesEngineTest < Test::Unit::TestCase
     - - - - @ - - - 
     - - - @ - - - - 
     - - - - - - - -"
-    assert_move_state(e, expected, C1)        
+    assert_move_state(e, expected, C1)
   end
-   
+
   #------
   # Rook
   #------
+
   def test_calculate_rook_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2376,9 +2393,9 @@ class RulesEngineTest < Test::Unit::TestCase
       @ - - - - - - - 
       @ - - - - - - -
       - @ @ @ @ @ @ @"
-    assert_move_state(e, expected, A1)        
+    assert_move_state(e, expected, A1)
   end
-  
+
   def test_calculate_rook_move_should_work_with_other_piece_around
     e = RulesEngine.new
     place_pieces(e, "
@@ -2399,12 +2416,13 @@ class RulesEngineTest < Test::Unit::TestCase
       @ - - - - - - - 
       @ - - - - - - -
       - @ @ @ @ - - -"
-    assert_move_state(e, expected, A1)        
-  end 
+    assert_move_state(e, expected, A1)
+  end
 
   #-------
   # Queen
   #-------
+
   def test_calculate_queen_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2425,7 +2443,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - @ - @ - @ - - 
       - - @ @ @ - - - 
       @ @ @ - @ @ @ @"
-    assert_move_state(e, expected, D1)    
+    assert_move_state(e, expected, D1)
   end
 
   def test_calculate_queen_move_should_be_stopped_by_opposing_pieces
@@ -2448,9 +2466,9 @@ class RulesEngineTest < Test::Unit::TestCase
     - @ - @ - @ - - 
     - - @ @ @ - - - 
     - @ @ - @ @ - -"
-    assert_move_state(e, expected, D1)    
+    assert_move_state(e, expected, D1)
   end
-  
+
   def test_calculate_queen_move_should_be_stopped_by_friendly_pieces
     e = RulesEngine.new
     place_pieces(e, "
@@ -2471,9 +2489,9 @@ class RulesEngineTest < Test::Unit::TestCase
     - - - - - - - - 
     - - @ @ @ - - - 
     - - @ - @ - - -"
-    assert_move_state(e, expected, D1)    
+    assert_move_state(e, expected, D1)
   end
-  
+
   def test_calculate_queen_move_should_be_stopped_by_friendly_queens
     e = RulesEngine.new
     place_pieces(e, "
@@ -2494,12 +2512,13 @@ class RulesEngineTest < Test::Unit::TestCase
     - - - - - - - - 
     - - @ @ @ - - - 
     - - @ - @ - - -"
-    assert_move_state(e, expected, D1)    
+    assert_move_state(e, expected, D1)
   end
-    
+
   #------
   # King
   # ------
+
   def test_calculate_king_move_should_work_from_start_square
     e = RulesEngine.new
     place_pieces(e, "
@@ -2520,8 +2539,8 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - @ @ @ - - 
       - - - @ - @ - -"
-    assert_move_state(e, expected, E1)    
-  end 
+    assert_move_state(e, expected, E1)
+  end
 
   def test_calculate_king_move_should_work_for_center_king
     e = RulesEngine.new
@@ -2543,9 +2562,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - @ @ @ - - - 
       - - - - - - - - 
       - - - - - - - -"
-    assert_move_state(e, expected, D4)    
+    assert_move_state(e, expected, D4)
   end
-  
+
   def test_calculate_king_move_should_not_allow_moving_into_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -2566,9 +2585,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - @ @ - - 
       - - - - - @ - -"
-    assert_move_state(e, expected, E1)    
+    assert_move_state(e, expected, E1)
   end
-  
+
   def test_calculate_king_move_should_allow_no_moves_for_checkmate
     e = RulesEngine.new
     place_pieces(e, "
@@ -2589,9 +2608,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -"
-    assert_move_state(e, expected, H1)    
+    assert_move_state(e, expected, H1)
   end
-  
+
   def test_calculate_king_move_should_allow_moves_from_game_one
     e = RulesEngine.new
     place_pieces(e, "
@@ -2613,9 +2632,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - @ - - - - 
       - - - - @ - - -"
-    assert_move_state(e, expected, E2)    
+    assert_move_state(e, expected, E2)
   end
-  
+
   def test_calculate_king_move_should_allow_moves_from_game_two
     e = RulesEngine.new
     place_pieces(e, "
@@ -2637,9 +2656,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -"
-    assert_move_state(e, expected, D8)    
+    assert_move_state(e, expected, D8)
   end
-  
+
   #----------------------------------------------------------------------------
   # End potential move calculation testing
   #----------------------------------------------------------------------------  
@@ -2647,40 +2666,41 @@ class RulesEngineTest < Test::Unit::TestCase
   #----------------------------------------------------------------------------
   # Start legal move check testing
   #----------------------------------------------------------------------------
-  
+
   #------
   # Pawn
   #------
+
   def test_chk_mv_pawn
     e = RulesEngine.new
-    
+
     # cannot move a "pawn" from an empty square
     assert_equal(e.chk_mv(Coord.from_alg('e3'), Coord.from_alg('e4')), false)
-    
+
     # can move one square forward
     assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), true)
-                
+
     # cannot move one square forward if blocked
     e.place_piece(Coord.from_alg('e3'), Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP))
     assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e3')), false)
-                
+
     # cannot move two squares forward if blocked
     assert(!e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('e4')))
-                
+
     # cannot move diagonally if not a capture
     assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
-                
+
     # can move diagonally if a capture
     e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP))
     assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), true)
-                
+
     # cannot capture the same colored piece
     e.place_piece(Coord.from_alg('d3'), Chess::Piece.new(Colour::WHITE, Chess::Piece::BISHOP))
     assert_equal(e.chk_mv(Coord.from_alg('e2'), Coord.from_alg('d3')), false)
-                
+
     # make sure it works both ways
     e.place_piece(Coord.from_alg('d6'), Chess::Piece.new(Colour::BLACK, Chess::Piece::BISHOP))
-    assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)           
+    assert_equal(e.chk_mv(Coord.from_alg('e7'), Coord.from_alg('f6')), false)
   end
 
   def test_white_pawn_should_have_en_passant_available_NW
@@ -2697,7 +2717,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - k -
     ")
     e.move_list = [Move.new(D7, D5)]
-    assert(e.chk_mv(E5, D6)) 
+    assert(e.chk_mv(E5, D6))
   end
 
   def test_white_pawn_should_have_en_passant_available_NE
@@ -2713,12 +2733,12 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - k -
     ")
     e.move_list = [Move.new(F7, F5)]
-    assert(e.chk_mv(E5, F6)) 
+    assert(e.chk_mv(E5, F6))
   end
 
   def test_white_pawn_should_not_have_en_passant_available_if_not_pawn
     e = RulesEngine.new
-    
+
     place_pieces(e, "
       - - - - - - - k 
       - - - - - - - -   
@@ -2747,7 +2767,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
     ")
     e.move_list = [Move.new(D6, D5)]
-    assert(!e.chk_mv(E5, D6)) 
+    assert(!e.chk_mv(E5, D6))
   end
 
   def test_black_pawn_should_have_en_passant_available_SW
@@ -2763,7 +2783,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
     ")
     e.move_list = [Move.new(E2, E4)]
-    assert(e.chk_mv(F4, E3)) 
+    assert(e.chk_mv(F4, E3))
   end
 
   def test_black_pawn_should_have_en_passant_available_SE
@@ -2779,7 +2799,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - k - - - - 
     ")
     e.move_list = [Move.new(G2, G4)]
-    assert(e.chk_mv(F4, G3)) 
+    assert(e.chk_mv(F4, G3))
   end
 
   def test_black_pawn_should_not_have_en_passant_available_if_not_pawn
@@ -2795,10 +2815,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - K - - - - - - 
     ")
     e.move_list = [Move.new(E2, E4)]
-    assert(!e.chk_mv(F4, E3)) 
+    assert(!e.chk_mv(F4, E3))
   end
 
-  def test_black_pawn_should_not_have_en_passant_available_if_one_square_moved 
+  def test_black_pawn_should_not_have_en_passant_available_if_one_square_moved
     e = RulesEngine.new
     place_pieces(e, "
       k - - - - - - -
@@ -2811,9 +2831,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
     ")
     e.move_list = [Move.new(E3, E4)]
-    assert(!e.chk_mv(F4, E3)) 
+    assert(!e.chk_mv(F4, E3))
   end
-  
+
   def test_pawn_blocks_pawn
     # Unit test for a bug condition -> Pawns don't seem to be blocked
     e = RulesEngine.new
@@ -2829,10 +2849,11 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.blocked?(C2, C3))
   end
-  
+
   #--------
   # Knight
   #--------
+
   def test_bug_chk_knight_move_allows_moving_to_h1_from_b1
     e = RulesEngine.new
     place_pieces(e, "
@@ -2845,9 +2866,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - n - - - - - - 
     ")
-    assert(!e.chk_mv(B1, Coord.new(-1, 1))) 
+    assert(!e.chk_mv(B1, Coord.new(-1, 1)))
   end
-  
+
   def test_bug_knight_should_not_be_able_leave_king_in_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -2862,20 +2883,21 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(D7, C5))
   end
-  
+
   #--------
   # Bishop
   #--------
+
   def test_check_mv_bishop
     e = RulesEngine.new
-    
+
     # cannot move a blocked bishop
     assert(!e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
     e.remove_piece(Coord.from_alg('d2'))
     assert(e.chk_mv(Coord.from_alg('c1'), Coord.from_alg('e3')))
 
   end
-  
+
   def test_bug_bishop_should_be_able_to_do_simple_diagonal_move
     e = RulesEngine.new
     place_pieces(e, "
@@ -2890,19 +2912,21 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.chk_mv(B2, C1))
   end
-  
+
   #------
   # Rook
   #------
+
   def test_rook_cannot_hop_pawn
     # Unit test for a bug condition -> Rook can hop a pawn
     e = RulesEngine.new
     assert(e.blocked?(Coord.new(0, 7), Coord.new(0, 5)))
   end
-  
+
   #------
   # King
   #------
+
   def test_white_king_should_not_be_able_to_wrap_around_board_bugfix
     e = RulesEngine.new
     place_pieces(e, "
@@ -2917,7 +2941,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ")
     assert(!e.chk_mv(H1, Coord.new(8, 1)))
   end
-  
+
   def test_white_king_should_have_kingside_castling_available
     e = RulesEngine.new
     place_pieces(e, "
@@ -2930,9 +2954,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - k - - r 
     ")
-    assert(e.chk_mv(E1, G1)) 
+    assert(e.chk_mv(E1, G1))
   end
-  
+
   def test_white_king_should_be_able_to_move_west
     e = RulesEngine.new
     place_pieces(e, "
@@ -2947,7 +2971,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ")
     assert(e.chk_mv(E1, D1))
   end
-  
+
   def test_white_king_should_not_be_able_to_move_into_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -2962,7 +2986,7 @@ class RulesEngineTest < Test::Unit::TestCase
       ")
     assert(!e.chk_mv(E1, D1))
   end
-  
+
   def test_white_king_should_have_queenside_castling_available
     e = RulesEngine.new
     place_pieces(e, "
@@ -2975,7 +2999,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       r - - - k - - - 
     ")
-    assert(e.chk_mv(E1, C1)) 
+    assert(e.chk_mv(E1, C1))
   end
 
   def test_black_king_should_have_kingside_castling_available
@@ -2990,9 +3014,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     ")
-    assert(e.chk_mv(E8, G8)) 
+    assert(e.chk_mv(E8, G8))
   end
-  
+
   def test_white_king_should_have_queenside_castling_available
     e = RulesEngine.new
     place_pieces(e, "
@@ -3005,9 +3029,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - - - - - 
     ")
-    assert(e.chk_mv(E8, C8)) 
+    assert(e.chk_mv(E8, C8))
   end
-   
+
   def test_white_king_cannot_castle_kingside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3022,7 +3046,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E1, G1))
   end
-  
+
   def test_white_king_cannot_castle_kingside_when_destination_is_attacked
     e = RulesEngine.new
     place_pieces(e, "
@@ -3035,9 +3059,9 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - - - - k - - r 
     ")
-    assert(!e.chk_mv(E1, G1))    
+    assert(!e.chk_mv(E1, G1))
   end
-  
+
   def test_white_king_cannot_castle_kingside_through_diagaonal_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3052,7 +3076,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E1, G1))
   end
-  
+
   def test_white_king_cannot_castle_queenside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3066,8 +3090,8 @@ class RulesEngineTest < Test::Unit::TestCase
       r - - - k - - - 
     ")
     assert(!e.chk_mv(E1, C1))
-  end  
-  
+  end
+
   def test_white_king_cannot_castle_queenside_when_destination_attacked
     e = RulesEngine.new
     place_pieces(e, "
@@ -3081,8 +3105,8 @@ class RulesEngineTest < Test::Unit::TestCase
       r - - - k - - - 
     ")
     assert(!e.chk_mv(E1, C1))
-  end  
-  
+  end
+
   def test_white_king_cannot_castle_queenside_through_diagonal_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3097,7 +3121,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E1, C1))
   end
-  
+
   def test_black_king_cannot_castle_kingside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3112,7 +3136,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E8, G8))
   end
-  
+
   def test_black_king_cannot_castle_kingside_through_diagonal_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3126,8 +3150,8 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - k - 
     ")
     assert(!e.chk_mv(E8, G8))
-  end  
-  
+  end
+
   def test_black_king_cannot_castle_queenside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3142,7 +3166,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(E8, C8))
   end
-  
+
   def test_black_king_canot_castle_queenside_through_diagonal_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3155,10 +3179,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -   
       - k - - - - - - 
     ")
-    assert(!e.chk_mv(E8, C8))    
+    assert(!e.chk_mv(E8, C8))
   end
-  
-  def test_king_cannot_stay_in_check_from_game_one 
+
+  def test_king_cannot_stay_in_check_from_game_one
     e = RulesEngine.new
     place_pieces(e, "
       p q - K - - - R
@@ -3187,7 +3211,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.chk_mv(E7, E8))
   end
-  
+
   def test_king_should_have_escapes_from_game_three
     e = RulesEngine.new
     place_pieces(e, "
@@ -3202,7 +3226,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.chk_mv(D8, E8))
   end
-  
+
   def test_king_should_have_capture_escape_from_game_four
     e = RulesEngine.new
     place_pieces(e, "
@@ -3217,13 +3241,15 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.chk_mv(G1, G2))
   end
+
   #----------------------------------------------------------------------------
   # End legal move check testing
   #---------------------------------------------------------------------------- 
-  
+
   #----------------------------------------------------------------------------
   # Start checkmate detection testing
   #----------------------------------------------------------------------------  
+
   def test_should_detect_white_kingside_back_rank_mate
     e = RulesEngine.new
     place_pieces(e, "
@@ -3237,7 +3263,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - R - - k - 
       ")
     assert(e.checkmate?(Colour::WHITE))
-  end 
+  end
 
   def test_should_detect_white_queenside_back_rank_mate
     e = RulesEngine.new
@@ -3252,8 +3278,8 @@ class RulesEngineTest < Test::Unit::TestCase
       - k - - R - - - 
       ")
     assert(e.checkmate?(Colour::WHITE))
-  end 
-  
+  end
+
   def test_should_detect_scholars_mate
     e = RulesEngine.new
     place_pieces(e, "
@@ -3266,9 +3292,9 @@ class RulesEngineTest < Test::Unit::TestCase
       p p p p p - - p   
       r n b q k b n r 
       ")
-    assert(e.checkmate?(Colour::WHITE))    
-  end  
-  
+    assert(e.checkmate?(Colour::WHITE))
+  end
+
   def test_should_calculate_checkmate_from_game_part_one
     e = RulesEngine.new
     place_pieces(e, "
@@ -3283,7 +3309,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.checkmate?(Colour::BLACK))
   end
-  
+
   def test_should_calculate_checkmake_from_game_part_two
     e = RulesEngine.new
     place_pieces(e, "
@@ -3298,7 +3324,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.checkmate?(Colour::WHITE))
   end
-  
+
   def test_should_not_be_checkmate_from_game_part_one
     e = RulesEngine.new
     place_pieces(e, "
@@ -3313,14 +3339,15 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(!e.checkmate?(Colour::WHITE))
   end
-  
+
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #----------------------------------------------------------------------------
 
-    #----------------------------------------------------------------------------
-  # Start checkmate detection testing
   #----------------------------------------------------------------------------
+  # Start draw detection testing
+  #----------------------------------------------------------------------------
+
   def test_only_two_kings_is_a_draw
     e = RulesEngine.new
     place_pieces(e, "
@@ -3351,13 +3378,29 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!e.draw?)
   end
 
+  def test_stalemate_should_be_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - k - q - - -
+      - - - - - - - -
+      - - - K - - - -
+      ")
+    assert(e.draw?)
+  end
+
   #----------------------------------------------------------------------------
-  # End checkmate detection testing
+  # End draw detection testing
   #----------------------------------------------------------------------------
 
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------
+
   def test_should_detect_simple_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3373,7 +3416,7 @@ class RulesEngineTest < Test::Unit::TestCase
     e.calculate_colour_attack(Colour::BLACK)
     assert(e.in_check?(Colour::WHITE))
   end
-  
+
   def test_pawn_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3388,7 +3431,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   def test_pawn_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3404,7 +3447,7 @@ class RulesEngineTest < Test::Unit::TestCase
     e.calculate_colour_attack(Colour::WHITE)
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   def test_northnorthwest_black_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3419,7 +3462,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::WHITE))
   end
-  
+
   def test_northnortheast_black_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3434,7 +3477,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::WHITE))
   end
-  
+
   def test_northwestwest_black_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3449,7 +3492,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::WHITE))
   end
-  
+
   def test_northeasteast_black_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3464,7 +3507,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::WHITE))
   end
-  
+
   def test_southsouthwest_white_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3479,7 +3522,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   def test_southsoutheast_white_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3494,7 +3537,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   def test_southwestwest_white_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3509,7 +3552,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   def test_southeasteast_white_knight_should_give_check
     e = RulesEngine.new
     place_pieces(e, "
@@ -3524,7 +3567,7 @@ class RulesEngineTest < Test::Unit::TestCase
     ")
     assert(e.in_check?(Colour::BLACK))
   end
-  
+
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------
