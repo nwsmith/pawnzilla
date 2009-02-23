@@ -403,6 +403,9 @@ class RulesEngine
   end
 
   def sq_at(coord)
+    return nil unless coord.x.between?(0, 7)
+    return nil unless coord.y.between?(0, 7)
+    
     square = Chess::Square.new(coord, RulesEngine.clrfcoord(coord))
     mask = RulesEngine.get_bv(coord)
 
@@ -1222,43 +1225,21 @@ class RulesEngine
     pawn_dir = clr.white? ? [Coord::NORTHEAST, Coord::NORTHWEST] : [Coord::SOUTHEAST, Coord::SOUTHWEST]
 
     pawn_dir.each do |dir|
-      pc = sq_at(src.go(dir)).piece
+      sq = sq_at(src.go(dir))
+      pc = sq.nil? ? nil : sq.piece
       return true if !pc.nil? && pc.colour.opposite?(clr) && pc.pawn?
     end
 
     # check for knights
-    pc = sq_at(src.north.north.west).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.north.north.east).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.north.west.west).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.north.east.east).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.south.south.west).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.south.south.east).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.south.west.west).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
-    pc = sq_at(src.south.east.east).piece
-    if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
-      return true
-    end
+    [src.north.north.west, src.north.north.east, src.north.west.west, src.north.east.east, \
+     src.south.south.west, src.south.south.east, src.south.west.west, src.south.east.east].each{|coord|
+
+      sq = sq_at(coord)
+      pc = sq.nil? ? nil : sq.piece
+      if (!pc.nil? && clr.opposite?(pc.colour) && pc.knight?)
+        return true
+      end
+    }
 
     all_dir.each do |dir|
       vector = RulesEngine.calc_board_vector(src, dir)

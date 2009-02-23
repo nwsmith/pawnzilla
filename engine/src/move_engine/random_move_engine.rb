@@ -62,6 +62,10 @@ class RandomMoveEngine < MoveEngine
 
     end
 
+    # we shouldn't need this but we do
+    if (!gamestate.chk_mv(src, dest))
+      throw :CHOOSE_PIECE
+    end
     return Move.new(src, dest)
   end
 end

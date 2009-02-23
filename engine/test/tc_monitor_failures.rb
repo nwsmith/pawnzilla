@@ -67,4 +67,47 @@ p - P k - r - -
 ")
     assert(!e.chk_mv(D7, B5), "This move should be illegal")
   end
+
+  def test_bishop_should_not_be_able_to_leave_king_in_check_2
+    e = RulesEngine.new
+    place_pieces(e, "
+r - B K - - - -
+- - r - - p - -
+- - - P - p - -
+R - - - - - - p
+- - - N R - - -
+- - - - - Q - -
+N n - - - - - k
+- - - b r - - -
+")
+    assert(!e.chk_mv(C8, A6))
+  end
+
+  def test_king_should_not_be_in_check
+    e = RulesEngine.new
+    place_pieces(e, "
+- - - r - - - -
+- - - b k - - -
+- - Q - - - K -
+- - - - p - - -
+- - - - - - - -
+- - - - B - - -
+- - - - - - - -
+- Q - - - - - - ")    
+    assert(!e.in_check?(Colour::BLACK))
+  end
+
+  def test_king_should_be_able_to_move_out_of_check
+    e = RulesEngine.new
+    place_pieces(e, "
+- - - r - - - -
+- - - b - - - -
+- - Q - k - K -
+- - - - p - - -
+- - - - - - - -
+- - - - B - - -
+- - - - - - - -
+- Q - - - - - - ")
+    assert(e.chk_mv(E6, E7))
+  end
 end
