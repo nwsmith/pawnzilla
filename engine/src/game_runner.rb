@@ -44,6 +44,7 @@ class GameRunner
     return nil unless game_is_over
     return Colour::BLACK if @rules_engine.checkmate?(Colour::WHITE)
     return Colour::WHITE if @rules_engine.checkmate?(Colour::BLACK)
+    return nil if @rules_engine.draw?
   end
   
   

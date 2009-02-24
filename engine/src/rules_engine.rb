@@ -906,6 +906,19 @@ class RulesEngine
     mv_bv
   end
 
+  # quicker calculation to see if a colour has any available moves will quit fast on success
+  def has_move?(colour)
+    bv = 0x01;
+    0.upto(63) {|i|
+      coord = get_coord_for_bv(bv)
+      pc = sq_at(coord).piece
+      if (!pc.nil? && pc.colour == colour && calculate_all_moves(coord) > 0)
+        return true
+      end
+      bv <<= 1
+    }
+    false
+  end
 
   # Note: For now, calculating all possible moves is a just-in-time calculation,
   # so we will return the bit vector representing all possible moves.  You'd
@@ -1074,7 +1087,8 @@ class RulesEngine
         # en passant hack
         if (pc_src.colour.white? && src.y == 4) || src.y == 3
           [Coord.new(src.x - 1, src.y), Coord.new(src.x + 1, src.y)].each do |ep_coord|
-            ep_pc = sq_at(ep_coord).piece
+            ep_sq = sq_at(ep_coord)
+            ep_pc = ep_sq.nil? ? nil : ep_sq.piece
             unless ep_pc.nil? || ep_pc.name != Chess::Piece::PAWN
               last_mv = @move_list.last
               return last_mv.dest == ep_coord && last_mv.src == Coord.new(ep_coord.x, ep_coord.y + (pc_src.colour.white? ? 2 : -2))
@@ -1194,17 +1208,9 @@ class RulesEngine
 
     # TODO: This is sooooooooooo slow
     # Stalemate
-    white_king = get_coord_for_bv(@clr_pos[Colour::WHITE] & pos[Chess::Piece::KING])
-    if (calc_all_mv_king(white_king) == 0 && calculate_all_moves_by_colour(Colour::WHITE) == 0 && !in_check?(Colour::WHITE))
+    if ((!has_move?(Colour::WHITE) && !in_check?(Colour::WHITE)) || (!has_move?(Colour::BLACK) && !in_check?(Colour::BLACK)))
       return true
     end
-
-    black_king = get_coord_for_bv(@clr_pos[Colour::BLACK] & pos[Chess::Piece::KING])
-    if (calc_all_mv_king(black_king) == 0 && calculate_all_moves_by_colour(Colour::BLACK) == 0 && !in_check?(Colour::BLACK))
-      return true
-    end
-
-    false
   end
 
   #----------------------------------------------------------------------------

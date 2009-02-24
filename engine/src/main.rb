@@ -76,7 +76,12 @@ puts ""
     puts "" if verbose
     begin
       if (monitor.gamerunner.game_is_over)
-        puts "#{runner.winner.colour} wins!" if verbose
+        winner = runner.winner
+        if (winner.nil?)
+          puts "A Draw!" if verbose
+        else
+          puts "#{winner.colour} wins!" if verbose
+        end
         white_move_engine = RandomMoveEngine.new
         black_move_engine = RandomMoveEngine.new
         monitor.gamerunner = GameRunner.new(white_move_engine, black_move_engine)
