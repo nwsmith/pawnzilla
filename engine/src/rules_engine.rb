@@ -405,7 +405,7 @@ class RulesEngine
   def sq_at(coord)
     return nil unless coord.x.between?(0, 7)
     return nil unless coord.y.between?(0, 7)
-    
+
     square = Chess::Square.new(coord, RulesEngine.clrfcoord(coord))
     mask = RulesEngine.get_bv(coord)
 
@@ -907,6 +907,7 @@ class RulesEngine
   end
 
   # quicker calculation to see if a colour has any available moves will quit fast on success
+
   def has_move?(colour)
     bv = 0x01;
     0.upto(63) {|i|
@@ -1206,6 +1207,34 @@ class RulesEngine
       return true
     end
 
+    # Check for king versus king and bishop
+    [Colour::WHITE, Colour::BLACK].each {|colour|
+      if (@clr_pos[colour] & @pos[Chess::Piece::KING] == @clr_pos[colour])
+        # White has only a king
+        if (bit_count(@clr_pos[colour.flip]) == 2)
+          if (bit_count(@pos[Chess::Piece::KNIGHT] & @clr_pos[colour.flip]) == 1 ||
+                  bit_count(@pos[Chess::Piece::BISHOP] & @clr_pos[colour.flip]) == 1)
+            # Only king and knight or bishop left - insufficient material
+            return true
+          end
+        end
+      end
+    }
+
+    # Check for king and bishop vs. king and bishop with bishop of same colour
+    if (bit_count(@clr_pos[Colour::WHITE]) == 2 && bit_count(@clr_pos[Colour::BLACK]) == 2)
+      # Each side has only two pieces left - one is the king
+      if (bit_count(@pos[Chess::Piece::BISHOP]) == 2)
+        # Each side has only a bishop and king left
+        w_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::WHITE] & pos[Chess::Piece::BISHOP]))
+        b_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::BLACK] & pos[Chess::Piece::BISHOP]))
+        if (w_sq.colour == b_sq.colour)
+          # The bishops are not opposite colours - insufficient material
+          return true
+        end
+      end
+    end
+
     # TODO: This is kinda slow
     # Stalemate
     if (!has_move?(colour_to_move) && !in_check?(colour_to_move))
@@ -1213,6 +1242,17 @@ class RulesEngine
     end
 
     false
+  end
+
+  #TODO: You guessed it, this is slow :-p
+
+  def bit_count(bv)
+    count = 0
+    0.upto(63) {|i|
+      count += bv & 0x01
+      bv >>= 1
+    }
+    count
   end
 
   #----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ class GameRunner
       move = next_move
       i += 1
       if (i > MAX_ATTEMPTS)
-        raise ArgumentError, "Tried #{MAX_ATTEMPTS} to find legal move.  Last candidate was #{move.src}-#{move.dest}"
+        raise ArgumentError, "Tried #{MAX_ATTEMPTS} time to find legal move.  Last candidate was #{move.src.to_alg}-#{move.dest.to_alg}"
       end
 
     end

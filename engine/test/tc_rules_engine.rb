@@ -3363,6 +3363,70 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.draw?(Colour::WHITE))
   end
 
+  def test_white_king_versus_black_king_and_bishop_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - B - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
+  def test_white_king_versuse_black_king_and_knight_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - N - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
+  def test_white_king_versus_black_king_and_queen_is_not_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - Q - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(!e.draw?(Colour::WHITE))
+    assert(!e.draw?(Colour::BLACK))
+  end
+
+  def test_black_king_versus_white_king_and_bishop_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - b - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
   def test_two_kings_with_a_queen_is_not_a_draw
     e = RulesEngine.new
     place_pieces(e, "
@@ -3378,7 +3442,39 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!e.draw?(Colour::BLACK))
   end
 
-  def test_stalemate_should_be_a_draw_if_it_is_not_stalemated_colours_turn
+  def test_black_king_versus_white_king_and_knight_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - n - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
+  def test_black_king_versus_white_king_and_queen_is_not_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - q - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(!e.draw?(Colour::WHITE))
+    assert(!e.draw?(Colour::BLACK))
+  end
+
+  def test_stalemate_should_not_be_a_draw_if_it_is_not_stalemated_colours_turn
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
@@ -3408,6 +3504,37 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.draw?(Colour::BLACK))
   end
 
+  def test_king_versus_king_with_same_coloured_bishops_is_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - B - -
+      - - - - b - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
+  def test_king_versus_king_with_different_coloured_bishops_is_not_a_draw
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - B - - -
+      - - - - b - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - K - - k -
+      ")
+    assert(!e.draw?(Colour::WHITE))
+    assert(!e.draw?(Colour::BLACK))
+  end
   #----------------------------------------------------------------------------
   # End draw detection testing
   #----------------------------------------------------------------------------
