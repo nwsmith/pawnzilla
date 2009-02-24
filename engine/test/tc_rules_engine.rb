@@ -3295,51 +3295,6 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.checkmate?(Colour::WHITE))
   end
 
-  def test_should_calculate_checkmate_from_game_part_one
-    e = RulesEngine.new
-    place_pieces(e, "
-      R - B - - R - - 
-      - - K P - - - - 
-      - P - p - P - - 
-      - - P - P p n P 
-      n - p - - - - - 
-      p q - p - - - r 
-      - - - b - - b - 
-      r - - - k - - -      
-    ")
-    assert(!e.checkmate?(Colour::BLACK))
-  end
-
-  def test_should_calculate_checkmake_from_game_part_two
-    e = RulesEngine.new
-    place_pieces(e, "
-      R N B - K - R - 
-      - P P P - - P - 
-      - - - - - Q - P 
-      P - B - P P - - 
-      - - - - - N p p 
-      p p - p p n - - 
-      n - p - k p - - 
-      - r b q - b - r 
-    ")
-    assert(!e.checkmate?(Colour::WHITE))
-  end
-
-  def test_should_not_be_checkmate_from_game_part_one
-    e = RulesEngine.new
-    place_pieces(e, "
-      p - - p R - - K 
-      B - - - R - - - 
-      - - - - - - b p 
-      - - - - - - p - 
-      - P - - - - - - 
-      - - - - - - P - 
-      - - - P - - B - 
-      - - - r - - k -
-    ")
-    assert(!e.checkmate?(Colour::WHITE))
-  end
-
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #----------------------------------------------------------------------------
