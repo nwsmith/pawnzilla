@@ -56,7 +56,7 @@ class GameMonitor
       error = false
       winner = @gamerunner.winner
       if (winner.nil?)
-        if (!@gamerunner.rules_engine.draw?)
+        if (!@gamerunner.rules_engine.draw?(@gamerunner.to_move))
           error = true;
         end
       else

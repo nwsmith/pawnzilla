@@ -12,7 +12,7 @@ class GameRunner
   end
   
   def game_is_over
-    return @rules_engine.checkmate?(Colour::WHITE) || @rules_engine.checkmate?(Colour::BLACK) || @rules_engine.draw?
+    return @rules_engine.checkmate?(Colour::WHITE) || @rules_engine.checkmate?(Colour::BLACK) || @rules_engine.draw?(@to_move)
   end
   
   def next_move
@@ -49,7 +49,7 @@ class GameRunner
     return nil unless game_is_over
     return Colour::BLACK if @rules_engine.checkmate?(Colour::WHITE)
     return Colour::WHITE if @rules_engine.checkmate?(Colour::BLACK)
-    return nil if @rules_engine.draw?
+    return nil if @rules_engine.draw?(@to_move)
   end
   
   

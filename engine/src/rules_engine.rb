@@ -1200,17 +1200,19 @@ class RulesEngine
   # Start draw detection
   #----------------------------------------------------------------------------
 
-  def draw?
+  def draw?(colour_to_move)
     # Check for only two kings.
     if (@pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
       return true
     end
 
-    # TODO: This is sooooooooooo slow
+    # TODO: This is kinda slow
     # Stalemate
-    if ((!has_move?(Colour::WHITE) && !in_check?(Colour::WHITE)) || (!has_move?(Colour::BLACK) && !in_check?(Colour::BLACK)))
+    if (!has_move?(colour_to_move) && !in_check?(colour_to_move))
       return true
     end
+
+    false
   end
 
   #----------------------------------------------------------------------------

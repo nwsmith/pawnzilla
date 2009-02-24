@@ -3360,7 +3360,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - K - - k -
       ")
-    assert(e.draw?)
+    assert(e.draw?(Colour::WHITE))
   end
 
   def test_two_kings_with_a_queen_is_not_a_draw
@@ -3375,10 +3375,10 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - K - - k -
       ")
-    assert(!e.draw?)
+    assert(!e.draw?(Colour::BLACK))
   end
 
-  def test_stalemate_should_be_a_draw
+  def test_stalemate_should_be_a_draw_if_it_is_not_stalemated_colours_turn
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
@@ -3390,7 +3390,22 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - -
       - - - K - - - -
       ")
-    assert(e.draw?)
+    assert(!e.draw?(Colour::WHITE))
+  end
+
+  def test_stalemate_should_not_be_a_draw_if_it_is_stalemated_colours_turn
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - k - q - - -
+      - - - - - - - -
+      - - - K - - - -
+      ")
+    assert(e.draw?(Colour::BLACK))
   end
 
   #----------------------------------------------------------------------------
