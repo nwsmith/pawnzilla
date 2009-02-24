@@ -54,13 +54,20 @@ class GameMonitor
     # Double check checkmate
     if (@gamerunner.game_is_over) 
       error = false
-      if (@gamerunner.winner.white?)
-        if (!@gamerunner.rules_engine.checkmate?(Colour::BLACK)) 
-          error = true
+      winner = @gamerunner.winner
+      if (winner.nil?)
+        if (!@gamerunner.rules_engine.draw?)
+          error = true;
         end
       else
-        if (!@gamerunner.rules_engine.checkmate?(Colour::WHITE))
-          error = true
+        if (winner.white?)
+          if (!@gamerunner.rules_engine.checkmate?(Colour::BLACK))
+            error = true
+          end
+        else
+          if (!@gamerunner.rules_engine.checkmate?(Colour::WHITE))
+            error = true
+          end
         end
       end
       

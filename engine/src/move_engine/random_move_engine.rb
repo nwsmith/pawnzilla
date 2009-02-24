@@ -65,6 +65,9 @@ class RandomMoveEngine < MoveEngine
       end
     end
 
+    if (!gamestate.chk_mv(src, dest))
+      raise ArgumentException("Cannot create legal move in random move engine.")
+    end
     return Move.new(src, dest)
   end
 end

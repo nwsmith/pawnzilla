@@ -93,7 +93,7 @@ N n - - - - - k
 - - - - - - - -
 - - - - B - - -
 - - - - - - - -
-- Q - - - - - - ")    
+- Q - - - - - - ")
     assert(!e.in_check?(Colour::BLACK))
   end
 
@@ -109,5 +109,20 @@ N n - - - - - k
 - - - - - - - -
 - Q - - - - - - ")
     assert(e.chk_mv(E6, E7))
+  end
+
+  def test_rook_should_not_leave_king_in_check
+    e = RulesEngine.new
+    place_pieces(e, "
+- - R - - - R -
+- - - - N - - P
+- - - - - - - p
+- - - - - - K -
+- - - - r - - -
+- - - P k - - b
+- P B r - - - -
+- - B - - - - -
+")
+    assert(!e.chk_mv(D2, C2))
   end
 end

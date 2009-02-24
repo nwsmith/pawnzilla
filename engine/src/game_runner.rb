@@ -21,8 +21,13 @@ class GameRunner
     @next_move    
   end
     
-  def move    
+  def move
+    #TODO maybe a max tries to keep things from going too far...
     move = next_move
+    until @rules_engine.chk_mv(move.src, move.dest)
+      move = next_move
+    end
+    
     @rules_engine.move!(move.src, move.dest)
     if (@rules_engine.can_promote?(@to_move))
       @rules_engine.promote!(move.dest, @move_engine[@to_move].get_promotion_piece)

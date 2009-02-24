@@ -53,7 +53,7 @@ require "game_monitor"
 
 puts "Pawnzilla game."
 puts ""
-puts "Copyright 2005 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
+puts "Copyright 2005 - 2009 - Nathan Smith, Sheldon Fuchs, Ron Thomas"
 puts ""
 
 #e = RulesEngine.new
