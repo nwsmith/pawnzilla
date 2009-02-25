@@ -18,29 +18,33 @@ class GameRunner
 
   def next_move
     return @next_move if !@next_move.nil?
-    @next_move = @move_engine[@to_move].get_move(@to_move, @rules_engine)
+
+    i, moves, current_move = 0, [], nil
+    loop do 
+      current_move = @move_engine[@to_move].get_move(@to_move, @rules_engine)
+      break if @rules_engine.chk_mv(current_move.src, current_move.dest)
+      moves.push(current_move)
+      i += 1
+      if (i > MAX_ATTEMPTS)
+        err_msg = "Tried #{MAX_ATTEMPTS} times to find legal move.  Candidate were:\n "
+        moves.each {|mv|  err_msg += "#{mv.src.to_alg}-#{mv.dest.to_alg}\n"}
+        raise ArgumentError, err_msg
+      end
+    end
+    @next_move = current_move
     @next_move
   end
 
   def move
-    i = 1
-    move = next_move
-    until @rules_engine.chk_mv(move.src, move.dest)
-      move = next_move
-      i += 1
-      if (i > MAX_ATTEMPTS)
-        raise ArgumentError, "Tried #{MAX_ATTEMPTS} time to find legal move.  Last candidate was #{move.src.to_alg}-#{move.dest.to_alg}"
-      end
+    current_move = next_move
 
-    end
-
-    @rules_engine.move!(move.src, move.dest)
+    @rules_engine.move!(current_move.src, current_move.dest)
     if (@rules_engine.can_promote?(@to_move))
-      @rules_engine.promote!(move.dest, @move_engine[@to_move].get_promotion_piece)
+      @rules_engine.promote!(current_move.dest, @move_engine[@to_move].get_promotion_piece)
     end
     @to_move = @to_move.flip
     @next_move = nil
-    move
+    current_move
   end
 
   def move_list

@@ -63,8 +63,8 @@ puts ""
   runner = GameRunner.new(white_move_engine, black_move_engine)
   monitor = GameMonitor.new(runner)
   err_cnt = 0
-  max_run = 1
-  verbose = true
+  max_run = 10
+  verbose = false
   tr = PieceTranslator.new
 
 # Main Game Loop
@@ -137,99 +137,4 @@ puts ""
 end
 
 puts "There were #{err_cnt} crashes in #{max_run} games"
-
-
-#begin
-#  loop do
-#  
-#  
-#    puts runner.rules_engine.to_txt if verbose
-#    puts if verbose
-#    
-#    if (runner.game_is_over) 
-#      white_move_engine = RandomMoveEngine.new
-#      black_move_engine = RandomMoveEngine.new
-#      runner = GameRunner.new(white_move_engine, black_move_engine)
-#      break if (run_count >= max_run)
-#    end
-#    run_count += 1
-#  
-#    move = runner.move
-#  
-#    puts "#{move.src.to_alg}-#{move.dest.to_alg}" if verbose
-#  end
-#rescue Exception => e
-#  puts "Crash on run #{run_count}"
-#  trace = "caught #{e.class} : #{e.message}\n"
-#  e.backtrace.each do |line|
-#    trace += line + "\n"  
-#  end
-#  trace += "\n"
-#  trace += runner.rules_engine.to_txt
-#  trace += "\n"
-#  runner.move_list.each do |move|
-#    trace += "(#{move.src.to_alg},#{move.dest.to_alg})\n"
-#  end
-#  filename = "/tmp/pz_err_" + err_cnt.to_s
-#  err_cnt += 1
-#  File.open(filename, 'w') {|f| f.write(trace)}
-##  
-##  file = File.new(filename)
-##  file.write(trace)
-##  file.close()
-#ensure
-#  # keep going
-#end
-#  
-#  
-#  
-#  
-#  
-#  mv_cnt = move_list.length + 1
-#  puts e.to_txt
-#  puts
-#  clr = (mv_cnt & 1 == 1) ? "White" : "Black" 
-#  print "Enter move #{mv_cnt} for #{clr}: "
-#  $stdout.flush
-#  mv = gets
-#  mv.chop!
-#  mv.downcase!
-#  
-#  if (mv == 'undo' || mv == 'u') 
-#    move_list.pop.undo(e)
-#    puts "Undoing last move."
-#    next
-#  end
-#
-#  if (mv == 'moves' || mv == 'm') 
-#    cnt = 1
-#    move_list.each_index do |i|
-#      print "#{cnt}. " if i % 2 == 0
-#      print "#{move_list[i].to_s} "
-#      if (i % 2 == 1)
-#        puts "\n"
-#        cnt += cnt
-#      end 
-#    end
-#    puts "\n"
-#    next
-#  end
-#   
-#  break if (mv == 'quit' || mv == 'q' || mv == 'exit' || mv == 'x') 
-#   
-#  puts
-#  src = Coord.from_alg(mv[0].chr + mv[1].chr)
-#  dest = Coord.from_alg(mv[2].chr + mv[3].chr)
-#  
-#  if (e.move?(src, dest)) 
-#    move_list.push(Move.execute(src, dest, e))
-#    puts
-#    puts    
-#    next
-#  end
-#  
-#  puts "#{mv} is not a legal move.  Try again, beeyotch."    
-#  puts
-#end
-
 puts "Thanks for the playing"
