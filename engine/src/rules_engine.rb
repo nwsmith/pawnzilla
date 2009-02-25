@@ -333,7 +333,6 @@ class RulesEngine
 
   def blocked?(src, dest)
     l = Line.new(src, dest)
-
     src_pc = sq_at(src).piece
 
     if (src_pc.name == Chess::Piece::PAWN)
@@ -351,8 +350,7 @@ class RulesEngine
     end
 
     dest_pc = sq_at(dest).piece
-    dest_pc.nil? || src_pc.colour.opposite?(dest_pc.colour)
-    false
+    return !(dest_pc.nil? || src_pc.colour.opposite?(dest_pc.colour))
   end
 
 
