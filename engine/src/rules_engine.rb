@@ -54,6 +54,7 @@ class RulesEngine
 
   def initialize()
     @move_list = []
+    @fifty_mv_rule = 0
 
     @white_can_castle_kingside = true;
     @white_can_castle_queenside = true;
@@ -151,7 +152,7 @@ class RulesEngine
 
   def self.get_coord_for_bv(bv)
     # only one bit can be set for this to be a legal square bv
-    raise ArgumentError, "Illegal bv for square #{pp_bv(bv)}" unless bv & -bv == bv
+    raise ArgumentError, "Illegal bv for square #{pp_bv(bv)}" unless bv > 0 && bv & -bv == bv
 
     # TODO: This is so inefficient it hurts, but will do for now
     0.upto(7) do |x|
@@ -332,27 +333,31 @@ class RulesEngine
   # 
 
   def blocked?(src, dest)
-    l = Line.new(src, dest)
     src_pc = sq_at(src).piece
+    dest_pc = sq_at(dest).piece
 
-    if (src_pc.name == Chess::Piece::PAWN)
-      if (src.on_file?(dest))
-        # pawns can't capture straight ahead
-        l.each_coord do |c|
-          return true unless sq_at(c).piece.nil? || c == src
-        end
-      end
+    # short cut - own colour always blocks
+    if (!dest_pc.nil? && src_pc.colour == dest_pc.colour)
+      return true
     end
+
+    # pawns can't capture straight ahead
+    if !dest_pc.nil? && src_pc.pawn? && src.on_file?(dest) && src_pc.colour.opposite?(dest_pc.colour)
+      return true
+    end
+
+    # Only knights won't be on the same line, and they are handled in the check above
+    return false unless Line.same_line?(src, dest) 
+
+    l = Line.new(src, dest)
 
     l.each_coord do |c|
       break if c == dest
       return true unless sq_at(c).piece.nil? || c == src
     end
 
-    dest_pc = sq_at(dest).piece
-    return !(dest_pc.nil? || src_pc.colour.opposite?(dest_pc.colour))
+    !(dest_pc.nil? || src_pc.colour.opposite?(dest_pc.colour))
   end
-
 
   def on_diagonal?(src, dest)
     # Normalize coordinates to be west to east
@@ -456,12 +461,11 @@ class RulesEngine
       raise ArgumentError, "Illegal move: #{src.to_alg},#{dest.to_alg}"
     end
 
-
     src_sq = sq_at(src)
     dest_sq = sq_at(dest)
     piece = src_sq.piece
 
-    if !src_sq.piece.nil? && src_sq.piece.name == Chess::Piece::KING and Line.new(src, dest).len == 3
+    if !piece.nil? && piece.name == Chess::Piece::KING and Line.new(src, dest).len == 3
       # Castling
       # Move the king
       move_piece(src, dest)
@@ -479,6 +483,12 @@ class RulesEngine
       end
     else
       move_piece(src, dest)
+    end
+
+    if piece.pawn? || dest_sq.piece.nil?
+      @fifty_mv_rule += 1
+    else 
+      @fifty_mv_rule = 0
     end
 
     @move_list.push(Move.new(src, dest))
@@ -1032,6 +1042,10 @@ class RulesEngine
 
     can_move = !pc.nil?
 
+    if (can_move) 
+        can_move = !blocked?(src, dest)
+    end
+
     if (can_move)
       if (in_check?(pc.colour))
         # Have to move out of check (or block check or capture checking piece)
@@ -1218,6 +1232,9 @@ class RulesEngine
   #----------------------------------------------------------------------------
 
   def draw?(colour_to_move)
+    # fastest check
+    return true if @fifty_mv_rule >= 50
+
     # Check for only two kings.
     if (@pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
       return true
@@ -1280,6 +1297,9 @@ class RulesEngine
 
   def in_check?(clr)
     bv = @clr_pos[clr] & @pos[Chess::Piece::KING]
+    if (bv == 0) 
+      raise ArgumentError, "#{clr} king has disappeared.\n#{pp_bv(@clr_pos[clr])}\n#{pp_bv(@pos[Chess::Piece::KING])}\n#{pp_bv(bv)}"
+    end
     src = get_coord_for_bv(bv)
     all_dir = [
             Coord::NORTH, Coord::SOUTH, Coord::EAST, Coord::WEST,

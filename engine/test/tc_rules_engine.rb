@@ -264,6 +264,22 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(!e.chk_mv(G1, G7))
   end
 
+  def test_knight_should_be_blocked_by_own_piece
+    e = RulesEngine.new
+    place_pieces(e, "
+- - B - K B N R
+R P P P - P - P
+P - N - - - - -
+- - - - P - P -
+p - - p p - p -
+- - n - - n - -
+- p p - - p b Q
+- r b q - - k r
+    ")
+    assert(e.blocked?(F3, G1))
+    assert(!e.chk_mv(F3, G1))
+  end
+
   def test_on_diagonal_nw_se
     b = RulesEngine.new
 
@@ -3355,6 +3371,22 @@ class RulesEngineTest < Test::Unit::TestCase
       ")
     assert(!e.checkmate?(Colour::WHITE))
   end
+
+  def test_should_know_how_to_get_out_of_check_through_capture_2
+    e = RulesEngine.new
+    place_pieces(e, "
+n - B Q K B - R
+P P P P P P P P
+- - - - - - - -
+- - - - N - n -
+- - - - - - - -
+- - - - - - - -
+p p p p p p N p
+r - b q k b - r
+    ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+
 
   #----------------------------------------------------------------------------
   # End checkmate detection testing

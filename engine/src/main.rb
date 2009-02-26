@@ -58,7 +58,7 @@ puts ""
 
 #e = RulesEngine.new
 #move_list = []
-  white_move_engine = RandomMoveEngine.new
+  white_move_engine = HumanMoveEngine.new
   black_move_engine = RandomMoveEngine.new
   runner = GameRunner.new(white_move_engine, black_move_engine)
   monitor = GameMonitor.new(runner)
@@ -74,6 +74,7 @@ puts ""
   loop do
     puts monitor.gamerunner.rules_engine.to_txt if verbose
     puts "" if verbose
+    move = nil
     begin
       if (monitor.gamerunner.game_is_over)
         winner = runner.winner
@@ -92,6 +93,7 @@ puts ""
       puts "#{move_count}: #{move.src.to_alg}-#{move.dest.to_alg}" if verbose
     rescue Exception => e
       puts "Crash on run #{run_count}"
+      puts "Move: #{move.src.to_alg}-#{move.dest.to_alg}" unless move.nil?
       trace = "caught #{e.class} : #{e.message}\n"
       e.backtrace.each do |line|
         trace += line + "\n"  
