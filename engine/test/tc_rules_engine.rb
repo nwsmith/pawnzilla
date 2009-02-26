@@ -248,6 +248,22 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.chk_mv(C1, G5))
   end
 
+  def test_rook_should_be_blocked_by_own_piece
+    e = RulesEngine.new
+    place_pieces(e, "      
+      - - - - K - R - 
+      - - - - - - P - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - - - - - - - 
+      - - b - k - - -
+    ")
+    assert(e.blocked?(G8, G7))
+    assert(!e.chk_mv(G1, G7))
+  end
+
   def test_on_diagonal_nw_se
     b = RulesEngine.new
 
