@@ -1187,9 +1187,7 @@ class RulesEngine
     # The king blocks attacks, so removing him calculates properly
     checkmate = in_check?(clr)
     if (checkmate)
-      #remove_piece(src)
       checkmate = (calc_all_mv_king(src) == 0)
-      place_piece(src, king)
     end
     checkmate
   end

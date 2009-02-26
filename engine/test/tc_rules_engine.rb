@@ -3295,6 +3295,21 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.checkmate?(Colour::WHITE))
   end
 
+  def test_should_detect_blockable_queenside_mate
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - r - - - - 
+      - - - - - - - -
+      p p p - - - - -
+      - k - - R - - -
+      ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+
   #----------------------------------------------------------------------------
   # End checkmate detection testing
   #----------------------------------------------------------------------------
