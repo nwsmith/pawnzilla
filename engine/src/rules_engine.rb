@@ -28,25 +28,25 @@ class RulesEngine
   DEFAULT_SEPARATOR = ' '
 
   RANK_MASKS = [
-          0xFF_00_00_00_00_00_00_00,
-                  0x00_FF_00_00_00_00_00_00,
-                  0x00_00_FF_00_00_00_00_00,
-                  0x00_00_00_FF_00_00_00_00,
-                  0x00_00_00_00_FF_00_00_00,
-                  0x00_00_00_00_00_FF_00_00,
-                  0x00_00_00_00_00_00_FF_00,
-                  0x00_00_00_00_00_00_00_FF
+    0xFF_00_00_00_00_00_00_00,
+    0x00_FF_00_00_00_00_00_00,
+    0x00_00_FF_00_00_00_00_00,
+    0x00_00_00_FF_00_00_00_00,
+    0x00_00_00_00_FF_00_00_00,
+    0x00_00_00_00_00_FF_00_00,
+    0x00_00_00_00_00_00_FF_00,
+    0x00_00_00_00_00_00_00_FF
   ]
 
   FILE_MASKS = [
-          0x80_80_80_80_80_80_80_80,
-                  0x40_40_40_40_40_40_40_40,
-                  0x20_20_20_20_20_20_20_20,
-                  0x10_10_10_10_10_10_10_10,
-                  0x08_08_08_08_08_08_08_08,
-                  0x04_04_04_04_04_04_04_04,
-                  0x02_02_02_02_02_02_02_02,
-                  0x01_01_01_01_01_01_01_01
+    0x80_80_80_80_80_80_80_80,
+    0x40_40_40_40_40_40_40_40,
+    0x20_20_20_20_20_20_20_20,
+    0x10_10_10_10_10_10_10_10,
+    0x08_08_08_08_08_08_08_08,
+    0x04_04_04_04_04_04_04_04,
+    0x02_02_02_02_02_02_02_02,
+    0x01_01_01_01_01_01_01_01
   ]
 
   attr_accessor :piece_info_bag, :move_list
@@ -327,24 +327,28 @@ class RulesEngine
     (sq_bv & attk_bv) == sq_bv
   end
 
-  #
-  # TODO: This is a placeholder implementation based on sq_at, 
-  # so it's quite inefficient
-  # 
-
   def blocked?(src, dest)
-    src_pc = sq_at(src).piece
-    dest_pc = sq_at(dest).piece
+    src_bv = get_bv(src)
+    dest_bv = get_bv(dest)
+
+    src_clr = @clr_pos[Colour::WHITE] &  src_bv == src_bv ? Colour::WHITE : Colour::BLACK
 
     # short cut - own colour always blocks
-    if (!dest_pc.nil? && src_pc.colour == dest_pc.colour)
+    if (dest_bv & @clr_pos[src_clr]) == dest_bv
       return true
     end
 
     # pawns can't capture straight ahead
-    if !dest_pc.nil? && src_pc.pawn? && src.on_file?(dest) && src_pc.colour.opposite?(dest_pc.colour)
+    if (src_bv & @pos[Chess::Piece::PAWN]) == src_bv && 
+        (RulesEngine.get_file(src_bv) == RulesEngine.get_file(dest_bv)) && 
+        (dest_bv & @clr_pos[src_clr.flip]) == dest_bv
       return true
     end
+
+    # TODO: From here, this is a placeholder implementation based on sq_at, 
+    # so it's quite inefficient
+    src_pc = sq_at(src).piece
+    dest_pc = sq_at(dest).piece
 
     # Only knights won't be on the same line, and they are handled in the check above
     return false unless Line.same_line?(src, dest) 
@@ -1212,16 +1216,8 @@ class RulesEngine
   #----------------------------------------------------------------------------
   # Start checkmate detection
   #----------------------------------------------------------------------------
-
   def checkmate?(clr)
-    src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
-    king = sq_at(src).piece
-    # The king blocks attacks, so removing him calculates properly
-    checkmate = in_check?(clr) && !has_move?(clr)
-#    if (checkmate)
-    #      checkmate = (calc_all_mv_king(src) == 0)
-    #    end
-    checkmate
+    in_check?(clr) && !has_move?(clr)
   end
 
   #----------------------------------------------------------------------------

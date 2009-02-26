@@ -58,7 +58,7 @@ puts ""
 
 #e = RulesEngine.new
 #move_list = []
-  white_move_engine = HumanMoveEngine.new
+  white_move_engine = RandomMoveEngine.new
   black_move_engine = RandomMoveEngine.new
   runner = GameRunner.new(white_move_engine, black_move_engine)
   monitor = GameMonitor.new(runner)

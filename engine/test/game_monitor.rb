@@ -79,24 +79,25 @@ class GameMonitor
     
     
     # Make sure pieces aren't drifting
-    all_pieces_prev.each_index do |i|
-      square = all_pieces_prev[i]
-      if (!(square == src_sq || square == dest_sq))
-        if (square != all_pieces_curr[i])
-          err_ms = "square == src: #{square == src_sq}\n"
-          err_ms += "square == dest: #{square == dest_sq}\n"
-          err_ms += "previous: #{square}\n"
-          err_ms += "current: #{all_pieces_curr[i]}\n"
-          err_ms += "move from: #{src_sq}\n"
-          err_ms += "move to: #{dest_sq}\n"
-          err_ms += "#{src_pc.name} has drifted!\n";
-          err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
-          err_ms += "Before move:\n#{prev_pos}\n"
-          err_ms += "After move:\n#{curr_pos}\n"
-          raise ArgumentError, err_ms
-        end
-      end
-    end
+    # This doesn't work for castling right now
+    #all_pieces_prev.each_index do |i|
+    #  square = all_pieces_prev[i]
+    #  if (!(square == src_sq || square == dest_sq))
+    #    if (square != all_pieces_curr[i])
+    #      err_ms = "square == src: #{square == src_sq}\n"
+    #      err_ms += "square == dest: #{square == dest_sq}\n"
+    #      err_ms += "previous: #{square}\n"
+    #      err_ms += "current: #{all_pieces_curr[i]}\n"
+    #      err_ms += "move from: #{src_sq}\n"
+    #      err_ms += "move to: #{dest_sq}\n"
+    #      err_ms += "#{src_pc.name} has drifted!\n";
+    #      err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
+    #      err_ms += "Before move:\n#{prev_pos}\n"
+    #      err_ms += "After move:\n#{curr_pos}\n"
+    #      raise ArgumentError, err_ms
+    #    end
+    #  end
+    #end
     
     # Make sure that the piece moving didn't disappear.  This 
     # generally happens with bugs in chk_mv
