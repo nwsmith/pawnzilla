@@ -63,8 +63,8 @@ puts ""
   runner = GameRunner.new(white_move_engine, black_move_engine)
   monitor = GameMonitor.new(runner)
   err_cnt = 0
-  max_run = 10
-  verbose = false
+  max_run = 1
+  verbose = true
   tr = PieceTranslator.new
 
 # Main Game Loop

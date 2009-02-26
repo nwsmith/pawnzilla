@@ -771,27 +771,38 @@ class RulesEngine
 
     chk_cell = attacking_piece - 8
     while (chk_cell > 0)
+      chk_bv = 0x0
       if ((1 << chk_cell) & all_pieces) == 0
-        bv |= 1 << chk_cell
+        chk_bv = 1 << chk_cell
       else
         if ((1 << chk_cell) & opp_pieces) > 0
-          bv |= 1 << chk_cell
+          chk_bv = 1 << chk_cell
         end
-        break
+        chk_cell = 0
       end
+
+      if chk_bv > 0 && chk_mv(coord, get_coord_for_bv(chk_bv))
+        bv |= chk_bv
+      end
+
       chk_cell -= 8
     end
 
     chk_cell = attacking_piece + 8
     while (chk_cell <= 63)
+      chk_bv = 0x0
       if ((1 << chk_cell) & all_pieces) == 0
-        bv |= 1 << chk_cell
+        chk_bv = 1 << chk_cell
       else
         if ((1 << chk_cell) & opp_pieces) > 0
-          bv |= 1 << chk_cell
+          chk_bv = 1 << chk_cell
         end
-        break
+        chk_cell = 64
       end
+      if chk_bv > 0 && chk_mv(coord, get_coord_for_bv(chk_bv))
+        bv |= chk_bv
+      end
+
       chk_cell += 8
     end
 
@@ -818,10 +829,10 @@ class RulesEngine
     loop do
       chk_cell <<= 0x1
       break if chk_cell > left_edge
-      if (all_pieces & chk_cell) == 0
+      if (all_pieces & chk_cell) == 0 && chk_mv(coord, get_coord_for_bv(chk_cell))
         attack_bitbrd |= chk_cell
       else
-        if (opp_pieces & chk_cell) > 0
+        if (opp_pieces & chk_cell) > 0 && chk_mv(coord, get_coord_for_bv(chk_cell))
           attack_bitbrd |= chk_cell
         end
         break
@@ -832,10 +843,10 @@ class RulesEngine
     loop do
       chk_cell >>= 0x1
       break if chk_cell < right_edge
-      if (chk_cell & all_pieces) == 0
+      if (chk_cell & all_pieces) == 0 && chk_mv(coord, get_coord_for_bv(chk_cell))
         attack_bitbrd |= chk_cell
       else
-        if (chk_cell & opp_pieces) > 0
+        if (chk_cell & opp_pieces) > 0 && chk_mv(coord, get_coord_for_bv(chk_cell))
           attack_bitbrd |= chk_cell
         end
         break;
@@ -873,7 +884,8 @@ class RulesEngine
       until (next_sq_off_edge || blocked)
         chk_sq = next_sq
         next_sq = chk_sq + shift_width
-        if ((1 << chk_sq) & all_pieces) == 0 || ((1 << chk_sq) & opp_pieces) > 0
+        dest = get_coord_for_bv(1 << chk_sq)
+        if (((1 << chk_sq) & all_pieces) == 0 || ((1 << chk_sq) & opp_pieces) > 0) && chk_mv(src, dest)
           bv |= (1 << chk_sq)
         end
 
@@ -1004,10 +1016,10 @@ class RulesEngine
   def chk_mv(src, dest)
     piece = sq_at(src).piece
     return false if piece.nil?
-    chk_mv_calc(src, dest, calculate_colour_attack(piece.colour.flip))
+    chk_mv_calc(src, dest)
   end
 
-  def chk_mv_calc(src, dest, attk_bv)
+  def chk_mv_calc(src, dest)
     return false unless src.x.between?(0, 7)
     return false unless src.y.between?(0, 7)
     return false unless dest.x.between?(0, 7)
@@ -1021,9 +1033,15 @@ class RulesEngine
     can_move = !pc.nil?
 
     if (can_move)
-      if (in_check?(pc.colour) && !pc.king?)
-        # Have to move out of check
-        can_move = false
+      if (in_check?(pc.colour))
+        # Have to move out of check (or block check or capture checking piece)
+        dest_pc = sq_at(dest).piece
+        move_piece(src, dest)
+        if (in_check?(pc.colour))
+          can_move = false
+        end
+        move_piece(dest, src)
+        place_piece(dest, dest_pc) unless dest_pc.nil?
       end
     end
     if (can_move)
@@ -1038,16 +1056,18 @@ class RulesEngine
           dest_pc = sq_at(dest).piece
 
           # In order to see if the king is in check, easier to just simulate the move
-          move_piece(src, dest)
+          if (!Line.same_line?(src, dest) || !blocked?(src, dest))
+            move_piece(src, dest)
 
-          # perhaps hopelessly naive
-          if (in_check?(pc.colour))
-            can_move = false;
+            # perhaps hopelessly naive
+            if (in_check?(pc.colour))
+              can_move = false;
+            end
+
+            # correct the simulated move
+            move_piece(dest, src)
+            place_piece(dest, dest_pc) unless dest_pc.nil?
           end
-
-          # correct the simulated move
-          move_piece(dest, src)
-          place_piece(dest, dest_pc) unless dest_pc.nil?
         end
       end
     end
@@ -1069,7 +1089,7 @@ class RulesEngine
 
     return false unless dst > 0
 
-    # no matter what, the pawn can only stay on the same rank or ONE either way        
+    # no matter what, the pawn can only stay on the same rank or ONE either way
     return false unless ((src.x - 1)..(src.x + 1)) === dest.x
 
     # pawns can move one square forward except for first move
@@ -1101,7 +1121,7 @@ class RulesEngine
         return pc_dest.colour.opposite?(pc_src.colour)
       end
     else
-      # it's a straight move, ensure it's not blocked                  
+      # it's a straight move, ensure it's not blocked
       return false if !pc_dest.nil? || blocked?(src, dest)
     end
 
@@ -1174,19 +1194,19 @@ class RulesEngine
 
   #----------------------------------------------------------------------------
   # Start legal move checks
-  #---------------------------------------------------------------------------- 
+  #----------------------------------------------------------------------------
   #----------------------------------------------------------------------------
   # Start checkmate detection
-  #---------------------------------------------------------------------------- 
+  #----------------------------------------------------------------------------
 
   def checkmate?(clr)
     src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
     king = sq_at(src).piece
     # The king blocks attacks, so removing him calculates properly
-    checkmate = in_check?(clr)
-    if (checkmate)
-      checkmate = (calc_all_mv_king(src) == 0)
-    end
+    checkmate = in_check?(clr) && !has_move?(clr)
+#    if (checkmate)
+    #      checkmate = (calc_all_mv_king(src) == 0)
+    #    end
     checkmate
   end
 
@@ -1259,7 +1279,8 @@ class RulesEngine
   #----------------------------------------------------------------------------
 
   def in_check?(clr)
-    src = get_coord_for_bv(@clr_pos[clr] & @pos[Chess::Piece::KING])
+    bv = @clr_pos[clr] & @pos[Chess::Piece::KING]
+    src = get_coord_for_bv(bv)
     all_dir = [
             Coord::NORTH, Coord::SOUTH, Coord::EAST, Coord::WEST,
                     Coord::NORTHWEST, Coord::NORTHEAST, Coord::SOUTHWEST, Coord::SOUTHEAST
@@ -1319,6 +1340,6 @@ class RulesEngine
   end
   #----------------------------------------------------------------------------
   # End check detection
-  #---------------------------------------------------------------------------- 
+  #----------------------------------------------------------------------------
 
 end

@@ -93,9 +93,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_attacked_should_work_for_simple_file_attack
     e = RulesEngine.new
     place_pieces(e, "
+      k - - - - - - -
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      K - - - - - - -
       - - - - - R - -
       - - - - - - - - 
       - - - - - - - - 
@@ -108,9 +108,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_attacked_should_work_for_simple_file_attack_on_C1_bug
     e = RulesEngine.new
     place_pieces(e, "
+      k - - - - - - -
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      K - - - - - - -
       - - R - - - - -
       - - - - - - - - 
       - - - - - - - - 
@@ -1514,9 +1514,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_rook_attack_in_corner_should_attack_like_an_l
     b = RulesEngine.new()
     place_pieces(b, "
+      -------k
       --------
-      --------
-      --------
+      -------K
       --------
       --------
       --------
@@ -1542,9 +1542,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_only_one_rook_attack_should_be_generated
     b = RulesEngine.new()
     place_pieces(b, "
+      -------k
       --------
-      --------
-      --------
+      -------K
       --------
       ----R---
       --------
@@ -1571,9 +1571,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_rook_should_not_attack_diagonally_bugfix
     b = RulesEngine.new()
     place_pieces(b, "
+      -------k
       --------
-      --------
-      --------
+      -------K
       --------
       ----R---
       --------
@@ -1601,9 +1601,9 @@ class RulesEngineTest < Test::Unit::TestCase
     b = RulesEngine.new()
     place_pieces(b, "
       --------
+      -------k
       --------
-      --------
-      --------
+      -------K
       R-------
       --------
       --------
@@ -1628,7 +1628,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_pieces_should_block_rook_attack
     b = RulesEngine.new()
     place_pieces(b, "
-      --------
+      k------K
       ---P----
       --------
       --Pr--P-
@@ -1656,9 +1656,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_own_pieces_should_block_rook_attack
     b = RulesEngine.new()
     place_pieces(b, "
-      --------
+      -------K
       ---P----
-      --------
+      -------k
       --Pr--r-
       --------
       --------
@@ -1685,9 +1685,9 @@ class RulesEngineTest < Test::Unit::TestCase
     b = RulesEngine.new()
 
     place_pieces(b, "
+      - - - - - - - k
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - - 
       - - - - - - - - 
       r - - - - - - - 
@@ -2393,9 +2393,9 @@ class RulesEngineTest < Test::Unit::TestCase
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
+      - - - - - - - k
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - - 
       - - - - - - - - 
@@ -2415,9 +2415,9 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_calculate_rook_move_should_work_with_other_piece_around
     e = RulesEngine.new
     place_pieces(e, "
+      - - - - - - - k
       - - - - - - - -
-      - - - - - - - -
-      - - - - - - - -
+      - - - - - - - K
       R - - - - - - -
       - - - - - - - -
       - - - - - - - - 
@@ -2586,7 +2586,7 @@ class RulesEngineTest < Test::Unit::TestCase
     place_pieces(e, "
       - - - - - - - -
       - - - - - - - -
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - R - - - -
       - - - - - - - - 
@@ -2608,7 +2608,7 @@ class RulesEngineTest < Test::Unit::TestCase
     e = RulesEngine.new
     place_pieces(e, "
       - - - - - - - -
-      - - - - - - - -
+      - - K - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -2991,7 +2991,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_white_king_should_not_be_able_to_move_into_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -3006,7 +3006,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_white_king_should_have_queenside_castling_available
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -3066,7 +3066,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_white_king_cannot_castle_kingside_when_destination_is_attacked
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - - - - R -
@@ -3096,7 +3096,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_white_king_cannot_castle_queenside_through_file_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - R - - - -
@@ -3111,7 +3111,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_white_king_cannot_castle_queenside_when_destination_attacked
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - R - - - - -
@@ -3148,7 +3148,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
-      - - - - - - - - 
+      - - k - - - - -
     ")
     assert(!e.chk_mv(E8, G8))
   end
@@ -3178,7 +3178,7 @@ class RulesEngineTest < Test::Unit::TestCase
       - - - - - - - - 
       - - - - - - - - 
       - - - - - - - -   
-      - - - - - - - - 
+      - - - - - - - k
     ")
     assert(!e.chk_mv(E8, C8))
   end
@@ -3269,7 +3269,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_should_detect_white_kingside_back_rank_mate
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      K - - - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -3284,7 +3284,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_should_detect_white_queenside_back_rank_mate
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
@@ -3311,14 +3311,44 @@ class RulesEngineTest < Test::Unit::TestCase
     assert(e.checkmate?(Colour::WHITE))
   end
 
+  def test_should_detect_blockable_scholars_mate
+    e = RulesEngine.new
+    place_pieces(e, "
+      R N B - K B N R
+      P P P P - P P P
+      - - - - P - - -
+      - - - - - - - -
+      - - - - n - p Q 
+      - - - - - p - -
+      p p p p p - - p
+      r n b q k b n r
+      ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+
   def test_should_detect_blockable_queenside_mate
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - - - - - -
       - - - r - - - - 
+      - - - - - - - -
+      p p p - - - - -
+      - k - - R - - -
+      ")
+    assert(!e.checkmate?(Colour::WHITE))
+  end
+
+  def test_should_know_can_get_out_of_check_through_capture
+    e = RulesEngine.new
+    place_pieces(e, "
+      - - - - - - - K
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - r - - - 
       - - - - - - - -
       p p p - - - - -
       - k - - R - - -
@@ -3532,7 +3562,7 @@ class RulesEngineTest < Test::Unit::TestCase
   def test_should_detect_simple_check
     e = RulesEngine.new
     place_pieces(e, "
-      - - - - - - - -
+      - - - - - - - K
       - - - - - - - -
       - - - - - - - -
       - - - R - - - -
