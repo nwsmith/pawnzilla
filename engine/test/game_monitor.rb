@@ -112,8 +112,8 @@ class GameMonitor
     
     # Kings just disappear sometimes, usually to illegal captures
     e = @gamerunner.rules_engine
-    if ((e.clr_pos[Colour::WHITE] & e.pos[Chess::Piece::KING]) == 0 || \
-        (e.clr_pos[Colour::BLACK] & e.pos[Chess::Piece::KING]) == 0) 
+    if ((e.clr_pos[Colour::WHITE] & e.pc_pos[Chess::Piece::KING]) == 0 || \
+        (e.clr_pos[Colour::BLACK] & e.pc_pos[Chess::Piece::KING]) == 0)
       err_ms = "King has disappeared!\n"
       err_ms += "Move: #{move.src.to_alg} - #{move.dest.to_alg}\n"
       err_ms += "Before move:\n#{prev_pos}\n"

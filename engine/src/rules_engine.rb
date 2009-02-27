@@ -3,7 +3,7 @@
 #
 # Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the "License")
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -49,63 +49,62 @@ class RulesEngine
     0x01_01_01_01_01_01_01_01
   ]
 
-  attr_accessor :piece_info_bag, :move_list
-  attr_reader :clr_pos, :pos
+  attr_accessor :move_list
 
   def initialize()
     @move_list = []
     @fifty_mv_rule = 0
 
-    @white_can_castle_kingside = true;
-    @white_can_castle_queenside = true;
-    @black_can_castle_kingside = true;
-    @black_can_castle_queenside = true;
+    @white_can_castle_kingside = true
+    @white_can_castle_queenside = true
+    @black_can_castle_kingside = true
+    @black_can_castle_queenside = true
 
-    @chk_lookup = {
-            Chess::Piece::BISHOP => method(:chk_mv_bishop),
-            Chess::Piece::KING => method(:chk_mv_king),
-            Chess::Piece::KNIGHT => method(:chk_mv_knight),
-            Chess::Piece::PAWN => method(:chk_mv_pawn),
-            Chess::Piece::QUEEN => method(:chk_mv_queen),
-            Chess::Piece::ROOK => method(:chk_mv_rook)
+    @chk_mv = {
+      Chess::Piece::BISHOP => method(:chk_mv_bishop),
+      Chess::Piece::KING => method(:chk_mv_king),
+      Chess::Piece::KNIGHT => method(:chk_mv_knight),
+      Chess::Piece::PAWN => method(:chk_mv_pawn),
+      Chess::Piece::QUEEN => method(:chk_mv_queen),
+      Chess::Piece::ROOK => method(:chk_mv_rook)
     }
 
-    @calc_mv_lookup = {
-            Chess::Piece::PAWN => method(:calc_all_mv_pawn),
-            Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
-            Chess::Piece::BISHOP => method(:calc_all_mv_bishop),
-            Chess::Piece::ROOK => method(:calc_all_mv_rook),
-            Chess::Piece::QUEEN => method(:calc_all_mv_queen),
-            Chess::Piece::KING => method(:calc_all_mv_king)
+    @calc_mv = {
+      Chess::Piece::PAWN => method(:calc_all_mv_pawn),
+      Chess::Piece::KNIGHT => method(:calc_all_mv_knight),
+      Chess::Piece::BISHOP => method(:calc_all_mv_bishop),
+      Chess::Piece::ROOK => method(:calc_all_mv_rook),
+      Chess::Piece::QUEEN => method(:calc_all_mv_queen),
+      Chess::Piece::KING => method(:calc_all_mv_king)
     }
 
-    @calc_attk_lookup = {
-            Chess::Piece::PAWN => method(:calc_attk_pawn),
-            Chess::Piece::KNIGHT => method(:calc_attk_knight),
-            Chess::Piece::BISHOP => method(:calc_attk_bishop),
-            Chess::Piece::ROOK => method(:calc_attk_rook),
-            Chess::Piece::QUEEN => method(:calc_attk_queen),
-            Chess::Piece::KING => method(:calc_attk_king)
+    @calc_attk = {
+      Chess::Piece::PAWN => method(:calc_attk_pawn),
+      Chess::Piece::KNIGHT => method(:calc_attk_knight),
+      Chess::Piece::BISHOP => method(:calc_attk_bishop),
+      Chess::Piece::ROOK => method(:calc_attk_rook),
+      Chess::Piece::QUEEN => method(:calc_attk_queen),
+      Chess::Piece::KING => method(:calc_attk_king)
     }
 
     @clr_pos = {
-            Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
-            Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
+      Colour::BLACK => 0x00_00_00_00_00_00_FF_FF,
+      Colour::WHITE => 0xFF_FF_00_00_00_00_00_00
     }
 
-    @pos = {
-            Chess::Piece::PAWN => 0x00_FF_00_00_00_00_FF_00,
-            Chess::Piece::ROOK => 0x81_00_00_00_00_00_00_81,
-            Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
-            Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
-            Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
-            Chess::Piece::KING => 0x08_00_00_00_00_00_00_08
+    @pc_pos = {
+      Chess::Piece::PAWN => 0x00_FF_00_00_00_00_FF_00,
+      Chess::Piece::ROOK => 0x81_00_00_00_00_00_00_81,
+      Chess::Piece::KNIGHT => 0x42_00_00_00_00_00_00_42,
+      Chess::Piece::BISHOP => 0x24_00_00_00_00_00_00_24,
+      Chess::Piece::QUEEN => 0x10_00_00_00_00_00_00_10,
+      Chess::Piece::KING => 0x08_00_00_00_00_00_00_08
     }
   end
 
   def clear()
     @clr_pos.each_key {|key| @clr_pos[key] = 0}
-    @pos.each_key {|key| @pos[key] = 0}
+    @pc_pos.each_key {|key| @pc_pos[key] = 0}
   end
 
   # Output a text representation of the current board state using the specified separator
@@ -113,7 +112,7 @@ class RulesEngine
 
   def to_txt(sep = DEFAULT_SEPARATOR)
     tr = PieceTranslator.new()
-    txt, row = '', 8;
+    txt, row = '', 8
 
     # Because we store the board in a standard orientation, in order to make the board
     # look "right side up" in a textual representation, we have to do the y-axis in
@@ -305,7 +304,7 @@ class RulesEngine
       elsif (direction == Coord::SOUTHWEST && coord_on_board?(end_point.southwest))
         end_point.southwest!
       else
-        break;
+        break
       end
     end
     Vector.new(coord, end_point)
@@ -339,7 +338,7 @@ class RulesEngine
     end
 
     # pawns can't capture straight ahead
-    if (src_bv & @pos[Chess::Piece::PAWN]) == src_bv && 
+    if (src_bv & @pc_pos[Chess::Piece::PAWN]) == src_bv &&
         (RulesEngine.get_file(src_bv) == RulesEngine.get_file(dest_bv)) && 
         (dest_bv & @clr_pos[src_clr.flip]) == dest_bv
       return true
@@ -426,8 +425,8 @@ class RulesEngine
 
     # Determine piece type
     if !color.nil?
-      @pos.each_key do |key|
-        if (@pos[key] & mask) == mask
+      @pc_pos.each_key do |key|
+        if (@pc_pos[key] & mask) == mask
           square.piece = Chess::Piece.new(color, key)
         end
       end
@@ -517,9 +516,9 @@ class RulesEngine
         @clr_pos[key] ^= dest_bv
       end
     end
-    @pos.each_key do |key|
-      if ((@pos[key] & dest_bv) == dest_bv)
-        @pos[key] ^= dest_bv
+    @pc_pos.each_key do |key|
+      if ((@pc_pos[key] & dest_bv) == dest_bv)
+        @pc_pos[key] ^= dest_bv
       end
     end
 
@@ -530,9 +529,9 @@ class RulesEngine
       end
     end
 
-    @pos.each_key do |key|
-      if (@pos[key] & src_bv) == src_bv
-        @pos[key] ^= ch_bv
+    @pc_pos.each_key do |key|
+      if (@pc_pos[key] & src_bv) == src_bv
+        @pc_pos[key] ^= ch_bv
       end
     end
   end
@@ -545,7 +544,7 @@ class RulesEngine
 
 
     @clr_pos[piece.colour] |= pc_bv
-    @pos[piece.name] |= pc_bv
+    @pc_pos[piece.name] |= pc_bv
   end
 
   def remove_piece(coord)
@@ -557,7 +556,7 @@ class RulesEngine
     return unless !piece.nil?
 
     @clr_pos[piece.colour] ^= pc_bv
-    @pos[piece.name] ^= pc_bv
+    @pc_pos[piece.name] ^= pc_bv
   end
 
   def promote!(coord, new_piece_name)
@@ -606,7 +605,7 @@ class RulesEngine
   def calc_attk(src)
     pc = sq_at(src).piece
     return 0 if pc.nil?
-    @calc_attk_lookup[pc.name].call(src)
+    @calc_attk[pc.name].call(src)
   end
 
   def calc_attk_pawn(src)
@@ -710,7 +709,7 @@ class RulesEngine
       end
     end
 
-    bv |= calc_attk_rook(src);
+    bv |= calc_attk_rook(src)
 
     bv
   end
@@ -863,7 +862,7 @@ class RulesEngine
         if (chk_cell & opp_pieces) > 0 && chk_mv(coord, get_coord_for_bv(chk_cell))
           attack_bitbrd |= chk_cell
         end
-        break;
+        break
       end
     end
 
@@ -919,7 +918,7 @@ class RulesEngine
   #----------------------------------------------------------------------------
 
   def calculate_all_moves_by_colour(colour)
-    mv_bv = 0;
+    mv_bv = 0
     0.upto(63) {|i|
       coord = get_coord_for_bv(0x01 << i)
       pc = sq_at(coord).piece
@@ -933,7 +932,7 @@ class RulesEngine
   # quicker calculation to see if a colour has any available moves will quit fast on success
 
   def has_move?(colour)
-    bv = 0x01;
+    bv = 0x01
     0.upto(63) {|i|
       coord = get_coord_for_bv(bv)
       pc = sq_at(coord).piece
@@ -952,7 +951,7 @@ class RulesEngine
 
   def calculate_all_moves(src)
     pc = sq_at(src).piece
-    @calc_mv_lookup[pc.name].call(src)
+    @calc_mv[pc.name].call(src)
   end
 
   def calc_all_mv_pawn(src)
@@ -1063,9 +1062,9 @@ class RulesEngine
       end
     end
     if (can_move)
-      can_move = @chk_lookup[pc.name].call(src, dest)
+      can_move = @chk_mv[pc.name].call(src, dest)
       if (can_move)
-        king_bv = @clr_pos[pc.colour] & @pos[Chess::Piece::KING]
+        king_bv = @clr_pos[pc.colour] & @pc_pos[Chess::Piece::KING]
         king_coord = get_coord_for_bv(king_bv)
 
         if (Line.same_line?(king_coord, src) || king_coord == src)
@@ -1079,7 +1078,7 @@ class RulesEngine
 
             # perhaps hopelessly naive
             if (in_check?(pc.colour))
-              can_move = false;
+              can_move = false
             end
 
             # correct the simulated move
@@ -1232,17 +1231,17 @@ class RulesEngine
     return true if @fifty_mv_rule >= 50
 
     # Check for only two kings.
-    if (@pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
+    if (@pc_pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
       return true
     end
 
     # Check for king versus king and bishop
     [Colour::WHITE, Colour::BLACK].each {|colour|
-      if (@clr_pos[colour] & @pos[Chess::Piece::KING] == @clr_pos[colour])
+      if (@clr_pos[colour] & @pc_pos[Chess::Piece::KING] == @clr_pos[colour])
         # White has only a king
         if (bit_count(@clr_pos[colour.flip]) == 2)
-          if (bit_count(@pos[Chess::Piece::KNIGHT] & @clr_pos[colour.flip]) == 1 ||
-                  bit_count(@pos[Chess::Piece::BISHOP] & @clr_pos[colour.flip]) == 1)
+          if (bit_count(@pc_pos[Chess::Piece::KNIGHT] & @clr_pos[colour.flip]) == 1 ||
+                  bit_count(@pc_pos[Chess::Piece::BISHOP] & @clr_pos[colour.flip]) == 1)
             # Only king and knight or bishop left - insufficient material
             return true
           end
@@ -1253,10 +1252,10 @@ class RulesEngine
     # Check for king and bishop vs. king and bishop with bishop of same colour
     if (bit_count(@clr_pos[Colour::WHITE]) == 2 && bit_count(@clr_pos[Colour::BLACK]) == 2)
       # Each side has only two pieces left - one is the king
-      if (bit_count(@pos[Chess::Piece::BISHOP]) == 2)
+      if (bit_count(@pc_pos[Chess::Piece::BISHOP]) == 2)
         # Each side has only a bishop and king left
-        w_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::WHITE] & pos[Chess::Piece::BISHOP]))
-        b_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::BLACK] & pos[Chess::Piece::BISHOP]))
+        w_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::WHITE] & @pc_pos[Chess::Piece::BISHOP]))
+        b_sq = sq_at(get_coord_for_bv(@clr_pos[Colour::BLACK] & @pc_pos[Chess::Piece::BISHOP]))
         if (w_sq.colour == b_sq.colour)
           # The bishops are not opposite colours - insufficient material
           return true
@@ -1292,9 +1291,9 @@ class RulesEngine
   #----------------------------------------------------------------------------
 
   def in_check?(clr)
-    bv = @clr_pos[clr] & @pos[Chess::Piece::KING]
+    bv = @clr_pos[clr] & @pc_pos[Chess::Piece::KING]
     if (bv == 0) 
-      raise ArgumentError, "#{clr} king has disappeared.\n#{pp_bv(@clr_pos[clr])}\n#{pp_bv(@pos[Chess::Piece::KING])}\n#{pp_bv(bv)}"
+      raise ArgumentError, "#{clr} king has disappeared.\n#{pp_bv(@clr_pos[clr])}\n#{pp_bv(@pc_pos[Chess::Piece::KING])}\n#{pp_bv(bv)}"
     end
     src = get_coord_for_bv(bv)
     all_dir = [
