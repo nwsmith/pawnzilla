@@ -29,7 +29,7 @@ The first true win between two random move engines.  Black wins!
 
 February 23, 2009
 
-Pawnzilla detects it's first draw in a game between two random move engines:
+Pawnzilla detects its first draw in a game between two random move engines:
 
 365: f7-g6
 8 - - - - - - - -
@@ -57,3 +57,203 @@ A Draw!
 There were 0 crashes in 1 games
 Thanks for the playing
 
+
+Februrary 27, 2009
+
+Pawnzilla detects its first stalemate in a game between two random move engines:
+324: e7-d6
+8 - - - - - - k -
+7 - - - - - - r -
+6 - - - K n - - -
+5 - q - - - - - -
+4 - - - - - - - -
+3 - - - - - - - -
+2 - - - - - - - -
+1 - - - - - - - -
+  a b c d e f g h
+
+325: g8-f7
+8 - - - - - - - -
+7 - - - - - k r -
+6 - - - K n - - -
+5 - q - - - - - -
+4 - - - - - - - -
+3 - - - - - - - -
+2 - - - - - - - -
+1 - - - - - - - -
+  a b c d e f g h
+
+
+February 27, 2009
+
+Pawnzilla plays its first game against a human and loses in a mere 7 moves.  But it worked!
+
+  Pawnzilla game.
+
+  Copyright 2005 - 2009 - Nathan Smith, Sheldon Fuchs, Ron Thomas
+
+  start game 1
+  8 R N B Q K B N R
+  7 P P P P P P P P
+  6 - - - - - - - -
+  5 - - - - - - - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p p p p p
+  1 r n b q k b n r
+    a b c d e f g h
+
+  Enter move: e2e4
+  1: e2-e4
+  8 R N B Q K B N R
+  7 P P P P P P P P
+  6 - - - - - - - -
+  5 - - - - - - - -
+  4 - - - - p - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k b n r
+    a b c d e f g h
+
+  2: f7-f5
+  8 R N B Q K B N R
+  7 P P P P P - P P
+  6 - - - - - - - -
+  5 - - - - - P - -
+  4 - - - - p - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k b n r
+    a b c d e f g h
+
+  Enter move: e4f5
+  3: e4-f5
+  8 R N B Q K B N R
+  7 P P P P P - P P
+  6 - - - - - - - -
+  5 - - - - - p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k b n r
+    a b c d e f g h
+
+  4: b8-c6
+  8 R - B Q K B N R
+  7 P P P P P - P P
+  6 - - N - - - - -
+  5 - - - - - p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k b n r
+    a b c d e f g h
+
+  Enter move: f1b5
+  5: f1-b5
+  8 R - B Q K B N R
+  7 P P P P P - P P
+  6 - - N - - - - -
+  5 - b - - - p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k - n r
+    a b c d e f g h
+
+  6: e7-e5
+  8 R - B Q K B N R
+  7 P P P P - - P P
+  6 - - N - - - - -
+  5 - b - - P p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b q k - n r
+    a b c d e f g h
+
+  Enter move: d1e2
+  7: d1-e2
+  8 R - B Q K B N R
+  7 P P P P - - P P
+  6 - - N - - - - -
+  5 - b - - P p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p q p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  8: e8-e7
+  8 R - B Q - B N R
+  7 P P P P K - P P
+  6 - - N - - - - -
+  5 - b - - P p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p q p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  Enter move: b5c6
+  9: b5-c6
+  8 R - B Q - B N R
+  7 P P P P K - P P
+  6 - - b - - - - -
+  5 - - - - P p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p q p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  10: a7-a6
+  8 R - B Q - B N R
+  7 - P P P K - P P
+  6 P - b - - - - -
+  5 - - - - P p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p q p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  Enter move: e2e5
+  11: e2-e5
+  8 R - B Q - B N R
+  7 - P P P K - P P
+  6 P - b - - - - -
+  5 - - - - q p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  12: e7-f7
+  8 R - B Q - B N R
+  7 - P P P - K P P
+  6 P - b - - - - -
+  5 - - - - q p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  Enter move: c6d5
+  13: c6-d5
+  8 R - B Q - B N R
+  7 - P P P - K P P
+  6 P - - - - - - -
+  5 - - - b q p - -
+  4 - - - - - - - -
+  3 - - - - - - - -
+  2 p p p p - p p p
+  1 r n b - k - n r
+    a b c d e f g h
+
+  white wins!
+  There were 0 crashes in 1 games
+  Thanks for the playing
+  
