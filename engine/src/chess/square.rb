@@ -25,6 +25,7 @@ module Chess
     def initialize(coord, colour) 
       @coord = coord
       @colour = colour
+      @piece = nil
     end
     
     def ==(square)
