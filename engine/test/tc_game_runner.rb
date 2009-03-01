@@ -1,7 +1,5 @@
 #
-#   $Id: test_tmpl.rb 228 2008-03-04 19:50:17Z nwsmith $
-#
-#   Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
+#   Copyright 2005-2009 Nathan Smith, Ron Thomas, Sheldon Fuchs
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,6 +12,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+#
 $:.unshift File.join(File.dirname(__FILE__), "..", "src")
 
 require "test/unit"

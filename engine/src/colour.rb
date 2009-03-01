@@ -1,7 +1,5 @@
 #
-#   $Id: src_tmpl.rb 160 2006-08-07 04:39:47Z nwsmith $
-#
-#   Copyright 2005-2008 Nathan Smith, Sheldon Fuchs, Ron Thomas
+#   Copyright 2005-2009 Nathan Smith, Ron Thomas, Sheldon Fuchs
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
