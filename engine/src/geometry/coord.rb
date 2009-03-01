@@ -51,33 +51,26 @@ class Coord
     return southwest if (Coord::SOUTHWEST == direction)
   end
   
-  # Returns the coordinate directly in north of this one
   def north
     return Coord.new(@x, @y+1)
   end
   
-  # Modifies the current coordinate to be the one directly north
   def north!
     @y += 1
   end
   
-  # Is the specified coord north of this coord, regardless of east/west
   def north_of?(coord)
     @y > coord.y
   end
   
-  # Is the specified coord DUE north of this coord.
-  # this means that a coordinate northeast or northwest will return false. 
   def due_north_of?(coord)
     @x == coord.x && @y > coord.y
   end
   
-  #Returns the coordinate directly south of this one
   def south
     return Coord.new(@x, @y-1)
   end
   
-  # Modifies the curent coordinate to be the one directly south
   def south!
     @y -= 1
   end
@@ -90,12 +83,10 @@ class Coord
     @x == coord.x && @y < coord.y 
   end
   
-  # Returns the coordinate west of this one
   def west
     return Coord.new(@x-1, @y)
   end
   
-  # Modifies the current coordinate to be the one directly west
   def west!
     @x -= 1
   end
@@ -108,12 +99,10 @@ class Coord
     @y == coord.y && @x < coord.x
   end
   
-  # Returns the coordinate east of this one
   def east
     return Coord.new(@x+1, @y)
   end
   
-  # Modifies the current coordinate to be the one directly east
   def east!
     @x += 1
   end
@@ -126,12 +115,10 @@ class Coord
     @y == coord.y && @x > coord.x
   end
   
-  # Returns the coordinate northwest of this one
   def northwest
     return Coord.new(@x-1, @y+1)
   end
   
-  # Modifies the current coordinate to be the one directly nortwest
   def northwest!
     north!
     west!
@@ -141,12 +128,10 @@ class Coord
     @x < coord.x && @y > coord.y
   end
   
-  # Returns the coordinate northeast of this one
   def northeast
     return Coord.new(@x+1, @y+1)
   end
   
-  # Modifies the current coordinate to be the one directly northeast
   def northeast!
     north!
     east!
@@ -156,12 +141,10 @@ class Coord
     @x > coord.x && @y > coord.y
   end
   
-  # Returns the coordinate southwest from this one
   def southwest
     return Coord.new(@x-1, @y-1)
   end
   
-  # Modifies this coordinate to its southwest neighbour
   def southwest!
     south!
     west!
@@ -171,12 +154,10 @@ class Coord
     @x < coord.x && @y < coord.y 
   end
   
-  # Returns the coordinate southeast of this one
   def southeast
     return Coord.new(@x+1, @y-1)
   end
   
-  # Modifies this coordinate to its souteast neighbour
   def southeast!
     south!
     east!
@@ -186,33 +167,27 @@ class Coord
     @x > coord.x && @y < coord.y
   end
   
-  # Checks if the specified coordinate is on the same diagonal as this object
-  def on_diag?(c) 
+  def on_diag?(c)
     Coord.same_diag?(self, c)
   end
   
-  # Checks if the specified coordinate is on the same rank as this object
   def on_rank?(c)
     Coord.same_rank?(self, c)
   end
   
-  # Checks if the specified coordinate is on the same file as this object
-  def on_file?(c) 
+  def on_file?(c)
     Coord.same_file?(self, c)
   end    
   
-  # Checks if the the two specified coordinates are on the same diagonal
   def Coord.same_diag?(c0, c1)
     (c1.x - c0.x).abs == (c1.y - c0.y).abs
   end
   
-  # Checks if the two specified coordinates are on the same file
-  def Coord.same_file?(c0, c1) 
+  def Coord.same_file?(c0, c1)
     c0.x == c1.x
   end
   
-  # Checks if the two specified coordinates are on the same rank
-  def Coord.same_rank?(c0, c1) 
+  def Coord.same_rank?(c0, c1)
     c0.y == c1.y
   end
   
@@ -225,5 +200,8 @@ class Coord
   def to_alg
     return (97 + @x).chr + (@y + 1).to_s
   end
-end
 
+  def to_s
+    return to_alg
+  end
+end
