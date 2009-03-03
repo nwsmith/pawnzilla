@@ -451,7 +451,7 @@ class RulesEngine
   end
 
   def can_castle_queenside?(colour)
-    colour.black ? @black_can_castle_queenside : @white_can_castle_queenside
+    colour.black? ? @black_can_castle_queenside : @white_can_castle_queenside
   end
 
   def move?(src, dest)
@@ -485,6 +485,29 @@ class RulesEngine
       end
     else
       move_piece(src, dest)
+    end
+
+    if piece.king?
+      # set castle state to false
+      if (piece.colour == Colour::WHITE)
+        @white_can_castle_kingside = false
+        @white_can_castle_queenside = false
+      else
+        @black_can_castle_kingside = false
+        @black_can_castle_queenside = false
+      end
+    end
+
+    if piece.rook?
+      if src == Coord.new(0, 0)
+        @white_can_castle_kingside = false
+      elsif src == Coord.new(7, 0)
+        @white_can_castle_queenside = false
+      elsif src == Coord.new(0, 7)
+        @black_can_castle_kingside = false
+      elsif src == Coord.new(7, 7)
+        @black_can_castle_queenside = false
+      end
     end
 
     if piece.pawn? || dest_sq.piece.nil?
