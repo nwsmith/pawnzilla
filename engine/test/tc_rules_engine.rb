@@ -3760,4 +3760,181 @@ r - b q k b - r
   #----------------------------------------------------------------------------
   # Start check detection testing
   #----------------------------------------------------------------------------
+
+  #----------------------------------------------------------------------------
+  # Start 3 fold repeatition testing
+  #----------------------------------------------------------------------------
+  def test_knights_repeat_moving_should_stalemate
+    e = RulesEngine.new
+    place_pieces(e, "
+      K - - N - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      k - - n - - - -
+    ")
+
+    e.move!(D1, B2);
+    e.move!(D8, B7);
+    e.move!(B2, D1);
+    e.move!(B7, D8);
+
+    e.move!(D1, B2);
+    e.move!(D8, B7);
+    e.move!(B2, D1);
+    e.move!(B7, D8);
+
+    e.move!(D1, B2);
+    e.move!(D8, B7);
+    e.move!(B2, D1);
+    e.move!(B7, D8);
+
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+  end
+
+  def test_knights_repeat_moving_should_not_stalemate_on_two_repeats
+    e = RulesEngine.new
+    place_pieces(e, "
+      K - - N - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      k - - n - - - -
+    ")
+
+    e.move!(D1, B2);
+    e.move!(D8, B7);
+    e.move!(B2, D1);
+    e.move!(B7, D8);
+
+    e.move!(D1, B2);
+    e.move!(D8, B7);
+    e.move!(B2, D1);
+    e.move!(B7, D8);
+
+    assert(!e.draw?(Colour::WHITE))
+    assert(!e.draw?(Colour::BLACK))
+  end
+
+  def test_castling_state_should_affect_stalemate_on_3fold
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - K N - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      r - - k n - - -
+    ")
+
+    e.move!(E1, C2);
+    e.move!(E8, C7);
+    e.move!(C2, E1);
+    e.move!(C7, E8);
+
+
+    e.move!(D1, D2);
+    e.move!(D8, D7);
+    e.move!(D2, D1);
+    e.move!(D7, D8);
+
+
+    e.move!(E1, C2);
+    e.move!(E8, C7);
+    e.move!(C2, E1);
+    e.move!(C7, E8);
+
+    assert(!e.draw?(Colour::WHITE))
+    assert(!e.draw?(Colour::BLACK))
+
+    e.move!(E1, C2);
+    e.move!(E8, C7);
+    e.move!(C2, E1);
+    e.move!(C7, E8);
+
+    assert(e.draw?(Colour::WHITE))
+    assert(e.draw?(Colour::BLACK))
+
+  end
+
+  def test_king_move_should_set_can_castle_to_false
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - K - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      r - - k - - - r
+    ")
+
+    e.move!(D1, D2);
+    assert(!e.can_castle?(Colour::WHITE));
+  end
+
+  def test_rook_kingside_move_should_set_can_castle_kingside_to_false
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - K - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      r - - k - - - r
+    ")
+
+    e.move!(A1, A2);
+    assert(!e.can_castle_kingside?(Colour::WHITE));
+    assert(e.can_castle_queenside?(Colour::WHITE));
+  end
+
+  def test_rook_queenside_move_should_set_can_castle_kingside_to_false
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - K - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      r - - k - - - r
+    ")
+
+    e.move!(H1, H2);
+    assert(e.can_castle_kingside?(Colour::WHITE));
+    assert(!e.can_castle_queenside?(Colour::WHITE));
+  end
+
+  def test_move_pawn_should_not_affect_castle_check
+    e = RulesEngine.new
+    place_pieces(e, "
+      R - - K - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - - - - -
+      - - - - p - - -
+      r - - k - - - r
+    ")
+
+    e.move!(E2, E4);
+    assert(e.can_castle_kingside?(Colour::WHITE));
+    assert(e.can_castle_queenside?(Colour::WHITE));
+  end
+
 end

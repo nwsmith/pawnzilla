@@ -52,6 +52,7 @@ class RulesEngine
   def initialize()
     @move_list = []
     @fifty_mv_rule = 0
+    @three_fold_cache = {}
 
     @white_can_castle_kingside = true
     @white_can_castle_queenside = true
@@ -450,7 +451,7 @@ class RulesEngine
   end
 
   def can_castle_queenside?(colour)
-    colour.black ? @black_can_castle_queenside : @white_can_castle_queenside
+    colour.black? ? @black_can_castle_queenside : @white_can_castle_queenside
   end
 
   def move?(src, dest)
@@ -486,10 +487,42 @@ class RulesEngine
       move_piece(src, dest)
     end
 
+    if piece.king?
+      # set castle state to false
+      if (piece.colour == Colour::WHITE)
+        @white_can_castle_kingside = false
+        @white_can_castle_queenside = false
+      else
+        @black_can_castle_kingside = false
+        @black_can_castle_queenside = false
+      end
+    end
+
+    if piece.rook?
+      if src == Coord.new(0, 0)
+        @white_can_castle_kingside = false
+      elsif src == Coord.new(7, 0)
+        @white_can_castle_queenside = false
+      elsif src == Coord.new(0, 7)
+        @black_can_castle_kingside = false
+      elsif src == Coord.new(7, 7)
+        @black_can_castle_queenside = false
+      end
+    end
+
     if piece.pawn? || dest_sq.piece.nil?
       @fifty_mv_rule += 1
     else 
       @fifty_mv_rule = 0
+    end
+
+    if (dest_sq.piece.nil?)
+      cached_state = three_fold_hash;
+      @three_fold_cache.has_key?(cached_state) ?
+          @three_fold_cache[cached_state] += 1 :
+          @three_fold_cache[cached_state] = 1
+    else
+      @three_fold_cache.clear
     end
 
     @move_list.push(Move.new(src, dest))
@@ -1227,6 +1260,7 @@ class RulesEngine
   def draw?(colour_to_move)
     # fastest check
     return true if @fifty_mv_rule >= 50
+    return true if @three_fold_cache.values.any?{|i| i >= 3}
 
     # Check for only two kings.
     if (@pc_pos[Chess::Piece::KING] == (@clr_pos[Colour::WHITE] | @clr_pos[Colour::BLACK]))
@@ -1354,5 +1388,20 @@ class RulesEngine
   #----------------------------------------------------------------------------
   # End check detection
   #----------------------------------------------------------------------------
+
+  :private
+  def three_fold_hash
+    hash = to_txt
+    
+    # store the queen castling state
+    hash += @white_can_castle_kingside.to_s + @white_can_castle_queenside.to_s +
+        @black_can_castle_kingside.to_s + @black_can_castle_queenside.to_s
+      
+    # en passant state (simply the attack vectors for now)
+    hash += calculate_colour_attack(Colour::WHITE).to_s
+    hash += calculate_colour_attack(Colour::BLACK).to_s
+
+    hash
+  end
 
 end
